@@ -1,0 +1,147 @@
+# Saved Gotran model
+parameters("Model parameters",
+#           Ko = ScalarParam(5.4, unit="mM"),
+           Nao = ScalarParam(140, unit="mM"),
+           Cao = ScalarParam(1.8, unit="mM"),
+           Clo = ScalarParam(150, unit="mM"),
+           Ki = ScalarParam(135, unit="mM"),
+           Mgi = ScalarParam(1, unit="mM"),
+           Cli = ScalarParam(15, unit="mM"),
+           Rgas = ScalarParam(8314.3, unit="J*kmole**-1*K**-1"),
+           T = ScalarParam(310, unit="K"),
+           F = ScalarParam(96485, unit="C*mole**-1"),
+           Cm = ScalarParam(1.381e-10, unit="F"),
+           cell_length = ScalarParam(100, unit="um"),
+           cell_radius = ScalarParam(10.25, unit="um"))
+
+
+expressions("Model parameters")
+Vol_Cell = 3.141592654*(cell_radius/1000)**2*cell_length/1000**3 # l
+Vol_SR = 0.035*Vol_Cell # l
+Vol_SL = 0.02*Vol_Cell # l
+Vol_jct1 = 0.0539*0.01*Vol_Cell # l
+Vol_myo = 0.65*Vol_Cell # l
+
+parameters("Ca buffer", "Cytosolic",
+           Bmax_Calmodulin=ScalarParam(0.024, unit='mM'),
+           koff_Calmodulin=ScalarParam(0.238, unit='ms**-1'),
+           kon_Calmodulin=ScalarParam(34, unit='mM**-1*ms**-1')) 
+
+
+
+parameters(
+#T=ScalarParam(310),
+#           Ca_jct1=ScalarParam(0.0001737475),
+           Na_jct1=ScalarParam(8.80329),
+#           Ki=ScalarParam(135),
+           Ko=ScalarParam(5.4),
+           Na_SL=ScalarParam(8.80733),
+           #V=ScalarParam(-85.56885),
+#           F=ScalarParam(96485),
+#           Cao=ScalarParam(1.8),
+#           Nao=ScalarParam(140),
+#           Rgas=ScalarParam(8314.3),
+           Ca_Calmodulin=ScalarParam(0.0002911916, unit='mM'),
+           Ca_SL=ScalarParam(0.0001031812))
+
+states("Cell",
+       V = ScalarParam(-8.556885e1, unit="mV"))
+
+parameters("Cell",
+           stim_start = ScalarParam(100, unit="ms"),
+           stim_period = ScalarParam(1000, unit="ms"),
+           stim_duration = ScalarParam(5, unit="ms"),
+           stim_amplitude = ScalarParam(9.5, unit="uA*uF**-1"))
+ 
+states("Ca buffer",
+#       Ca_Calsequestrin = ScalarParam(1.242988, unit="mM"),
+#       Ca_SLB_SL = ScalarParam(1.110363e-1, unit="mM"),
+#       Ca_SLB_jct1 = ScalarParam(9.566355e-3, unit="mM"),
+#       Ca_SLHigh_SL = ScalarParam(7.297378e-2, unit="mM"),
+#       Ca_SLHigh_jct1 = ScalarParam(7.347888e-3, unit="mM"),
+#       Ca_SR = ScalarParam(5.545201e-1, unit="mM"),
+#       Ca_Calmodulin=ScalarParam(0.0002911916, unit='mM'),
+       Ca_jct1 = ScalarParam(1.737475e-4, unit="mM"))
+
+
+parameters("ICaL",
+           Fx_ICaL_SL=ScalarParam(0.1),
+           Fx_ICaL_jct1=ScalarParam(0.9),
+           PCa=ScalarParam(0.00054, unit='l*F**-1*ms**-1'),
+           PK=ScalarParam(2.7e-07, unit='l*F**-1*ms**-1'),
+           PNa=ScalarParam(1.5e-08, unit='l*F**-1*ms**-1'),
+           Q10_CaL=ScalarParam(1.8),
+           gamma_Cai=ScalarParam(0.341),
+           gamma_Cao=ScalarParam(0.341),
+           gamma_Ki=ScalarParam(0.75),
+           gamma_Ko=ScalarParam(0.75),
+           gamma_Nai=ScalarParam(0.75),
+           gamma_Nao=ScalarParam(0.75))
+
+states("ICaL", "FCa gate",
+       fCaB_SL=ScalarParam(0.01452605),
+       fCaB_jct1=ScalarParam(0.02421991))
+
+parameters("ICaL", "FCa gate",
+           lccCaInact=ScalarParam(1.7))
+
+states("ICaL", "d gate",
+       d=ScalarParam(7.175662e-06))
+
+states("ICaL", "f gate",
+       f=ScalarParam(1.000681))
+
+expressions("ICaL", "d gate")
+d_infinity = 1.0/(1 + 0.0892185174093*exp(-V/6))
+tau_d = (1 - 0.0892185174093*exp(-V/6))*d_infinity/(0.5075 + 0.035*V)
+dd_dt = (-d + d_infinity)/tau_d
+
+expressions("ICaL", "f gate")
+f_infinity = 1.0/(1 + 16964.681259*exp(0.277777777778*V)) + 0.6/(1 + exp(5/2 -\
+    V/20))
+tau_f = 1.0/(0.02 + 0.0197*exp(-((0.48865 + 0.0337*V)*(0.48865 + 0.0337*V))))
+df_dt = (-f + f_infinity)/tau_f
+
+expressions("ICaL", "FCa gate")
+fCa_SL = 1 - fCaB_SL
+fCa_jct1 = 1 - fCaB_jct1
+dfCaB_SL_dt = -0.0119*fCaB_SL + Ca_SL*lccCaInact*(1 - fCaB_SL)
+dfCaB_jct1_dt = -0.0119*fCaB_jct1 + Ca_jct1*lccCaInact*(1 - fCaB_jct1)
+
+expressions("ICaL")
+Q_CaL = pow(Q10_CaL, -31 + T/10)
+temp = 0.45*V*(F*F)*Q_CaL*d*f/(Rgas*T)
+i_CaL_Ca_jct1 = 4*Fx_ICaL_jct1*PCa*(-Cao*gamma_Cao +\
+    Ca_jct1*gamma_Cai*exp(2*F*V/(Rgas*T)))*fCa_jct1*temp/(-1 +\
+    exp(2*F*V/(Rgas*T)))
+i_CaL_Na_jct1 = Fx_ICaL_jct1*PNa*(-Nao*gamma_Nao +\
+    Na_jct1*gamma_Nai*exp(F*V/(Rgas*T)))*fCa_jct1*temp/(-1 +\
+    exp(F*V/(Rgas*T)))
+i_CaL_Ca_SL = 4*Fx_ICaL_SL*PCa*(-Cao*gamma_Cao +\
+    Ca_SL*gamma_Cai*exp(2*F*V/(Rgas*T)))*fCa_SL*temp/(-1 +\
+    exp(2*F*V/(Rgas*T)))
+i_CaL_Na_SL = Fx_ICaL_SL*PNa*(-Nao*gamma_Nao +\
+    Na_SL*gamma_Nai*exp(F*V/(Rgas*T)))*fCa_SL*temp/(-1 + exp(F*V/(Rgas*T)))
+i_CaL_K = PK*(Fx_ICaL_SL*fCa_SL + Fx_ICaL_jct1*fCa_jct1)*(-Ko*gamma_Ko +\
+    Ki*gamma_Ki*exp(F*V/(Rgas*T)))*temp/(-1 + exp(F*V/(Rgas*T)))
+i_CaL = i_CaL_Ca_SL + i_CaL_Ca_jct1 + i_CaL_K + i_CaL_Na_SL + i_CaL_Na_jct1
+
+
+
+
+
+expressions("Ca buffer")
+dCa_Calmodulin = -koff_Calmodulin*Ca_Calmodulin +\
+    kon_Calmodulin*(Bmax_Calmodulin - Ca_Calmodulin)*Ca_jct1
+#dCa_jct1_dt = -i_Ca_jct1_tot*Cm/(Vol_jct1*2*F) - J_Ca_jct1_SL/Vol_jct1 + j_rel_SR*Vol_SR/Vol_jct1 + j_leak_SR*Vol_myo/Vol_jct1 - 1*dCa_jct1_tot_bound
+dCa_jct1_tot_bound = dCa_Calmodulin 
+i_Ca_jct1_tot = i_CaL_Ca_jct1
+dCa_jct1_dt = -i_Ca_jct1_tot*Cm/(Vol_jct1*2*F)  - 1*dCa_jct1_tot_bound
+
+
+expressions("Cell")
+i_Stim = Conditional(And(Ge(time - floor(time/stim_period)*stim_period, stim_start), Le(time - floor(time/stim_period)*stim_period, stim_start + stim_duration), ), -stim_amplitude, 0) # uA*uF**-1
+# Only ICal 
+#dV_dt = -(i_CaL + i_Stim)
+dV_dt = -(i_Stim)
+
