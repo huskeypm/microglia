@@ -2,6 +2,7 @@
 
 Prelim data for microglia
 - CaM is not behaving as a state for some reason 
+- Voltage/stim potential needs to be corrected
 
 ### What is this repository for? ###
 
@@ -18,6 +19,8 @@ Prelim data for microglia
 * How to run tests
 
 gotranrun  ICaL.ode  --plot_y Ca_jct1 --tstop=2000 --dt 1.
+python /u1/pmke226/srcs//gotran/scripts/gotranrun  stim.ode  --plot_y cATP --tstop=100 --dt 0.1
+
 
 
 

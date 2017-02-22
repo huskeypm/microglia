@@ -1,0 +1,14 @@
+# Saved Gotran model
+
+parameters("Cell",
+           stim_period = ScalarParam(3., unit="ms"),
+           stim_amplitude = ScalarParam(0.0001, unit="uA*uF**-1"))
+
+states("Cell",
+       cATP = ScalarParam(0, unit="mM"))     
+
+expressions("Cell")
+rate = Conditional( Ge(sin(time/stim_period),0.0), stim_amplitude,-stim_amplitude) 
+dcATP_dt = rate      
+
+
