@@ -1,6 +1,7 @@
 # Saved Gotran model
 
 parameters("Model parameters",
+           logATP = ScalarParam(1e-3, unit="mM"),
            Ko = ScalarParam(5.4, unit="mM"),
            Nao = ScalarParam(140, unit="mM"),
            Cao = ScalarParam(1.8, unit="mM"),
@@ -32,9 +33,16 @@ parameters("Ca buffer", "Cytosolic",
 
 parameters("Cell",
            stim_start = ScalarParam(100, unit="ms"),
-           stim_period = ScalarParam(1000, unit="ms"),
+#          stim_period = ScalarParam(1000, unit="ms"),
+           stim_period = ScalarParam(3.0, unit="ms"),
            stim_duration = ScalarParam(5, unit="ms"),
-           stim_amplitude = ScalarParam(9.5, unit="uA*uF**-1"))
+#          stim_amplitude = ScalarParam(9.5, unit="uA*uF**-1"))
+           stim_amplitude = ScalarParam(0.0001, unit="uA*uF**-1"))
+                                           
+#           stim_start = ScalarParam(100, unit="ms"),
+#           stim_period = ScalarParam(1000, unit="ms"),
+#           stim_duration = ScalarParam(5, unit="ms"),
+#           stim_amplitude = ScalarParam(9.5, unit="uA*uF**-1"))
 
 parameters("Na buffer",
            Bmax_SL = ScalarParam(1.65, unit="mM"),
@@ -55,6 +63,14 @@ parameters("INaCa",
            ksat = 0.27,
            eta = 0.35,
            HNa = 3)
+
+parameters("P2X",
+           KdP2X = ScalarParam(1.0e-3, unit="mM"),
+           gCaP2X = ScalarParam(5.4e-4, unit="l*F**-1*ms**-1"))
+
+parameters("BDNF",
+           KdBDNF = ScalarParam(1.0e-3, unit="mM"),
+           gCaBDNF = ScalarParam(5.4e-4, unit="l*F**-1*ms**-1"))
 
 parameters("ICaL",
            PCa = ScalarParam(5.4e-4, unit="l*F**-1*ms**-1"),
@@ -91,6 +107,8 @@ parameters("ICaL", "FCa gate",
            lccCaInact = ScalarParam(1.7))
 
 states("Cell",
+#       V = ScalarParam(-8.556885e1, unit="mV"),
+#       logATP = ScalarParam(1e-3, unit="mM"))
        V = ScalarParam(-8.556885e1, unit="mV"))
 
 states("Na buffer",
@@ -232,19 +250,37 @@ dNa_jct1_dt = -Cm*(i_Na_jct1 + 3*i_NaCa_jct1 + i_Nab_jct1 + i_CaL_Na_jct1)/(Vol_
 dNa_SL_dt = -Cm*(i_Na_SL + 3*i_NaCa_SL + i_Nab_SL + i_CaL_Na_SL)/(Vol_SL*F) + (J_Na_jct1_SL - J_Na_SL_myo)/Vol_SL - dNa_SL_buf
 dNai_dt = J_Na_SL_myo/Vol_myo
 
-expressions("Ca buffer")
-dCa_Calmodulin = kon_Calmodulin * Ca_jct1 * (Bmax_Calmodulin - Ca_Calmodulin) - koff_Calmodulin * Ca_Calmodulin # mM*ms**-1
+#expressions("Ca buffer")
+#dCa_Calmodulin = kon_Calmodulin * Ca_jct1 * (Bmax_Calmodulin - Ca_Calmodulin) - koff_Calmodulin * Ca_Calmodulin # mM*ms**-1
 #dCa_Calmodulin = -koff_Calmodulin*Ca_Calmodulin +\
 #    kon_Calmodulin*(Bmax_Calmodulin - Ca_Calmodulin)*Ca_jct1
 #dCa_jct1_dt = -i_Ca_jct1_tot*Cm/(Vol_jct1*2*F) - J_Ca_jct1_SL/Vol_jct1 + j_rel_SR*Vol_SR/Vol_jct1 + j_leak_SR*Vol_myo/Vol_jct1 - 1*dCa_jct1_tot_bound
-dCa_jct1_tot_bound = dCa_Calmodulin 
-i_Ca_jct1_tot = i_CaL_Ca_jct1
-dCa_jct1_dt = -i_Ca_jct1_tot*Cm/(Vol_jct1*2*F)  - 1*dCa_jct1_tot_bound
+#dCa_jct1_tot_bound = dCa_Calmodulin 
+#i_Ca_jct1_tot = i_CaL_Ca_jct1
+#dCa_jct1_dt = -i_Ca_jct1_tot*Cm/(Vol_jct1*2*F)  - 1*dCa_jct1_tot_bound
 
 expressions("Cell")
 i_Stim = Conditional(And(Ge(time - floor(time/stim_period)*stim_period, stim_start), Le(time - floor(time/stim_period)*stim_period, stim_start + stim_duration), ), -stim_amplitude, 0) # uA*uF**-1
 # Only ICal 
 dV_dt = -(i_Nab + i_NaCa + i_CaL + i_Cab + i_Cap + i_Stim)
 #dV_dt = -(i_Stim)
+dlogcATP_dt = Conditional( Ge(sin(time/stim_period),0.0), stim_amplitude,-stim_amplitude)
+cATP = 10 ** (logATP)
+
+expressions("P2X")
+i_P2X = gCaP2X * 1/(1+(KdP2X/cATP))
+
+expressions("BDNF")
+i_BDNF = gCaBDNF * 1/(1+(KdBDNF/cATP))
+
+expressions("Ca buffer")
+dCa_Calmodulin = kon_Calmodulin * Ca_jct1 * (Bmax_Calmodulin - Ca_Calmodulin) - koff_Calmodulin * Ca_Calmodulin # mM*ms**-1
+#dCa_Calmodulin = -koff_Calmodulin*Ca_Calmodulin +\
+###    kon_Calmodulin*(Bmax_Calmodulin - Ca_Calmodulin)*Ca_jct1
+###dCa_jct1_dt = -i_Ca_jct1_tot*Cm/(Vol_jct1*2*F) - J_Ca_jct1_SL/Vol_jct1 + j_rel_SR*Vol_SR/Vol_jct1 + j_leak_SR*Vol_myo/Vol_jct1 - 1*dCa_jct1_tot_bound
+dCa_jct1_tot_bound = dCa_Calmodulin
+i_Ca_jct1_tot = i_CaL_Ca_jct1
+dCa_jct1_dt = - i_P2X * Cm/(Vol_jct1*2*F) - i_BDNF * Cm/(Vol_jct1*2*F) - 1*dCa_jct1_tot_bound
+
 
 
