@@ -21,6 +21,11 @@ Prelim data for microglia
 gotranrun  ICaL.ode  --plot_y Ca_jct1 --tstop=2000 --dt 1.
 python /u1/pmke226/srcs//gotran/scripts/gotranrun  stim.ode  --plot_y cATP --tstop=100 --dt 0.1
 
+or
+
+python ../wholecell/daisychain.py -odeName microglia.ode -dt 1 -dtn 2000 -name test
+
+
 
 
 
