@@ -1,0 +1,92 @@
+#### This model was completed to match suggestions given in email "pkh.ode" sent on Feb 24th 2017
+# This is a basic model that has a p2x conductance, logpATP value that oscilates between -6 and -3, and a i_BDNF that turns on at ~0.5 uM Ca_jct1
+#
+# 4/17/17 Realized that in order for the oscialtion to occur over a 1 sec interval, stim_period need to be changed to 1000.0. This meant that logpATP was refited to oscilate as needed.
+#
+# Next step is to add in istim, LCC, iCab, iCap, CaM, NaCa, and iNab. potentially need to adjust Na/Ca leak rates to balence Na/Ca entry
+
+
+parameters("Model parameters",
+#           logATP = ScalarParam(1e-3, unit="mM"),
+           Ko = ScalarParam(5.4, unit="mM"),
+           Nao = ScalarParam(140, unit="mM"),
+           Cao = ScalarParam(1.8, unit="mM"),
+           Clo = ScalarParam(150, unit="mM"),
+           Ki = ScalarParam(135, unit="mM"),
+           Mgi = ScalarParam(1, unit="mM"),
+           Cli = ScalarParam(15, unit="mM"),
+           Rgas = ScalarParam(8314.3, unit="J*kmole**-1*K**-1"),
+           T = ScalarParam(310, unit="K"),
+           F = ScalarParam(96485, unit="C*mole**-1"),
+           Cm = ScalarParam(1.381e-10, unit="F"),
+           cell_length = ScalarParam(100, unit="um"),
+           cell_radius = ScalarParam(10.25, unit="um"))
+
+parameters("Ca buffer", "Cytosolic",
+           #Ca_Calmodulin = ScalarParam(2.911916e-4, unit="mM"),
+           Ca_Calmodulin = ScalarParam(3.386533668e-4, unit="mM"),
+           Ca_SL = ScalarParam(1.031812e-4, unit="mM"),
+           Bmax_Calmodulin = ScalarParam(0.024, unit='mM'),
+           koff_Calmodulin = ScalarParam(0.238, unit='ms**-1'),
+           kon_Calmodulin = ScalarParam(34, unit='mM**-1*ms**-1'))
+
+parameters("Cell",
+	   #gCaP2X = ScalarParam(5.4e-4, unit="l*F**-1*ms**-1"),
+	    gCaBDNF = ScalarParam(5.4e-4, unit="l*F**-1*ms**-1"),
+            gCaP2X = ScalarParam(1.0e-3, unit="l*F**-1*ms**-1"),
+	    stim_start = ScalarParam(100, unit="ms"),
+            #stim_period = ScalarParam(5.0, unit="ms"),
+            stim_period = ScalarParam(1000.0, unit="ms"),
+            stim_duration = ScalarParam(5, unit="ms"),
+            stim_amplitude = ScalarParam(0.0001, unit="uA*uF**-1"))
+	    
+states("Ca buffer",
+#       Ca_Calsequestrin = ScalarParam(1.242988, unit="mM"),
+#       Ca_SLB_SL = ScalarParam(1.110363e-1, unit="mM"),
+#       Ca_SLB_jct1 = ScalarParam(9.566355e-3, unit="mM"),
+#       Ca_SLHigh_SL = ScalarParam(7.297378e-2, unit="mM"),
+#       Ca_SLHigh_jct1 = ScalarParam(7.347888e-3, unit="mM"),
+#       Ca_SR = ScalarParam(5.545201e-1, unit="mM"),
+#       Ca_Calmodulin=ScalarParam(0.0002911916, unit='mM'),
+#       Ca_Calmodulin = ScalarParam(2.911916e-4, unit="mM"),
+#       Ca_SL = ScalarParam(1.031812e-4, unit="mM"),
+#       Ca_jct1 = ScalarParam(1.737475e-4, unit="mM"))
+	Ca_jct1 = ScalarParam(1.0e-4, unit="mM"))
+
+states("Cell",
+       V = ScalarParam(-8.556885e1, unit="mV"),
+       BDNF = ScalarParam(0, unit="mM"),
+       logpATP = ScalarParam(-6, unit="logM"))
+
+expressions("Model parameters")
+Vol_Cell = 3.141592654*(cell_radius/1000)**2*cell_length/1000**3 # l
+Vol_SR = 0.035*Vol_Cell # l
+Vol_SL = 0.002*Vol_Cell # l BDS updated 3/29/2017 from 0.02 to 0.002 to base off Morotti
+Vol_jct1 = 0.000539*Vol_Cell # l BDS updated 3/29/2017 from 0.0539*0.01 to 0.000539 to base off Morotti
+Vol_myo = 0.65*Vol_Cell # l
+
+expressions("Cell")
+i_Stim = Conditional(And(Ge(time - floor(time/stim_period)*stim_period, stim_start), Le(time - floor(time/stim_period)*stim_period, stim_start + stim_duration), ), -stim_amplitude, 0) # uA*uF**-1
+# Only ICal 
+# #dV_dt = -(i_Nab + i_NaCa + i_CaL + i_Cab + i_Cap + i_Stim)
+dV_dt = 0 # need to leave this as a state, since the runner tries to record these data
+dlogpATP_dt = 0.0068 *  (sin(3.141 * time/stim_period))**3
+cATP = 10 ** (logpATP)
+i_P2X = Conditional(Ge(cATP, 1.0e-4), -gCaP2X ,0)
+r_BDNF = Conditional(Ge(Ca_jct1, 1.3e-4), gCaBDNF, 0)
+dBDNF_dt = r_BDNF
+
+expressions("Ca buffer")
+#dCa_Calmodulin = kon_Calmodulin * Ca_jct1 * (Bmax_Calmodulin - Ca_Calmodulin) - koff_Calmodulin * Ca_Calmodulin # mM*ms**-1
+#dCa_Calmodulin = -koff_Calmodulin*Ca_Calmodulin +\
+###    kon_Calmodulin*(Bmax_Calmodulin - Ca_Calmodulin)*Ca_jct1
+###dCa_jct1_dt = -i_Ca_jct1_tot*Cm/(Vol_jct1*2*F) - J_Ca_jct1_SL/Vol_jct1 + j_rel_SR*Vol_SR/Vol_jct1 + j_leak_SR*Vol_myo/Vol_jct1 - 1*dCa_jct1_tot_bound
+#dCa_jct1_tot_bound = dCa_Calmodulin
+#i_Ca_jct1_tot = i_CaL_Ca_jct1
+#dCa_jct1_dt = - i_P2X * Cm/(Vol_jct1*2*F)# - i_BDNF * Cm/(Vol_jct1*2*F) - 1*dCa_jct1_tot_bound
+#iNCX = 1e-5/5. # uM/ms 
+iNCX = 0. # uM/ms 
+dCa_jct1_dt = - i_P2X * Cm/(Vol_jct1*2*F) - iNCX
+
+
+

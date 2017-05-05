@@ -1,0 +1,240 @@
+#### This model was completed to match suggestions given in email "pkh.ode" sent on Feb 24th 2017
+# This is a basic model that has a p2x conductance, logpATP value that oscilates between -6 and -3, and a i_BDNF that turns on at ~0.5 uM Ca_jct1
+#
+# 4/17/17 Realized that in order for the oscialtion to occur over a 1 sec interval, stim_period need to be changed to 1000.0. This meant that logpATP was refited to oscilate as needed.
+#
+# Next step is to add in istim, LCC, iCab, iCap, CaM, NaCa, and iNab. potentially need to adjust Na/Ca leak rates to balence Na/Ca entry
+
+
+parameters("Model parameters",
+#           logATP = ScalarParam(1e-3, unit="mM"),
+           Ko = ScalarParam(5.4, unit="mM"),
+           Nao = ScalarParam(140, unit="mM"),
+           Cao = ScalarParam(1.8, unit="mM"),
+           Clo = ScalarParam(150, unit="mM"),
+           Ki = ScalarParam(135, unit="mM"),
+           Mgi = ScalarParam(1, unit="mM"),
+           Cli = ScalarParam(15, unit="mM"),
+           Rgas = ScalarParam(8314.3, unit="J*kmole**-1*K**-1"),
+           T = ScalarParam(310, unit="K"),
+           F = ScalarParam(96485, unit="C*mole**-1"),
+           Cm = ScalarParam(1.381e-10, unit="F"),
+           cell_length = ScalarParam(100, unit="um"),
+           cell_radius = ScalarParam(10.25, unit="um"),
+           nuc_radius = ScalarParam(5.0,unit="um"), # BDS 4/21/2017 added this parameter to get radius of nucleus
+	   nuclear_pore_length = ScalarParam(0.120, unit="um")) # BDS 4/21/2017 added this parameter to take into account diffusion of NFAT into/out of nucleus. Need to find lit value (value taken from wikipedia).
+
+parameters("INa",
+           #G_INa = ScalarParam(16, unit="mS*uF**-1"), # Rabbit Original
+           G_INa = ScalarParam(10, unit="mS*uF**-1"), # Mouse CES 11/20/15
+           #Fx_Na_jct1 = 0.11, # Rabbit Original
+           #Fx_Na_SL = 0.89) # Rabbit Original
+           Fx_Na_jct1 = 0.19, # Mouse CES 9/24/15
+           Fx_Na_SL = 0.81) # Mouse CES 9/24/15
+
+parameters("Ca buffer", "Cytosolic",
+           PNFAT = ScalarParam(8.91e-6,unit="l*F**-1*ms**-1"),
+           Ca_SL = ScalarParam(1.031812e-4, unit="mM"),  # BDS 4/19/2017 moved from Ca buffer state to have code compile. Need to fix in future.
+           #Bmax_TroponinC = ScalarParam(0.07, unit="mM"),
+           #Bmax_TroponinC_Ca_Mg_Ca = ScalarParam(0.14, unit="mM"),
+           #Bmax_TroponinC_Ca_Mg_Mg = ScalarParam(0.14, unit="mM"),
+           Bmax_Calmodulin = ScalarParam(0.024, unit="mM"),
+           Bmax_Calcineurin = ScalarParam(0.0109, unit="mM"), # BDS 4/19/17 taken from literature. "The Calcineurin B Subunit (CnB) Is a New Ligand of Integrin aM That Mediates CnB-Induced Apo2L/TRAIL Expression in Macrophages", Liu et al. The journal of Immunology.
+           Bmax_NFAT = ScalarParam(0.02, unit="mM"), # BDS 4/20/2017 need to find a value from literature.
+           #Bmax_Myosin_Ca = ScalarParam(0.14, unit="mM"),
+           #Bmax_Myosin_Mg = ScalarParam(0.14, unit="mM"),
+           #Bmax_SRB = ScalarParam(0.0171, unit="mM"),
+           #kon_TroponinC = ScalarParam(32.7, unit="mM**-1*ms**-1"),
+           #kon_TroponinC_Ca_Mg_Ca = ScalarParam(2.37, unit="mM**-1*ms**-1"),
+           #kon_TroponinC_Ca_Mg_Mg = ScalarParam(3e-3, unit="mM**-1*ms**-1"),
+           kon_Calmodulin = ScalarParam(34, unit="mM**-1*ms**-1"),
+           kon_Calcineurin = ScalarParam(46, unit="mM**-1*ms**-1"),  # BDS 4/19/17 taken from literature. "Kinetics of calmodulin binding to calcineurin", Quintana et al., biochemical and biophysical research communications.
+           kon_NFAT = ScalarParam(30, unit="mM**-1*ms**-1"), # BDS 4/20/2017 need to find a value from literature.
+           #kon_Myosin_Ca = ScalarParam(13.8, unit="mM**-1*ms**-1"),
+           #kon_Myosin_Mg = ScalarParam(15.7e-3, unit="mM**-1*ms**-1"),
+           #kon_SRB = ScalarParam(100, unit="mM**-1*ms**-1"),
+           #koff_TroponinC = ScalarParam(19.6e-3, unit="ms**-1"),
+           #koff_TroponinC_Ca_Mg_Ca = ScalarParam(0.032e-3, unit="ms**-1"),
+           #koff_TroponinC_Ca_Mg_Mg = ScalarParam(3.33e-3, unit="ms**-1"),
+           koff_Calmodulin = ScalarParam(238e-3, unit="ms**-1"),
+           koff_Calcineurin = ScalarParam(0.0012e-3, unit="ms**-1"),  # BDS 4/19/17 taken from literature. "Kinetics of calmodulin binding to calcineurin", Quintana et al., biochemical and biophysical research communications.
+           koff_NFAT = ScalarParam(0.001e-3, unit="ms**-1"))
+           #koff_Myosin_Ca = ScalarParam(0.46e-3, unit="ms**-1"),
+           #koff_Myosin_Mg = ScalarParam(0.057e-3, unit="ms**-1"),
+           #koff_SRB = ScalarParam(60e-3, unit="ms**-1"))
+
+#parameters("Ca buffer",
+           #Bmax_SLB_SL = ScalarParam(0.0374, unit="mM"),
+           #Bmax_SLB_jct1 = ScalarParam(0.0046, unit="mM"),
+           #Bmax_SLHigh_SL = ScalarParam(0.0134, unit="mM"),
+           #Bmax_SLHigh_jct1 = ScalarParam(0.00165, unit="mM"),
+           #Bmax_Calsequestrin = ScalarParam(0.14, unit="mM"),
+           #kon_SL = ScalarParam(100, unit="mM**-1*ms**-1"),
+           #kon_Calsequestrin = ScalarParam(100, unit="mM**-1*ms**-1"),
+           #koff_SLB = ScalarParam(1.3, unit="ms**-1"),
+           #koff_SLHigh = ScalarParam(30e-3, unit="ms**-1"),
+           #koff_Calsequestrin = ScalarParam(65, unit="ms**-1"))
+
+parameters("Cell",
+	    #gCaP2X = ScalarParam(5.4e-4, unit="l*F**-1*ms**-1"),
+	    kD_BDNF = ScalarParam(0.3, unit="l*F**-1*ms**-1"),
+	    gCaBDNF = ScalarParam(5.4e-4, unit="l*F**-1*ms**-1"),
+            gCaP2X = ScalarParam(1.0e-3, unit="l*F**-1*ms**-1"),
+	    stim_start = ScalarParam(100, unit="ms"),
+            #stim_period = ScalarParam(5.0, unit="ms"),
+            stim_period = ScalarParam(1000.0, unit="ms"),
+            stim_duration = ScalarParam(5, unit="ms"),
+            stim_amplitude = ScalarParam(0.0001, unit="uA*uF**-1"))
+	  
+parameters("INaCa",
+            V_max_INaCa = ScalarParam(1e-5, unit="uA*uF**-1"), # Mouse CES 9/24/15
+            Fx_NCX_jct1 = 0.19,  # Mouse CES 11/20/15
+            Fx_NCX_SL = 0.81,  # Mouse CES 11/20/15
+            Q10_NCX = 1.57,
+            K_mNai = ScalarParam(12.29, unit="mM"),
+            K_mCao = ScalarParam(1.3, unit="mM"),
+            K_mNao = ScalarParam(87.5, unit="mM"),
+            K_mCai = ScalarParam(0.00359, unit="mM"),
+            Kd_act = ScalarParam(0.000128, unit="mM"), # Mouse CES 9/24/15
+            ksat = 0.27,
+            eta = 0.35,
+            HNa = 3)
+ 
+parameters("Na buffer",
+           Bmax_SL = ScalarParam(1.65, unit="mM"),
+           Bmax_jct1 = ScalarParam(7.561, unit="mM"),
+           kon = ScalarParam(0.0001, unit="mM**-1*ms**-1"),
+           koff = ScalarParam(1e-3, unit="ms**-1"))
+ 
+states("Ca buffer",
+        #Ca_Calsequestrin = ScalarParam(1.242988, unit="mM"),
+        #Ca_SLB_SL = ScalarParam(1.110363e-1, unit="mM"),
+        #Ca_SLB_jct1 = ScalarParam(9.566355e-3, unit="mM"),
+        #Ca_SLHigh_SL = ScalarParam(7.297378e-2, unit="mM"),
+        #Ca_SLHigh_jct1 = ScalarParam(7.347888e-3, unit="mM"),
+        #Ca_SR = ScalarParam(5.545201e-1, unit="mM"),
+        #Ca_jct1 = ScalarParam(1.737475e-4, unit="mM"),
+        #Ca_SL = ScalarParam(1.031812e-4, unit="mM"),
+        #Cai = ScalarParam(8.597401e-5, unit="mM"))
+	Ca_jct1 = ScalarParam(1.0e-4, unit="mM"))
+
+states("Ca buffer", "Cytosolic",
+       #Ca_TroponinC = ScalarParam(8.773191e-3, unit="mM"),
+       #Ca_TroponinC_Ca_Mg = ScalarParam(1.078283e-1, unit="mM"),
+       #Mg_TroponinC_Ca_Mg = ScalarParam(1.524002e-2, unit="mM"),
+       Ca_Calmodulin = ScalarParam(2.911916e-4, unit="mM"),
+       CaM_Calcineurin = ScalarParam(1e-6, unit="mM"),  # BDS 4/20/2017 need to find a value from literature. Review article said that calcineurin could have lower concentration but rises as one ages.
+       Ca_NFAT_active = ScalarParam(1e-5 , unit="mM"), # BDS 4/20/2017 need to find a value from literature.
+       Ca_NFAT_Nucleus =  ScalarParam(1e-8, unit="mM")) # BDS 4/20/2017 need to find a value from literature.
+       #Ca_Myosin = ScalarParam(1.298754e-3, unit="mM"),
+       #Mg_Myosin = ScalarParam(1.381982e-1, unit="mM"),
+       #Ca_SRB = ScalarParam(2.143165e-3, unit="mM"))
+
+states("Na buffer",
+        # PKH mouse 
+        Na_jct1_buf = ScalarParam(3.999892, unit="mM"), # PKH mouse 
+        Na_SL_buf = ScalarParam(8.710854e-1, unit="mM"), # PKH mouse 
+        Na_jct1 = ScalarParam(12.0, unit="mM"), # BDS rat 
+        Na_SL = ScalarParam(12.0, unit="mM"), # BDS rat 
+        Nai = ScalarParam(12.0, unit="mM")) # BDS rat
+      
+states("Cell",
+       V = ScalarParam(-8.556885e1, unit="mV"),
+       BDNF = ScalarParam(0, unit="mM"),
+       logpATP = ScalarParam(-6, unit="logM"))
+
+expressions("Model parameters")
+Vol_Cell = 3.141592654*(cell_radius/1000)**2*cell_length/1000**3 # l  Equal to 33 pL (assume cylinder shape)
+Vol_SR = 0.035*Vol_Cell # l
+Vol_SL = 0.002*Vol_Cell # l BDS updated 3/29/2017 from 0.02 to 0.002 to base off Morotti
+Vol_jct1 = 0.000539*Vol_Cell # l BDS updated 3/29/2017 from 0.0539*0.01 to 0.000539 to base off Morotti
+Vol_myo = 0.65*Vol_Cell # l
+Vol_Nuc = 3.141592654 * (4/3) * nuc_radius**3 # l # BDS 4/20/2017 added to accound for volume of nucleus Equal to 0.524 pL given radius is 5e-4 cm (5.0 um) (assuming sphere shape)
+SufArea_Nuc_inner = 4 * 3.141592654 * nuc_radius**2
+SufArea_Nuc_outer = 4 * 3.141592654 * (nuc_radius + nuclear_pore_length)**2
+
+expressions("Ion diffusion")
+J_Na_jct1_SL = (Na_jct1 - Na_SL)*1.8313e-14 # mmole*ms**-1
+J_Na_SL_myo = (Na_SL - Nai)*1.6386e-12 # mmole*ms**-1
+J_Ca_jct1_SL = (Ca_jct1 - Ca_SL)*8.2413e-13 # mmole*ms**-1
+J_Ca_SL_myo = (Ca_SL - Ca_jct1)*3.7243e-12 # mmole*ms**-1
+
+expressions("Na buffer")
+dNa_jct1_buf = kon*Na_jct1*(Bmax_jct1 - Na_jct1_buf) - koff*Na_jct1_buf # mM*ms**-1
+dNa_SL_buf = kon*Na_SL*(Bmax_SL - Na_SL_buf) - koff*Na_SL_buf # mM*ms**-1
+dNa_jct1_buf_dt = dNa_jct1_buf
+dNa_SL_buf_dt = dNa_SL_buf
+#dNa_jct1_dt = -Cm*(i_Na_jct1 + 3*i_NaCa_jct1 + i_Nab_jct1 + 3*i_NaK_jct1 + i_CaL_Na_jct1)/(Vol_jct1*F) - J_Na_jct1_SL/Vol_jct1 - dNa_jct1_buf
+#dNa_SL_dt = -Cm*(i_Na_SL + 3*i_NaCa_SL + i_Nab_SL + 3*i_NaK_SL + i_CaL_Na_SL)/(Vol_SL*F) + (J_Na_jct1_SL - J_Na_SL_myo)/Vol_SL - dNa_SL_buf
+dNa_jct1_dt = 0  # BDS 4/19/2017 need to fix this at some point. Done to make the Na buffer compile.
+dNa_SL_dt = 0  # BDS 4/19/2017 need to fix this at some point. Done to make the Na buffer compile.
+dNai_dt = J_Na_SL_myo/Vol_myo
+
+expressions("Cell")
+i_Stim = Conditional(And(Ge(time - floor(time/stim_period)*stim_period, stim_start), Le(time - floor(time/stim_period)*stim_period, stim_start + stim_duration), ), -stim_amplitude, 0) # uA*uF**-1
+# Only ICal 
+# #dV_dt = -(i_Nab + i_NaCa + i_CaL + i_Cab + i_Cap + i_Stim)
+dV_dt = 0 # need to leave this as a state, since the runner tries to record these data
+dlogpATP_dt = 0.007 *  (sin(3.141 * time/stim_period))**3  # Oscilation between -6 and -3
+#dlogpATP_dt = 0.003 *  (sin(3.141 * time/stim_period))**3  # Oscilation between -6 and -4.75
+#dlogpATP_dt = 0.005 *  (sin(3.141 * time/stim_period))**3  # Oscilation between -6 and -3.9
+cATP = 10 ** (logpATP)
+i_P2X = Conditional(Ge(cATP, 6.3e-4), -gCaP2X ,0)
+r_BDNF = Conditional(Ge(Ca_jct1, kD_BDNF), gCaBDNF, 0)
+dBDNF_dt = r_BDNF
+
+expressions("INaCa")
+temp_jct1 = (exp(eta*V*F/(Rgas*T))*Na_jct1**HNa*Cao - exp((eta - 1)*V*F/(Rgas*T))*Nao**HNa*Ca_jct1)/(1 + ksat*exp((eta - 1)*V*F/(Rgas*T))) # mM**4
+temp_SL = (exp(eta*V*F/(Rgas*T))*Na_SL**HNa*Cao - exp((eta - 1)*V*F/(Rgas*T))*Nao**HNa*Ca_SL)/(1 + ksat*exp((eta - 1)*V*F/(Rgas*T))) # mM**4
+Q_NCX = Q10_NCX**((T - 310)/10)
+Ka_SL = 1/(1 + (Kd_act/Ca_SL)**3)
+Ka_jct1 = 1/(1 + (Kd_act/Ca_jct1)**3)
+i_NaCa_jct1 = Fx_NCX_jct1*V_max_INaCa*Ka_jct1*Q_NCX*temp_jct1/(K_mCai*Nao**HNa*(1 + (Na_jct1/K_mNai)**HNa) + K_mNao**HNa*Ca_jct1*(1 + Ca_jct1/K_mCai) + K_mCao*Na_jct1**HNa + Na_jct1**HNa*Cao + Nao**HNa*Ca_jct1) # uA*uF**-1
+i_NaCa_SL = Fx_NCX_SL*V_max_INaCa*Ka_SL*Q_NCX*temp_SL/(K_mCai*Nao**HNa*(1 + (Na_SL/K_mNai)**HNa) + K_mNao**HNa*Ca_SL*(1 + Ca_SL/K_mCai) + K_mCao*Na_SL**HNa + Na_SL**HNa*Cao + Nao**HNa*Ca_SL) # uA*uF**-1
+#i_NaCa = i_NaCa_jct1 + i_NaCa_SL # uA*uF**-1
+#i_NaCa = V_max_INaCa  # uA*uF**-1  # BDS 4/19/2017 need to fix this at some point. Done to make Ca_jct1 oscilate as return to steady state.
+i_NaCa = Conditional(Ge(Ca_jct1, 1.001e-4), V_max_INaCa, 0)  # uA*uF**-1  # BDS 4/19/2017 need to fix this at some point. Done to make Ca_jct1 oscilate as return to steady state.
+
+expressions("Ca buffer", "Cytosolic")
+#dCa_TroponinC = kon_TroponinC*Cai*(Bmax_TroponinC - Ca_TroponinC) - koff_TroponinC*Ca_TroponinC # mM*ms**-1
+NFAT_diffusion = (Ca_NFAT_active - Ca_NFAT_Nucleus) * PNFAT  #+ ((((Ca_NFAT_CN_Cytosol/Vol_jct1) - (Ca_NFAT_CN_Nucleus/Vol_Nuc))/nuclear_pore_length) * SufArea_Nuc_outer * PNFAT)   # mM*ms**-1
+#dCa_TroponinC_Ca_Mg = kon_TroponinC_Ca_Mg_Ca*Cai*(Bmax_TroponinC_Ca_Mg_Ca - (Ca_TroponinC_Ca_Mg + Mg_TroponinC_Ca_Mg)) - koff_TroponinC_Ca_Mg_Ca*Ca_TroponinC_Ca_Mg # mM*ms**-1
+#dMg_TroponinC_Ca_Mg = kon_TroponinC_Ca_Mg_Mg*Mgi*(Bmax_TroponinC_Ca_Mg_Mg - (Ca_TroponinC_Ca_Mg + Mg_TroponinC_Ca_Mg)) - koff_TroponinC_Ca_Mg_Mg*Mg_TroponinC_Ca_Mg # mM*ms**-1
+dCa_Calmodulin_dt = kon_Calmodulin * Ca_jct1 * (Bmax_Calmodulin - Ca_Calmodulin) - koff_Calmodulin*Ca_Calmodulin # mM*ms**-1
+dCaM_Calcineurin_dt = kon_Calcineurin * Ca_Calmodulin * (Bmax_Calcineurin - CaM_Calcineurin) - koff_Calcineurin * CaM_Calcineurin # mM*ms**-1
+dCa_NFAT_active_dt = -kon_NFAT * CaM_Calcineurin * (Bmax_NFAT - Ca_NFAT_active) + koff_NFAT * Ca_NFAT_active - NFAT_diffusion 
+#dCa_Myosin = kon_Myosin_Ca*Cai*(Bmax_Myosin_Ca - (Ca_Myosin + Mg_Myosin)) - koff_Myosin_Ca*Ca_Myosin # mM*ms**-1
+dCa_NFAT_Nucleus_dt =  NFAT_diffusion
+#dMg_Myosin = kon_Myosin_Mg*Mgi*(Bmax_Myosin_Mg - (Ca_Myosin + Mg_Myosin)) - koff_Myosin_Mg*Mg_Myosin # mM*ms**-1
+#dCa_SRB = kon_SRB*Cai*(Bmax_SRB - Ca_SRB) - koff_SRB*Ca_SRB # mM*ms**-1
+#dCa_cytosol_tot_bound = dCa_TroponinC + dCa_TroponinC_Ca_Mg + dMg_TroponinC_Ca_Mg + dCa_Calmodulin + dCa_Myosin + dMg_Myosin + dCa_SRB # mM*ms**-1
+#dCa_TroponinC_dt = dCa_TroponinC
+#dCa_TroponinC_Ca_Mg_dt = dCa_TroponinC_Ca_Mg
+#dMg_TroponinC_Ca_Mg_dt = dMg_TroponinC_Ca_Mg
+#dCa_Myosin_dt = dCa_Myosin
+#dMg_Myosin_dt = dMg_Myosin
+#dCa_SRB_dt = dCa_SRB
+
+expressions("Ca buffer")
+#dCalsequestrin = kon_Calsequestrin*Ca_SR*(Bmax_Calsequestrin*Vol_myo/Vol_SR - Ca_Calsequestrin) - koff_Calsequestrin*Ca_Calsequestrin # mM*ms**-1
+#dCa_Calsequestrin_dt = dCalsequestrin
+#dCa_SLB_SL = kon_SL*Ca_SL*(Bmax_SLB_SL*Vol_myo/Vol_SL - Ca_SLB_SL) - koff_SLB*Ca_SLB_SL # mM*ms**-1
+#dCa_SLB_jct1 = kon_SL*Ca_jct1*(Bmax_SLB_jct1*0.1*Vol_myo/Vol_jct1 - Ca_SLB_jct1) - koff_SLB*Ca_SLB_jct1 # mM*ms**-1
+#dCa_SLHigh_SL = kon_SL*Ca_SL*(Bmax_SLHigh_SL*Vol_myo/Vol_SL - Ca_SLHigh_SL) - koff_SLHigh*Ca_SLHigh_SL # mM*ms**-1
+#dCa_SLHigh_jct1 = kon_SL*Ca_jct1*(Bmax_SLHigh_jct1*0.1*Vol_myo/Vol_jct1 - Ca_SLHigh_jct1) - koff_SLHigh*Ca_SLHigh_jct1 # mM*ms**-1
+#dCa_SLB_SL_dt = dCa_SLB_SL
+#dCa_SLB_jct1_dt = dCa_SLB_jct1
+#dCa_SLHigh_SL_dt = dCa_SLHigh_SL
+#dCa_SLHigh_jct1_dt = dCa_SLHigh_jct1
+#dCa_jct1_tot_bound = dCa_SLB_jct1 + dCa_SLHigh_jct1 # mM*ms**-1
+#dCa_SL_tot_bound = dCa_SLB_SL + dCa_SLHigh_SL # mM*ms**-1
+#i_Ca_jct1_tot = i_CaL_Ca_jct1 - 2*i_NaCa_jct1 + i_Cab_jct1 + i_Cap_jct1 # uA*uF**-1
+#i_Ca_SL_tot = i_CaL_Ca_SL - 2*i_NaCa_SL + i_Cab_SL + i_Cap_SL # uA*uF**-1
+#dCa_SR_dt = j_pump_SR - (j_leak_SR*Vol_myo/Vol_SR + j_rel_SR) - dCalsequestrin
+#dCa_jct1_dt = -i_Ca_jct1_tot*Cm/(Vol_jct1*2*F) - J_Ca_jct1_SL/Vol_jct1 + j_rel_SR*Vol_SR/Vol_jct1 + j_leak_SR*Vol_myo/Vol_jct1 - 1*dCa_jct1_tot_bound
+#dCa_SL_dt = -i_Ca_SL_tot*Cm/(Vol_SL*2*F) + (J_Ca_jct1_SL - J_Ca_SL_myo)/Vol_SL - 1*dCa_SL_tot_bound
+#dCai_dt = -j_pump_SR*Vol_SR/Vol_myo + J_Ca_SL_myo/Vol_myo - 1*dCa_cytosol_tot_bound
+dCa_jct1_dt = - i_P2X * Cm/(Vol_jct1*2*F)  - i_NaCa
+
+
+
