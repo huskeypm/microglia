@@ -20,9 +20,9 @@ parameters("Model parameters",
            F = ScalarParam(96485, unit="C*mole**-1"),
            Cm = ScalarParam(1.381e-10, unit="F"),
            cell_length = ScalarParam(100, unit="um"),
-           cell_radius = ScalarParam(10.25, unit="um"),
-           nuc_radius = ScalarParam(5.0,unit="um"), # BDS 4/21/2017 added this parameter to get radius of nucleus
-	   nuclear_pore_length = ScalarParam(0.120, unit="um")) # BDS 4/21/2017 added this parameter to take into account diffusion of NFAT into/out of nucleus. Need to find lit value (value taken from wikipedia).
+           cell_radius = ScalarParam(10.25, unit="um"))
+           #nuc_radius = ScalarParam(5.0,unit="um"), # BDS 4/21/2017 added this parameter to get radius of nucleus
+	   #nuclear_pore_length = ScalarParam(0.120, unit="um")) # BDS 4/21/2017 added this parameter to take into account diffusion of NFAT into/out of nucleus. Need to find lit value (value taken from wikipedia).
 
 parameters("INa",
            #G_INa = ScalarParam(16, unit="mS*uF**-1"), # Rabbit Original
@@ -124,8 +124,8 @@ states("Ca buffer", "Cytosolic",
        #Mg_TroponinC_Ca_Mg = ScalarParam(1.524002e-2, unit="mM"),
        Ca_Calmodulin = ScalarParam(2.911916e-4, unit="mM"),
        CaM_Calcineurin = ScalarParam(1e-6, unit="mM"),  # BDS 4/20/2017 need to find a value from literature. Review article said that calcineurin could have lower concentration but rises as one ages.
-       Ca_NFAT_active = ScalarParam(1e-5 , unit="mM"), # BDS 4/20/2017 need to find a value from literature.
-       Ca_NFAT_Nucleus =  ScalarParam(1e-8, unit="mM")) # BDS 4/20/2017 need to find a value from literature.
+       Ca_NFAT_active = ScalarParam(1e-5 , unit="mM"),  # BDS 4/20/2017 need to find a value from literature.
+       Ca_NFAT_Nucleus =  ScalarParam(1e-6, unit="mM")) # BDS 4/20/2017 need to find a value from literature.
        #Ca_Myosin = ScalarParam(1.298754e-3, unit="mM"),
        #Mg_Myosin = ScalarParam(1.381982e-1, unit="mM"),
        #Ca_SRB = ScalarParam(2.143165e-3, unit="mM"))
@@ -149,9 +149,9 @@ Vol_SR = 0.035*Vol_Cell # l
 Vol_SL = 0.002*Vol_Cell # l BDS updated 3/29/2017 from 0.02 to 0.002 to base off Morotti
 Vol_jct1 = 0.000539*Vol_Cell # l BDS updated 3/29/2017 from 0.0539*0.01 to 0.000539 to base off Morotti
 Vol_myo = 0.65*Vol_Cell # l
-Vol_Nuc = 3.141592654 * (4/3) * nuc_radius**3 # l # BDS 4/20/2017 added to accound for volume of nucleus Equal to 0.524 pL given radius is 5e-4 cm (5.0 um) (assuming sphere shape)
-SufArea_Nuc_inner = 4 * 3.141592654 * nuc_radius**2
-SufArea_Nuc_outer = 4 * 3.141592654 * (nuc_radius + nuclear_pore_length)**2
+#Vol_Nuc = 3.141592654 * (4/3) * nuc_radius**3 # l # BDS 4/20/2017 added to accound for volume of nucleus Equal to 0.524 pL given radius is 5e-4 cm (5.0 um) (assuming sphere shape)
+#SufArea_Nuc_inner = 4 * 3.141592654 * nuc_radius**2
+#SufArea_Nuc_outer = 4 * 3.141592654 * (nuc_radius + nuclear_pore_length)**2
 
 expressions("Ion diffusion")
 J_Na_jct1_SL = (Na_jct1 - Na_SL)*1.8313e-14 # mmole*ms**-1
@@ -193,18 +193,18 @@ i_NaCa_jct1 = Fx_NCX_jct1*V_max_INaCa*Ka_jct1*Q_NCX*temp_jct1/(K_mCai*Nao**HNa*(
 i_NaCa_SL = Fx_NCX_SL*V_max_INaCa*Ka_SL*Q_NCX*temp_SL/(K_mCai*Nao**HNa*(1 + (Na_SL/K_mNai)**HNa) + K_mNao**HNa*Ca_SL*(1 + Ca_SL/K_mCai) + K_mCao*Na_SL**HNa + Na_SL**HNa*Cao + Nao**HNa*Ca_SL) # uA*uF**-1
 #i_NaCa = i_NaCa_jct1 + i_NaCa_SL # uA*uF**-1
 #i_NaCa = V_max_INaCa  # uA*uF**-1  # BDS 4/19/2017 need to fix this at some point. Done to make Ca_jct1 oscilate as return to steady state.
-i_NaCa = Conditional(Ge(Ca_jct1, 1.001e-4), V_max_INaCa, 0)  # uA*uF**-1  # BDS 4/19/2017 need to fix this at some point. Done to make Ca_jct1 oscilate as return to steady state.
+i_NaCa = Conditional(Ge(Ca_jct1, 1.00001e-4), V_max_INaCa, 0)  # uA*uF**-1  # BDS 4/19/2017 need to fix this at some point. Done to make Ca_jct1 oscilate as return to steady state.
 
 expressions("Ca buffer", "Cytosolic")
 #dCa_TroponinC = kon_TroponinC*Cai*(Bmax_TroponinC - Ca_TroponinC) - koff_TroponinC*Ca_TroponinC # mM*ms**-1
 NFAT_diffusion = (Ca_NFAT_active - Ca_NFAT_Nucleus) * PNFAT  #+ ((((Ca_NFAT_CN_Cytosol/Vol_jct1) - (Ca_NFAT_CN_Nucleus/Vol_Nuc))/nuclear_pore_length) * SufArea_Nuc_outer * PNFAT)   # mM*ms**-1
 #dCa_TroponinC_Ca_Mg = kon_TroponinC_Ca_Mg_Ca*Cai*(Bmax_TroponinC_Ca_Mg_Ca - (Ca_TroponinC_Ca_Mg + Mg_TroponinC_Ca_Mg)) - koff_TroponinC_Ca_Mg_Ca*Ca_TroponinC_Ca_Mg # mM*ms**-1
 #dMg_TroponinC_Ca_Mg = kon_TroponinC_Ca_Mg_Mg*Mgi*(Bmax_TroponinC_Ca_Mg_Mg - (Ca_TroponinC_Ca_Mg + Mg_TroponinC_Ca_Mg)) - koff_TroponinC_Ca_Mg_Mg*Mg_TroponinC_Ca_Mg # mM*ms**-1
-dCa_Calmodulin_dt = kon_Calmodulin * Ca_jct1 * (Bmax_Calmodulin - Ca_Calmodulin) - koff_Calmodulin*Ca_Calmodulin # mM*ms**-1
+dCa_Calmodulin_dt = kon_Calmodulin * Ca_jct1 * (Bmax_Calmodulin - Ca_Calmodulin) - koff_Calmodulin * Ca_Calmodulin # mM*ms**-1
 dCaM_Calcineurin_dt = kon_Calcineurin * Ca_Calmodulin * (Bmax_Calcineurin - CaM_Calcineurin) - koff_Calcineurin * CaM_Calcineurin # mM*ms**-1
-dCa_NFAT_active_dt = -kon_NFAT * CaM_Calcineurin * (Bmax_NFAT - Ca_NFAT_active) + koff_NFAT * Ca_NFAT_active - NFAT_diffusion 
+dCa_NFAT_active_dt = kon_NFAT * CaM_Calcineurin * (Bmax_NFAT - Ca_NFAT_active) - koff_NFAT * Ca_NFAT_active - NFAT_diffusion 
 #dCa_Myosin = kon_Myosin_Ca*Cai*(Bmax_Myosin_Ca - (Ca_Myosin + Mg_Myosin)) - koff_Myosin_Ca*Ca_Myosin # mM*ms**-1
-dCa_NFAT_Nucleus_dt =  NFAT_diffusion
+dCa_NFAT_Nucleus_dt = NFAT_diffusion
 #dMg_Myosin = kon_Myosin_Mg*Mgi*(Bmax_Myosin_Mg - (Ca_Myosin + Mg_Myosin)) - koff_Myosin_Mg*Mg_Myosin # mM*ms**-1
 #dCa_SRB = kon_SRB*Cai*(Bmax_SRB - Ca_SRB) - koff_SRB*Ca_SRB # mM*ms**-1
 #dCa_cytosol_tot_bound = dCa_TroponinC + dCa_TroponinC_Ca_Mg + dMg_TroponinC_Ca_Mg + dCa_Calmodulin + dCa_Myosin + dMg_Myosin + dCa_SRB # mM*ms**-1
