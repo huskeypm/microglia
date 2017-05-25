@@ -35,12 +35,17 @@ parameters("INa",
 parameters("Ca buffer", "Cytosolic",
            PNFAT = ScalarParam(8.91e-6,unit="l*F**-1*ms**-1"),
            Ca_SL = ScalarParam(1.031812e-4, unit="mM"),  # BDS 4/19/2017 moved from Ca buffer state to have code compile. Need to fix in future.
+           Calcineurin_total = ScalarParam(1.0e-3, unit="mM"), # BDS 5/25/2017 value from Table 2 of Cooling et al. Sensitivity of NFAT Cycling to Cytosolic Calcium Concentration... Biophysical Journal 96(6) 2095-2104
+           Volume_adjust = ScalarParam(50.0), # BDS 5/25/2017 value from Table 2 (originally in paper as Ccn) of Cooling et al. Sensitivity of NFAT Cycling to Cytosolic Calcium Concentration... Biophysical Journal 96(6) 2095-2104
            #Bmax_TroponinC = ScalarParam(0.07, unit="mM"),
            #Bmax_TroponinC_Ca_Mg_Ca = ScalarParam(0.14, unit="mM"),
            #Bmax_TroponinC_Ca_Mg_Mg = ScalarParam(0.14, unit="mM"),
            Bmax_Calmodulin = ScalarParam(0.024, unit="mM"),
            Bmax_Calcineurin = ScalarParam(0.0109, unit="mM"), # BDS 4/19/17 taken from literature. "The Calcineurin B Subunit (CnB) Is a New Ligand of Integrin aM That Mediates CnB-Induced Apo2L/TRAIL Expression in Macrophages", Liu et al. The journal of Immunology.
            Bmax_NFAT = ScalarParam(0.02, unit="mM"), # BDS 4/20/2017 need to find a value from literature.
+           n = ScalarParam(2.92), # BDS 5/25/2017 value from Table 2 of Cooling et al. Sensitivity of NFAT Cycling to Cytosolic Calcium Concentration... Biophysical Journal 96(6) 2095-2104 
+           kM_Cam = ScalarParam(535e-6, unit="mM"), # BDS 5/25/2017 value from Table 2 of Cooling et al. Sensitivity of NFAT Cycling to Cytosolic Calcium Concentration... Biophysical Journal 96(6) 2095-2104
+           kD_CN_Cam = ScalarParam(1760e-6, unit="mM"), # BDS 5/25/2017 value from Table 2 of Cooling et al. Sensitivity of NFAT Cycling to Cytosolic Calcium Concentration... Biophysical Journal 96(6) 2095-2104
            #Bmax_Myosin_Ca = ScalarParam(0.14, unit="mM"),
            #Bmax_Myosin_Mg = ScalarParam(0.14, unit="mM"),
            #Bmax_SRB = ScalarParam(0.0171, unit="mM"),
@@ -49,7 +54,10 @@ parameters("Ca buffer", "Cytosolic",
            #kon_TroponinC_Ca_Mg_Mg = ScalarParam(3e-3, unit="mM**-1*ms**-1"),
            kon_Calmodulin = ScalarParam(34, unit="mM**-1*ms**-1"),
            kon_Calcineurin = ScalarParam(46, unit="mM**-1*ms**-1"),  # BDS 4/19/17 taken from literature. "Kinetics of calmodulin binding to calcineurin", Quintana et al., biochemical and biophysical research communications.
-           kon_NFAT = ScalarParam(30, unit="mM**-1*ms**-1"), # BDS 4/20/2017 need to find a value from literature.
+           kon_NFAT_Cytosol = ScalarParam(7.69e-15, unit="mM**-1*ms**-1"), #BDS 5/24/2017 value from Table 2 of Cooling et al. Sensitivity of NFAT Cycling to Cytosolic Calcium Concentration... Biophysical Journal 96(6) 2095-2104
+           kon_NFAT_Cytosol_Nucleus = ScalarParam(1.44e-6, unit="ms**-1"), #BDS 5/24/2017 value from Table 2 of Cooling et al. Sensitivity of NFAT Cycling to Cytosolic Calcium Concentration... Biophysical Journal 96(6) 2095-2104
+           kon_NFAT_Nucleus = ScalarParam(3.62e-7, unit="ms**-1"), #BDS 5/24/2017 value from Table 2 of Cooling et al. Sensitivity of NFAT Cycling to Cytosolic Calcium Concentration... Biophysical Journal 96(6) 2095-2104
+           kon_NFAT_Nucleus_Cytosol = ScalarParam(4.45e-7, unit="ms**-1"), #BDS 5/24/2017 value from Table 2 of Cooling et al. Sensitivity of NFAT Cycling to Cytosolic Calcium Concentration... Biophysical Journal 96(6) 2095-2104
            #kon_Myosin_Ca = ScalarParam(13.8, unit="mM**-1*ms**-1"),
            #kon_Myosin_Mg = ScalarParam(15.7e-3, unit="mM**-1*ms**-1"),
            #kon_SRB = ScalarParam(100, unit="mM**-1*ms**-1"),
@@ -58,7 +66,8 @@ parameters("Ca buffer", "Cytosolic",
            #koff_TroponinC_Ca_Mg_Mg = ScalarParam(3.33e-3, unit="ms**-1"),
            koff_Calmodulin = ScalarParam(238e-3, unit="ms**-1"),
            koff_Calcineurin = ScalarParam(0.0012e-3, unit="ms**-1"),  # BDS 4/19/17 taken from literature. "Kinetics of calmodulin binding to calcineurin", Quintana et al., biochemical and biophysical research communications.
-           koff_NFAT = ScalarParam(0.001e-3, unit="ms**-1"))
+           koff_NFAT_Cytosol = ScalarParam(1.93e-5, unit="ms**-1"), #BDS 5/24/2017 value from Table 2 of Cooling et al. Sensitivity of NFAT Cycling to Cytosolic Calcium Concentration... Biophysical Journal 96(6) 2095-2104
+           koff_NFAT_Nucleus = ScalarParam(4.71e-14, unit="mM**-1*ms**-1")) #BDS 5/24/2017 value from Table 2 of Cooling et al. Sensitivity of NFAT Cycling to Cytosolic Calcium Concentration... Biophysical Journal 96(6) 2095-2104 
            #koff_Myosin_Ca = ScalarParam(0.46e-3, unit="ms**-1"),
            #koff_Myosin_Mg = ScalarParam(0.057e-3, unit="ms**-1"),
            #koff_SRB = ScalarParam(60e-3, unit="ms**-1"))
@@ -123,9 +132,11 @@ states("Ca buffer", "Cytosolic",
        #Ca_TroponinC_Ca_Mg = ScalarParam(1.078283e-1, unit="mM"),
        #Mg_TroponinC_Ca_Mg = ScalarParam(1.524002e-2, unit="mM"),
        Ca_Calmodulin = ScalarParam(2.911916e-4, unit="mM"),
-       CaM_Calcineurin = ScalarParam(1e-6, unit="mM"),  # BDS 4/20/2017 need to find a value from literature. Review article said that calcineurin could have lower concentration but rises as one ages.
-       Ca_NFAT_active = ScalarParam(1e-5 , unit="mM"),  # BDS 4/20/2017 need to find a value from literature.
-       Ca_NFAT_Nucleus =  ScalarParam(1e-6, unit="mM")) # BDS 4/20/2017 need to find a value from literature.
+       CaM_Calcineurin = ScalarParam(3e-6, unit="mM"),  # BDS 5/24/2017 took value from Saucerman/Bers paper (3e-3uM). BDS 4/20/2017 need to find a value from literature. Review article said that calcineurin could have lower concentration but rises as one ages.
+       Ca_NFAT_Cytosol_inactive = ScalarParam(9.83e-7, unit="mM"), #BDS 5/24/2017 value from Table 2 of Cooling et al. Sensitivity of NFAT Cycling to Cytosolic Calcium Concentration... Biophysical Journal 96(6) 2095-2104
+       Ca_NFAT_Cytosol_active = ScalarParam(1.70e-9 , unit="mM"),  #BDS 5/24/2017 value from Table 2 of Cooling et al. Sensitivity of NFAT Cycling to Cytosolic Calcium Concentration... Biophysical Journal 96(6) 2095-2104
+       Ca_NFAT_Nucleus_active = ScalarParam(5.901e-7, unit="mM"),  #BDS 5/24/2017 value from Table 2 of Cooling et al. Sensitivity of NFAT Cycling to Cytosolic Calcium Concentration... Biophysical Journal 96(6) 2095-2104
+       Ca_NFAT_Nucleus_inactive = ScalarParam(2.76e-7, unit="mM")) #BDS 5/24/2017 value from Table 2 of Cooling et al. Sensitivity of NFAT Cycling to Cytosolic Calcium Concentration... Biophysical Journal 96(6) 2095-2104
        #Ca_Myosin = ScalarParam(1.298754e-3, unit="mM"),
        #Mg_Myosin = ScalarParam(1.381982e-1, unit="mM"),
        #Ca_SRB = ScalarParam(2.143165e-3, unit="mM"))
@@ -197,14 +208,23 @@ i_NaCa = Conditional(Ge(Ca_jct1, 1.00001e-4), V_max_INaCa, 0)  # uA*uF**-1  # BD
 
 expressions("Ca buffer", "Cytosolic")
 #dCa_TroponinC = kon_TroponinC*Cai*(Bmax_TroponinC - Ca_TroponinC) - koff_TroponinC*Ca_TroponinC # mM*ms**-1
-NFAT_diffusion = (Ca_NFAT_active - Ca_NFAT_Nucleus) * PNFAT  #+ ((((Ca_NFAT_CN_Cytosol/Vol_jct1) - (Ca_NFAT_CN_Nucleus/Vol_Nuc))/nuclear_pore_length) * SufArea_Nuc_outer * PNFAT)   # mM*ms**-1
+#NFAT_diffusion = (Ca_NFAT_active - Ca_NFAT_Nucleus) * PNFAT  #+ ((((Ca_NFAT_CN_Cytosol/Vol_jct1) - (Ca_NFAT_CN_Nucleus/Vol_Nuc))/nuclear_pore_length) * SufArea_Nuc_outer * PNFAT)   # mM*ms**-1 # BDS 5/25/2017 Old NFAT model
 #dCa_TroponinC_Ca_Mg = kon_TroponinC_Ca_Mg_Ca*Cai*(Bmax_TroponinC_Ca_Mg_Ca - (Ca_TroponinC_Ca_Mg + Mg_TroponinC_Ca_Mg)) - koff_TroponinC_Ca_Mg_Ca*Ca_TroponinC_Ca_Mg # mM*ms**-1
 #dMg_TroponinC_Ca_Mg = kon_TroponinC_Ca_Mg_Mg*Mgi*(Bmax_TroponinC_Ca_Mg_Mg - (Ca_TroponinC_Ca_Mg + Mg_TroponinC_Ca_Mg)) - koff_TroponinC_Ca_Mg_Mg*Mg_TroponinC_Ca_Mg # mM*ms**-1
 dCa_Calmodulin_dt = kon_Calmodulin * Ca_jct1 * (Bmax_Calmodulin - Ca_Calmodulin) - koff_Calmodulin * Ca_Calmodulin # mM*ms**-1
 dCaM_Calcineurin_dt = kon_Calcineurin * Ca_Calmodulin * (Bmax_Calcineurin - CaM_Calcineurin) - koff_Calcineurin * CaM_Calcineurin # mM*ms**-1
-dCa_NFAT_active_dt = kon_NFAT * CaM_Calcineurin * (Bmax_NFAT - Ca_NFAT_active) - koff_NFAT * Ca_NFAT_active - NFAT_diffusion 
+#actN = (Ca_jct1**n) / ((Ca_jct1**n) + (
+NFAT_Cytosol_flux = (kon_NFAT_Cytosol * CaM_Calcineurin * Ca_NFAT_Cytosol_inactive) - (koff_NFAT_Cytosol * Ca_NFAT_Cytosol_active * (1 - (CaM_Calcineurin / Calcineurin_total)))
+NFAT_Cytosol_to_Nucleus_flux = kon_NFAT_Cytosol_Nucleus * Ca_NFAT_Cytosol_active
+NFAT_Nucleus_flux = (kon_NFAT_Nucleus * Ca_NFAT_Nucleus_active * (1 - (CaM_Calcineurin / Calcineurin_total))) - (koff_NFAT_Nucleus * CaM_Calcineurin * Ca_NFAT_Nucleus_inactive)
+NFAT_Nucleus_to_Cytosol_flux = kon_NFAT_Nucleus_Cytosol * Ca_NFAT_Nucleus_inactive
+dCa_NFAT_Cytosol_inactive_dt = (NFAT_Nucleus_to_Cytosol_flux / Volume_adjust) - NFAT_Cytosol_flux
+dCa_NFAT_Cytosol_active_dt = NFAT_Cytosol_flux - NFAT_Cytosol_to_Nucleus_flux
+dCa_NFAT_Nucleus_active_dt = (NFAT_Cytosol_to_Nucleus_flux * Volume_adjust) - NFAT_Nucleus_flux
+dCa_NFAT_Nucleus_inactive_dt = NFAT_Nucleus_flux - NFAT_Nucleus_to_Cytosol_flux
+#dCa_NFAT_active_dt = kon_NFAT * CaM_Calcineurin * (Bmax_NFAT - Ca_NFAT_active) - koff_NFAT * Ca_NFAT_active - NFAT_diffusion # BDS 5/25/2017 Old NFAT model
 #dCa_Myosin = kon_Myosin_Ca*Cai*(Bmax_Myosin_Ca - (Ca_Myosin + Mg_Myosin)) - koff_Myosin_Ca*Ca_Myosin # mM*ms**-1
-dCa_NFAT_Nucleus_dt = NFAT_diffusion
+#dCa_NFAT_Nucleus_dt = NFAT_diffusion   # BDS 5/25/2017 Old NFAT model
 #dMg_Myosin = kon_Myosin_Mg*Mgi*(Bmax_Myosin_Mg - (Ca_Myosin + Mg_Myosin)) - koff_Myosin_Mg*Mg_Myosin # mM*ms**-1
 #dCa_SRB = kon_SRB*Cai*(Bmax_SRB - Ca_SRB) - koff_SRB*Ca_SRB # mM*ms**-1
 #dCa_cytosol_tot_bound = dCa_TroponinC + dCa_TroponinC_Ca_Mg + dMg_TroponinC_Ca_Mg + dCa_Calmodulin + dCa_Myosin + dMg_Myosin + dCa_SRB # mM*ms**-1
