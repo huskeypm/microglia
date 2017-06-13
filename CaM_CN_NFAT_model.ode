@@ -15,42 +15,42 @@ states("Cell",
        Ca_jct1 = ScalarParam(0.0001, unit="mM"))
 
 states("Cytosolic",
-       CaM_CN = ScalarParam(3.0e-06, unit='mM'),
+       CaM_CN = ScalarParam(3.0e-6, unit='mM'),
        Ca_CaM = ScalarParam(2.911916e-4, unit='mM'),
        Ca_NFAT_Cytosol_active = ScalarParam(1.7e-09, unit='mM'),    # Cooling NFATN_c 
        Ca_NFAT_Cytosol_inactive = ScalarParam(9.83e-07, unit='mM'), # Cooling NFATp_c
-       Ca_NFAT_Nucleus_active = ScalarParam(5.901e-07, unit='mM'),  # Cooling NFATN_n
+       Ca_NFAT_Nucleus_active = ScalarParam(5.09e-07, unit='mM'),   # Cooling NFATN_n
        Ca_NFAT_Nucleus_inactive = ScalarParam(2.76e-07, unit='mM')) # Cooling NFATp_n
 
 parameters("Cytosolic",
            Bmax_CN = ScalarParam(0.0109, unit='mM'),
            Bmax_CaM = ScalarParam(0.024, unit='mM'),
-           CN_total = ScalarParam(0.001, unit='mM'),   # Cooling N_tot (total CN) 
+           CN_total = ScalarParam(1.0e-3, unit='mM'),   # Cooling N_tot (total CN) 
            CaM_total = ScalarParam(6.0e-3, unit='mM'), # Cooling M (given concentration of CaM)
            Volume_adjust = ScalarParam(50.0), # Cooling Ccn
-           kD_CN_CaM = ScalarParam(0.00176, unit='mM'), # Cooling K_d1 (CN_Cam dissociation constant)
-           kM_CaM = ScalarParam(0.000535, unit='mM'),   # Cooling K_mN (half-maximal activation concentration of Ca for CaM activation for a given concentration of CN)
-           koff_CN = ScalarParam(1.2e-06, unit='ms**-1'),
-           koff_CaM = ScalarParam(0.238, unit='ms**-1'),
-           koff_NFAT_Cytosol = ScalarParam(1.93e-05, unit='ms**-1'),        # Cooling k_r1
-           koff_NFAT_Nucleus = ScalarParam(0.0471, unit='mM**-1*ms**-1'),   # Cooling k_r3
+           kD_CN_CaM = ScalarParam(1.76e-3, unit='mM'), # Cooling K_d1 (CN_Cam dissociation constant)
+           kM_CaM = ScalarParam(5.35e-4, unit='mM'),   # Cooling K_mN (half-maximal activation concentration of Ca for CaM activation for a given concentration of CN)
+           koff_CN = ScalarParam(1.2e-1, unit='ms**-1'),
+           koff_CaM = ScalarParam(2.38e-1, unit='ms**-1'),
+           koff_NFAT_Cytosol = ScalarParam(1.93e-5, unit='ms**-1'),        # Cooling k_r1
+           koff_NFAT_Nucleus = ScalarParam(4.71e-2, unit='mM**-1*ms**-1'),   # Cooling k_r3
            kon_CN = ScalarParam(46, unit='mM**-1*ms**-1'),         
            kon_CaM = ScalarParam(34, unit='mM**-1*ms**-1'),          
-           kon_NFAT_Cytosol = ScalarParam(0.00769, unit='mM**-1*ms**-1'),   # Cooling k_f1
-           kon_NFAT_Cytosol_Nucleus = ScalarParam(1.44e-06, unit='ms**-1'), # Cooling k_f2
-           kon_NFAT_Nucleus = ScalarParam(3.62e-07, unit='ms**-1'),         # Cooling k_f3
-           kon_NFAT_Nucleus_Cytosol = ScalarParam(4.45e-07, unit='ms**-1'), # Cooling k_f4
+           kon_NFAT_Cytosol = ScalarParam(7.69e-3, unit='mM**-1*ms**-1'),   # Cooling k_f1
+           kon_NFAT_Cytosol_Nucleus = ScalarParam(1.44e-6, unit='ms**-1'), # Cooling k_f2
+           kon_NFAT_Nucleus = ScalarParam(3.62e-7, unit='ms**-1'),         # Cooling k_f3
+           kon_NFAT_Nucleus_Cytosol = ScalarParam(4.45e-7, unit='ms**-1'), # Cooling k_f4
            n = ScalarParam(2.92)) # Cooling CN activation Hill coefficient 
 
 expressions("Cytosolic")
 dCa_CaM_dt = Ca_jct1 * kon_CaM * (Bmax_CaM - Ca_CaM) - koff_CaM * Ca_CaM
 dCaM_CN_dt = Ca_CaM * kon_CN * (Bmax_CN - CaM_CN) - koff_CN * CaM_CN
-fraction_CN = (Ca_jct1**n) / ((Ca_jct1**n) + (kM_CaM**n) * (1 + (kD_CN_CaM / CaM_total)))  # Cooling act_N (fraction of activated calcineurin)
+fraction_CN = (Ca_jct1**n) / ((Ca_jct1**n) + ((kM_CaM**n) * (1 + (kD_CN_CaM / CaM_total))))  # Cooling act_N (fraction of activated calcineurin)
 CN_active = CN_total * fraction_CN  # Cooling N_active (amount of activated CN)
-NFAT_Cytosol_flux = kon_NFAT_Cytosol * Ca_NFAT_Cytosol_inactive * CN_total * fraction_CN - koff_NFAT_Cytosol * Ca_NFAT_Cytosol_active * (1 - CN_active)  # Cooling J_1
-NFAT_Cytosol_to_Nucleus_flux = Ca_NFAT_Cytosol_active * kon_NFAT_Cytosol_Nucleus                                                                         # Cooling J_2
-NFAT_Nucleus_flux = kon_NFAT_Nucleus * Ca_NFAT_Nucleus_active * (1 - CN_active) - koff_NFAT_Nucleus * Ca_NFAT_Nucleus_inactive * CN_total * fraction_CN  # Cooling J_3
-NFAT_Nucleus_to_Cytosol_flux = Ca_NFAT_Nucleus_inactive * kon_NFAT_Nucleus_Cytosol                                                                       # Cooling J_4
+NFAT_Cytosol_flux = kon_NFAT_Cytosol * Ca_NFAT_Cytosol_inactive * CN_total * fraction_CN - koff_NFAT_Cytosol * Ca_NFAT_Cytosol_active * (1 - fraction_CN)  # Cooling J_1
+NFAT_Cytosol_to_Nucleus_flux = Ca_NFAT_Cytosol_active * kon_NFAT_Cytosol_Nucleus                                                                           # Cooling J_2
+NFAT_Nucleus_flux = kon_NFAT_Nucleus * Ca_NFAT_Nucleus_active * (1 - fraction_CN) - koff_NFAT_Nucleus * Ca_NFAT_Nucleus_inactive * CN_total * fraction_CN  # Cooling J_3
+NFAT_Nucleus_to_Cytosol_flux = Ca_NFAT_Nucleus_inactive * kon_NFAT_Nucleus_Cytosol                                                                         # Cooling J_4
 dCa_NFAT_Cytosol_inactive_dt = NFAT_Nucleus_to_Cytosol_flux / Volume_adjust - NFAT_Cytosol_flux # Cooling dNFATp_c/dt
 dCa_NFAT_Cytosol_active_dt   = NFAT_Cytosol_flux - NFAT_Cytosol_to_Nucleus_flux                 # Cooling dNFATN_c/dt
 dCa_NFAT_Nucleus_active_dt   = NFAT_Cytosol_to_Nucleus_flux * Volume_adjust - NFAT_Nucleus_flux # Cooling dNFATN_n/dt
