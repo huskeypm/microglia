@@ -2,7 +2,6 @@
 
 Prelim data for microglia
 - CaM is not behaving as a state for some reason 
-- Voltage/stim potential needs to be corrected
 
 ### What is this repository for? ###
 
@@ -19,15 +18,16 @@ Prelim data for microglia
 * How to run tests
 
 gotranrun  ICaL.ode  --plot_y Ca_jct1 --tstop=2000 --dt 1.
-python /u1/pmke226/srcs//gotran/scripts/gotranrun  stim.ode  --plot_y cATP --tstop=100 --dt 0.1
 
-or
+python /u1/pmke226/srcs//gotran/scripts//gotranrun test.ode  --plot_y logpATP --tstop=30 --dt 0.1
 
-python ../wholecell/daisychain.py -odeName microglia.ode -dt 1 -dtn 2000 -name test
+python /home/AD/bdst227/sources/gotran/scripts/gotranrun microglia.ode --plot_y logpATP --tstop=30000 --dt 0.1  # 30s
 
+### tstop is in units of ms. 1000 ms = 1 s.
 
+montage -label '(a)' Intracellular_logpATP_Test_Test2_Test3_plots.png -label '(b)' Intracellular_Ca_jct1_Test_Test2_Test3_plots.png -label '(c)' Intracellular_i_P2X_Test_Test2_Test3_plots.png -label '(d)' Intracellular_r_BDNF_Test_Test2_Test3_plots.png -pointsize 100 -tile 2x2 -geometry '+2+2+2+2>' merged_Test_logpATP_Ca_jct1_i_P2X_r_BDNF_Plots.png
 
-
+python daisychain.py -dt 0.10 -jit -stim 1000 -T 10000 -iters 6 -fileOutputDirectory /home/AD/bdst227/ipython/ipython-notebooks/microglia/ranJobs/ -finalOutputDirectory /net/share/bdst227/microglia/microglia_Simulations_Data/ -downsampleRate 10 -odeName Starting_Point_2.ode -name /home/AD/bdst227/ipython/ipython-notebooks/microglia/ranJobs/test3_Starting_point_2 &
 
 * Deployment instructions
 

@@ -1,7 +1,7 @@
 # Saved Gotran model
 
 parameters("Model parameters",
-           logATP = ScalarParam(1e-3, unit="mM"),
+#           logATP = ScalarParam(1e-3, unit="mM"),
            Ko = ScalarParam(5.4, unit="mM"),
            Nao = ScalarParam(140, unit="mM"),
            Cao = ScalarParam(1.8, unit="mM"),
@@ -27,6 +27,9 @@ parameters("INab",
            Fx_NaBk_SL = 0.89)
 
 parameters("Ca buffer", "Cytosolic",
+           #Ca_Calmodulin = ScalarParam(2.911916e-4, unit="mM"),
+           Ca_Calmodulin = ScalarParam(3.386533668e-4, unit="mM"),
+           Ca_SL = ScalarParam(1.031812e-4, unit="mM"),
            Bmax_Calmodulin = ScalarParam(0.024, unit='mM'),
            koff_Calmodulin = ScalarParam(0.238, unit='ms**-1'),
            kon_Calmodulin = ScalarParam(34, unit='mM**-1*ms**-1')) 
@@ -99,17 +102,17 @@ parameters("ICab",
            Fx_CaBk_jct1 = 0.11,
            Fx_CaBk_SL = 0.89)
 
-parameters(
-           Ca_Calmodulin = ScalarParam(2.911916e-4, unit="mM"),
-           Ca_SL = ScalarParam(1.031812e-4, unit="mM"))
+#parameters(
+#           Ca_Calmodulin = ScalarParam(2.911916e-4, unit="mM"),
+#           Ca_SL = ScalarParam(1.031812e-4, unit="mM"))
 
 parameters("ICaL", "FCa gate",
            lccCaInact = ScalarParam(1.7))
 
 states("Cell",
-#       V = ScalarParam(-8.556885e1, unit="mV"),
-#       logATP = ScalarParam(1e-3, unit="mM"))
-       V = ScalarParam(-8.556885e1, unit="mV"))
+       V = ScalarParam(-8.556885e1, unit="mV"),
+       logpATP = ScalarParam(-6, unit="logM"))
+#       V = ScalarParam(-8.556885e1, unit="mV"))
 
 states("Na buffer",
        Na_jct1_buf = ScalarParam(3.539892, unit="mM"),
@@ -135,6 +138,8 @@ states("Ca buffer",
 #       Ca_SLHigh_jct1 = ScalarParam(7.347888e-3, unit="mM"),
 #       Ca_SR = ScalarParam(5.545201e-1, unit="mM"),
 #       Ca_Calmodulin=ScalarParam(0.0002911916, unit='mM'),
+#       Ca_Calmodulin = ScalarParam(2.911916e-4, unit="mM"),
+#       Ca_SL = ScalarParam(1.031812e-4, unit="mM"),
        Ca_jct1 = ScalarParam(1.737475e-4, unit="mM"))
 
 states("ICaL", "FCa gate",
@@ -262,13 +267,15 @@ dNai_dt = J_Na_SL_myo/Vol_myo
 expressions("Cell")
 i_Stim = Conditional(And(Ge(time - floor(time/stim_period)*stim_period, stim_start), Le(time - floor(time/stim_period)*stim_period, stim_start + stim_duration), ), -stim_amplitude, 0) # uA*uF**-1
 # Only ICal 
-dV_dt = -(i_Nab + i_NaCa + i_CaL + i_Cab + i_Cap + i_Stim)
+#dV_dt = -(i_Nab + i_NaCa + i_CaL + i_Cab + i_Cap + i_Stim)
+dV_dt = 0 # need to leave this as a state, since the runner tries to record these data
 #dV_dt = -(i_Stim)
-dlogcATP_dt = Conditional( Ge(sin(time/stim_period),0.0), stim_amplitude,-stim_amplitude)
-cATP = 10 ** (logATP)
+#dlogpATP_dt = Conditional( Ge(sin(time*2/stim_period),0.0), stim_amplitude,-stim_amplitude*1.68)
+dlogpATP_dt =  ((sin(10 * time/stim_period))**3) / 6
+cATP = 10 ** (logpATP)
 
 expressions("P2X")
-i_P2X = gCaP2X * 1/(1+(KdP2X/cATP))
+i_P2X = 0.0 #gCaP2X * 1/(1+(KdP2X/cATP))
 
 expressions("BDNF")
 i_BDNF = gCaBDNF * 1/(1+(KdBDNF/cATP))

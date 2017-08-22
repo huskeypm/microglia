@@ -9,7 +9,7 @@ import runner
 import matplotlib.pylab as plt
 import numpy as np
 import downSamplePickles as dsp
-from runShannonTest import *
+#from runShannonTest import *
 import json
 import taufitting as tf
 import scipy.fftpack as fftp

@@ -54,7 +54,7 @@ parameters("Ca buffer", "Cytosolic",
            #kon_TroponinC_Ca_Mg_Mg = ScalarParam(3e-3, unit="mM**-1*ms**-1"),
            kon_Calmodulin = ScalarParam(34, unit="mM**-1*ms**-1"),
            kon_Calcineurin = ScalarParam(46, unit="mM**-1*ms**-1"),  # BDS 4/19/17 taken from literature. "Kinetics of calmodulin binding to calcineurin", Quintana et al., biochemical and biophysical research communications.
-           kon_NFAT_Cytosol = ScalarParam(7.69e-15, unit="mM**-1*ms**-1"), #BDS 5/24/2017 value from Table 2 of Cooling et al. Sensitivity of NFAT Cycling to Cytosolic Calcium Concentration... Biophysical Journal 96(6) 2095-2104
+           kon_NFAT_Cytosol = ScalarParam(7.69e-3, unit="mM**-1*ms**-1"), #BDS 5/24/2017 value from Table 2 of Cooling et al. Sensitivity of NFAT Cycling to Cytosolic Calcium Concentration... Biophysical Journal 96(6) 2095-2104
            kon_NFAT_Cytosol_Nucleus = ScalarParam(1.44e-6, unit="ms**-1"), #BDS 5/24/2017 value from Table 2 of Cooling et al. Sensitivity of NFAT Cycling to Cytosolic Calcium Concentration... Biophysical Journal 96(6) 2095-2104
            kon_NFAT_Nucleus = ScalarParam(3.62e-7, unit="ms**-1"), #BDS 5/24/2017 value from Table 2 of Cooling et al. Sensitivity of NFAT Cycling to Cytosolic Calcium Concentration... Biophysical Journal 96(6) 2095-2104
            kon_NFAT_Nucleus_Cytosol = ScalarParam(4.45e-7, unit="ms**-1"), #BDS 5/24/2017 value from Table 2 of Cooling et al. Sensitivity of NFAT Cycling to Cytosolic Calcium Concentration... Biophysical Journal 96(6) 2095-2104
@@ -67,7 +67,7 @@ parameters("Ca buffer", "Cytosolic",
            koff_Calmodulin = ScalarParam(238e-3, unit="ms**-1"),
            koff_Calcineurin = ScalarParam(0.0012e-3, unit="ms**-1"),  # BDS 4/19/17 taken from literature. "Kinetics of calmodulin binding to calcineurin", Quintana et al., biochemical and biophysical research communications.
            koff_NFAT_Cytosol = ScalarParam(1.93e-5, unit="ms**-1"), #BDS 5/24/2017 value from Table 2 of Cooling et al. Sensitivity of NFAT Cycling to Cytosolic Calcium Concentration... Biophysical Journal 96(6) 2095-2104
-           koff_NFAT_Nucleus = ScalarParam(4.71e-14, unit="mM**-1*ms**-1")) #BDS 5/24/2017 value from Table 2 of Cooling et al. Sensitivity of NFAT Cycling to Cytosolic Calcium Concentration... Biophysical Journal 96(6) 2095-2104 
+           koff_NFAT_Nucleus = ScalarParam(4.71e-2, unit="mM**-1*ms**-1")) #BDS 5/24/2017 value from Table 2 of Cooling et al. Sensitivity of NFAT Cycling to Cytosolic Calcium Concentration... Biophysical Journal 96(6) 2095-2104 
            #koff_Myosin_Ca = ScalarParam(0.46e-3, unit="ms**-1"),
            #koff_Myosin_Mg = ScalarParam(0.057e-3, unit="ms**-1"),
            #koff_SRB = ScalarParam(60e-3, unit="ms**-1"))
