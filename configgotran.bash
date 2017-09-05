@@ -1,4 +1,6 @@
-export LOC=$HOME/sources/            
+
+#export LOC=$HOME/sources/            
+export LOC=/home/AD/bdst227/sources/            
 export MYPATH=$LOC/mypython/
 export PYTHONPATH=$PYTHONPATH:$MYPATH/lib/python2.7/site-packages/
 export PATH=$PATH:$LOC/gotran/scripts/
