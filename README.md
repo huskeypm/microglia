@@ -23,6 +23,8 @@ python /u1/pmke226/srcs//gotran/scripts//gotranrun test.ode  --plot_y logpATP --
 
 python /home/AD/bdst227/sources/gotran/scripts/gotranrun microglia.ode --plot_y logpATP --tstop=30000 --dt 0.1  # 30s
 
+python /home/AD/bdst227/sources/gotran/scripts/gotranrun P2X4_test.ode --plot_y i_P2X --tstop=5000 --dt 0.1  # 5s
+
 ### tstop is in units of ms. 1000 ms = 1 s.
 
 montage -label '(a)' Intracellular_logpATP_Test_Test2_Test3_plots.png -label '(b)' Intracellular_Ca_jct1_Test_Test2_Test3_plots.png -label '(c)' Intracellular_i_P2X_Test_Test2_Test3_plots.png -label '(d)' Intracellular_r_BDNF_Test_Test2_Test3_plots.png -pointsize 100 -tile 2x2 -geometry '+2+2+2+2>' merged_Test_logpATP_Ca_jct1_i_P2X_r_BDNF_Plots.png
