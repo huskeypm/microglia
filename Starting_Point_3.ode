@@ -186,8 +186,8 @@ i_NaCa_SL = Fx_NCX_SL*V_max_INaCa*Ka_SL*Q_NCX*temp_SL/(K_mCai*Nao**HNa*(1 + (Na_
 i_NaCa = Conditional(Ge(Ca_jct1, 1.00001e-4), V_max_INaCa, 0)  # uA*uF**-1  # BDS 4/19/2017 need to fix this at some point. Done to make Ca_jct1 oscilate as return to steady state.
 
 expressions("Ca buffer", "Cytosolic")
-#dpp38_dt = Ca_jct1 * kon_p38 * (Bmax_p38 - pp38) - koff_p38 * pp38
-dpp38_dt = 1 / (1 + (100.0e-3 / Ca_jct1)**2)
+dpp38_dt = Ca_jct1 * kon_p38 * (Bmax_p38 - pp38) - koff_p38 * pp38
+#dpp38_dt = 1 / (1 + (100.0e-3 / Ca_jct1)**2)
 dCa_CaM_dt = Ca_jct1 * kon_CaM * (Bmax_CaM - Ca_CaM) - koff_CaM * Ca_CaM
 dCaM_CN_dt = Ca_CaM * kon_CN * (Bmax_CN - CaM_CN) - koff_CN * CaM_CN
 fraction_CN = (Ca_jct1**n) / ((Ca_jct1**n) + ((kM_CaM**n) * (1 + (kD_CN_CaM / CaM_total))))  # Cooling act_N (fraction of activated calcineurin)
