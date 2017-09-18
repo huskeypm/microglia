@@ -62,7 +62,7 @@ parameters("Cell",
 	    gCaBDNF = ScalarParam(5.4e-4, unit="l*F**-1*ms**-1"),
             gCaP2X = ScalarParam(1.0e-3, unit="l*F**-1*ms**-1"),
 	    stim_start = ScalarParam(100, unit="ms"),
-            stim_period = ScalarParam(1000.0, unit="ms"),
+            stim_period = ScalarParam(2000.0, unit="ms"),
             stim_duration = ScalarParam(5, unit="ms"),
             stim_amplitude = ScalarParam(0.00065, unit="uA*uF**-1"))
 	  
@@ -158,7 +158,8 @@ dlogpATP_dt = 0.007 *  (sin(3.141 * time/stim_period))**3  # Oscilation between 
 #dlogpATP_dt = 0.0  # Keeps ATP at zero
 cATP = 10 ** (logpATP)
 modulo = (time/stim_period) - floor(time/stim_period)
-i_P2X = Conditional(Ge(cATP, 6.3e-4),  ((stim_amplitude * exp(-1.2 * modulo)) * (1 - (1 / (1 + exp(-(modulo - 0.58 ) * 30.0))))) ,0)
+i_P2X =  -((stim_amplitude * exp(-1.2 * modulo)) * (1 - (1 / (1 + exp(-(modulo - 0.58 ) * 30.0)))))
+#i_P2X = Conditional(Ge(cATP, 6.3e-4),  ((stim_amplitude * exp(-1.2 * modulo)) * (1 - (1 / (1 + exp(-(modulo - 0.58 ) * 30.0))))) ,0)
 #i_P2X = Conditional(Ge(cATP, 6.3e-4), -gCaP2X ,0)
 #dP2X_dt = kon_P2X * Ca_NFAT_Nucleus_active * (Bmax_P2X - P2X) - koff_P2X * P2X
 #dP2X_dt = Conditional(Ge(BDNF, 1.0), kon_P2X * BDNF * (Bmax_P2X - P2X) - koff_P2X * P2X, 0)
@@ -185,7 +186,8 @@ i_NaCa_SL = Fx_NCX_SL*V_max_INaCa*Ka_SL*Q_NCX*temp_SL/(K_mCai*Nao**HNa*(1 + (Na_
 i_NaCa = Conditional(Ge(Ca_jct1, 1.00001e-4), V_max_INaCa, 0)  # uA*uF**-1  # BDS 4/19/2017 need to fix this at some point. Done to make Ca_jct1 oscilate as return to steady state.
 
 expressions("Ca buffer", "Cytosolic")
-dpp38_dt = Ca_jct1 * kon_p38 * (Bmax_p38 - pp38) - koff_p38 * pp38
+#dpp38_dt = Ca_jct1 * kon_p38 * (Bmax_p38 - pp38) - koff_p38 * pp38
+dpp38_dt = 1 / (1 + (100.0e-3 / Ca_jct1)**2)
 dCa_CaM_dt = Ca_jct1 * kon_CaM * (Bmax_CaM - Ca_CaM) - koff_CaM * Ca_CaM
 dCaM_CN_dt = Ca_CaM * kon_CN * (Bmax_CN - CaM_CN) - koff_CN * CaM_CN
 fraction_CN = (Ca_jct1**n) / ((Ca_jct1**n) + ((kM_CaM**n) * (1 + (kD_CN_CaM / CaM_total))))  # Cooling act_N (fraction of activated calcineurin)
@@ -199,7 +201,8 @@ dCa_NFAT_Cytosol_inactive_dt = NFAT_Nucleus_to_Cytosol_flux / Volume_adjust - NF
 dCa_NFAT_Cytosol_active_dt   = NFAT_Cytosol_flux - NFAT_Cytosol_to_Nucleus_flux                 # Cooling dNFATN_c/dt
 dCa_NFAT_Nucleus_active_dt   = NFAT_Cytosol_to_Nucleus_flux * Volume_adjust - NFAT_Nucleus_flux # Cooling dNFATN_n/dt
 dCa_NFAT_Nucleus_inactive_dt = NFAT_Nucleus_flux - NFAT_Nucleus_to_Cytosol_flux                 # Cooling dNFATp_c/dt
-r_BDNF = kon_BDNF * pp38 - koff_BDNF * BDNF  # pp38 * kon_BDNF * (Bmax_BDNF - BDNF) - koff_BDNF * BDNF
+r_BDNF = 1 / (1 + (100.0e-3 / pp38) ** 2)
+#r_BDNF = kon_BDNF * pp38 - koff_BDNF * BDNF  # pp38 * kon_BDNF * (Bmax_BDNF - BDNF) - koff_BDNF * BDNF
 dBDNF_dt = r_BDNF
 r_TNF = kon_TNF * Ca_NFAT_Nucleus_active # - koff_TNF * TNF
 dTNF_dt = r_TNF
@@ -223,7 +226,8 @@ expressions("Ca buffer")
 #dCa_jct1_dt = -i_Ca_jct1_tot*Cm/(Vol_jct1*2*F) - J_Ca_jct1_SL/Vol_jct1 + j_rel_SR*Vol_SR/Vol_jct1 + j_leak_SR*Vol_myo/Vol_jct1 - 1*dCa_jct1_tot_bound
 #dCa_SL_dt = -i_Ca_SL_tot*Cm/(Vol_SL*2*F) + (J_Ca_jct1_SL - J_Ca_SL_myo)/Vol_SL - 1*dCa_SL_tot_bound
 #dCai_dt = -j_pump_SR*Vol_SR/Vol_myo + J_Ca_SL_myo/Vol_myo - 1*dCa_cytosol_tot_bound
-dCa_jct1_dt = - i_P2X * Cm/(Vol_jct1*2*F) - i_NaCa #+ 0.00005
+#dCa_jct1_dt = Conditional(And(Ge(time - floor(time/stim_period)*stim_period, stim_start), Le(time - floor(time/stim_period)*stim_period, stim_start + stim_duration), ), -stim_amplitude, 0) # uA*uF**-1
+dCa_jct1_dt = - i_P2X * Cm/(Vol_jct1*2*F) - i_NaCa - 0.00000085
 
 
 
