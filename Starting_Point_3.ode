@@ -67,7 +67,7 @@ parameters("Cell",
             stim_amplitude = ScalarParam(0.00065, unit="uA*uF**-1"))
 	  
 parameters("INaCa",
-            V_max_INaCa = ScalarParam(1.0e-5, unit="uA*uF**-1"), # Mouse CES 9/24/15
+            V_max_INaCa = ScalarParam(4.0e-5, unit="uA*uF**-1"), # Mouse CES 9/24/15
             Fx_NCX_jct1 = 0.19,  # Mouse CES 11/20/15
             Fx_NCX_SL = 0.81,  # Mouse CES 11/20/15
             Q10_NCX = 1.57,
@@ -183,7 +183,9 @@ i_NaCa_jct1 = Fx_NCX_jct1*V_max_INaCa*Ka_jct1*Q_NCX*temp_jct1/(K_mCai*Nao**HNa*(
 i_NaCa_SL = Fx_NCX_SL*V_max_INaCa*Ka_SL*Q_NCX*temp_SL/(K_mCai*Nao**HNa*(1 + (Na_SL/K_mNai)**HNa) + K_mNao**HNa*Ca_SL*(1 + Ca_SL/K_mCai) + K_mCao*Na_SL**HNa + Na_SL**HNa*Cao + Nao**HNa*Ca_SL) # uA*uF**-1
 #i_NaCa = i_NaCa_jct1 + i_NaCa_SL # uA*uF**-1
 #i_NaCa = V_max_INaCa  # uA*uF**-1  # BDS 4/19/2017 need to fix this at some point. Done to make Ca_jct1 oscilate as return to steady state.
-i_NaCa = Conditional(Ge(Ca_jct1, 1.00001e-4), V_max_INaCa, 0)  # uA*uF**-1  # BDS 4/19/2017 need to fix this at some point. Done to make Ca_jct1 oscilate as return to steady state.
+#i_NaCa = Conditional(Ge(Ca_jct1, 1.00001e-4), V_max_INaCa, 0)  # uA*uF**-1  # BDS 4/19/2017 need to fix this at some point. Done to make Ca_jct1 oscilate as return to steady state.
+r = 1 / (1 + Kd_act / Kd_act)
+i_NaCa = V_max_INaCa * ((1 / (1 + Kd_act / Ca_jct1)) - r ) 
 
 expressions("Ca buffer", "Cytosolic")
 dpp38_dt = Ca_jct1 * kon_p38 * (Bmax_p38 - pp38) - koff_p38 * pp38
@@ -227,7 +229,7 @@ expressions("Ca buffer")
 #dCa_SL_dt = -i_Ca_SL_tot*Cm/(Vol_SL*2*F) + (J_Ca_jct1_SL - J_Ca_SL_myo)/Vol_SL - 1*dCa_SL_tot_bound
 #dCai_dt = -j_pump_SR*Vol_SR/Vol_myo + J_Ca_SL_myo/Vol_myo - 1*dCa_cytosol_tot_bound
 #dCa_jct1_dt = Conditional(And(Ge(time - floor(time/stim_period)*stim_period, stim_start), Le(time - floor(time/stim_period)*stim_period, stim_start + stim_duration), ), -stim_amplitude, 0) # uA*uF**-1
-dCa_jct1_dt = - i_P2X * Cm/(Vol_jct1*2*F) - i_NaCa - 0.00000085
+dCa_jct1_dt = - i_P2X * Cm/(Vol_jct1*2*F) - i_NaCa #- 0.00000085
 
 
 
