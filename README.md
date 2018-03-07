@@ -17,7 +17,8 @@ Prelim data for microglia
 * Database configuration
 * How to run tests
 
-gotranrun  ICaL.ode  --plot_y Ca_jct1 --tstop=2000 --dt 1.
+source configgotran.bash
+gotranrun  simpleRyR.ode  --plot_y O --tstop=2000 --dt 1.
 
 python /u1/pmke226/srcs//gotran/scripts//gotranrun test.ode  --plot_y logpATP --tstop=30 --dt 0.1
 

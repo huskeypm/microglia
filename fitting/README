@@ -1,0 +1,5 @@
+To do
+1. make p2x channel gotran file (model after simpleRyR)
+2. get ode file to run and remove extraneous dependencies 
+3. use waveforms for fitting, unless exps work well
+
