@@ -416,7 +416,8 @@ def run(
 	outputParamName="Nai",
 	outputParamSearcher="Nai",
 	outputParamMethod="mean",
-	outputParamTruthVal=12.0e-3
+	outputParamTruthVal=12.0e-3,
+        maxCores = 30
 	):
 
   timeRange = [((jobDuration*ms_to_s)-3),jobDuration*ms_to_s] # [s] range for data (It's because of the way GetData rescales the time series)
@@ -430,7 +431,7 @@ def run(
   outputList = {outputParamName:outputObj(outputParamSearcher,outputParamMethod,timeRange,outputParamTruthVal)}
 
   # Run 
-  numCores = np.min([numRandomDraws,30])
+  numCores = np.min([numRandomDraws,maxCores])
   trial(odeModel=odeModel,paramDict=paramDict,outputList=outputList,numCores=numCores,numRandomDraws=numRandomDraws,jobDuration=jobDuration,numIters=numIters,sigmaScaleRate=sigmaScaleRate,fileName=fileName)
 
 

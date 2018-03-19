@@ -1,0 +1,58 @@
+#
+# Contribution of Calcium Otons to P2X Channel Responses. Egan and Khakh
+
+
+parameters("Cell",
+	    stim_start = ScalarParam(100, unit="ms"),
+            stim_period = ScalarParam(2000.0, unit="ms"),
+            stim_duration = ScalarParam(5, unit="ms"),
+            stim_amplitude = ScalarParam(0.00065, unit="uA*uF**-1"))
+	  
+states("Cell",
+       V = ScalarParam(-8.556885e1, unit="mV"),
+       logpATP = ScalarParam(-3, unit="logM"))
+
+states("Jrel sr",
+       R = 0.9,           
+       O = 1e-3,          # first open state 
+       Ot = 1e-3,         # second open state
+       Oc = 0,            # this is basically a placeholder to show combined contributions of O and Ot        
+)
+
+parameters("Jrel sr",
+           Ca_SR = 5.5e-1,
+#           cATP= 1e-3,
+           Max_SR = 15,
+           Min_SR = 1,
+           EC50_SR = 0.45,
+           ks = 25,
+           koCa = 10,
+           kom = 0.06,
+           kiCa = 1e-3,
+           kim = 0.05,
+           HSR = 2.5)
+
+
+expressions("Cell")
+dV_dt = 0 # need to leave this as a state, since the runner tries to record these data
+dlogpATP_dt = 0.007 *  (sin(2*3.141 * (time-2000)/stim_period))  # Oscilation between -6 and -3
+cATP = 10 ** (logpATP)
+
+
+expressions("Jrel sr")
+kCaSR = Max_SR - (Max_SR - Min_SR)/(one + (EC50_SR/Ca_SR)**HSR)
+koSRCa = koCa/kCaSR
+kiSRCa = kiCa*kCaSR
+RI = one - R - O - Ot
+comment("The ODE system: 3 states")
+dR_dt = kim*RI - kiSRCa*cATP*R - (koSRCa*cATP**three*R)  + kom*O
+O_RHS = koSRCa*cATP**three*R - kom*O - (kiSRCa*cATP*O)  + kim*Ot
+Ot_RHS= kiSRCa*cATP*O - kim*Ot - (kom*Ot - koSRCa*cATP**two*RI)
+dO_dt = O_RHS
+dOt_dt = Ot_RHS
+
+j_rel_SR = ks*O*(Ca_SR - cATP)
+#monitor(j_rel_SR)
+
+# placeholder to report combined contributions of O and Ot 
+dOc_dt = O_RHS + Ot_RHS 

@@ -2,4 +2,58 @@ To do
 1. make p2x channel gotran file (model after simpleRyR)
 2. get ode file to run and remove extraneous dependencies 
 3. use waveforms for fitting, unless exps work well
+4. Brad provided 'readme' below; can we add this to the script in a standard documentation style? 
+5. Use yaml
+
+To run
+see https://pkh.as.uky.edu/wiki/gotran
+cd microglia/fitting
+# load configs
+source ../configgotran.bash
+# run 'simple' simulation 
+# to assess model performance 
+gotranrun simpleRyR.ode --plot_y O  --tstop=2000 --dt 0.1 --parameters Ca_jct 1e-3
+# aqctual val, 0.5 
+python fittingAlgorithm.py -odeModel simpleRyR.ode -myVariedParam kiCa -variedParamTruthVal 3.0 -jobDuration 2e3 -fileName This_Is_A_Test.png -numRandomDraws 10 -numIters 9 -sigmaScaleRate 0.15 -outputParamName pO -outputParamSearcher O -outputParamMethod max -outputParamTruthVal 2.05e-5
+
+
+
+
+
+Brad's notes 
+
+This is a README file on explaining how to use the fitting algorithm to get a model to fit to a single value.
+This fitting algorithm was used in the Amylin paper of Stewart et al. (2018)
+
+Files needed: (I think this is the majority of files. I may have missed one since they are all so interconnected. The main ones dealing with fitting is the fitter.py and the fittingAlgorithm.py)
+	fitter.py # The workers in order to generate various jobs given by the fittingAlgorithm.py
+	fittingAlgorithm.py  # This is the beast of the whole program. This script is used to put in a ode model and then take a particular input and randomly generate jobs off of that input to then give you outputs that are checked against an output value that you wish to get. Then the file picks the best new starting place and begins the process again. NOTE: The example code shown below to run an example of a fitting experiment was taken from the end of this file. 
+	analyzeODE.py    # used to analyze ODE files. I believe this is where things dealing with pandas got moved to this file to be used int he future.
+	taufitting.py    # This is just used to fit tau values of the transients
+	runShannonTest.py # This was the base test file used to run experiments. This was from back when Caitlin made this. I do not remember much else about it off hand.
+	daisychain.py    # Fancy thing to allow us to daisychain multiple iterations together in order to prevent numerical instability from occuring. 
+
+An example of code used with fittingAlgorithm.py:
+
+	python fittingAlgorithm.py -odeModel shannon_2004_rat.ode -myVariedParam I_NaK_max -variedParamTruthVal 5.0 -jobDuration 30e3 -fileName This_Is_A_Test.png -numRandomDraws 3 -numIters 3 -sigmaScaleRate 0.15 -outputParamName Nai -outputParamSearcher Nai -outputParamMethod mean -outputParamTruthVal 12.0e-3 &
+
+	# Braking this down:
+		-odeModel: this is the odeModel you wish to use for running the simulation. In this case, the shannon_2004_rat.ode file was being used.
+		-myVariedParam: This is the param that is going to be varied with each job running. In this case, the I_NaK_max (sodium pump) was being varied.
+		-variedParamTruthVal: This is the starting value that you will use to then varie for the varied param. In this case, the I_NaK_max pump starts with a value of 5.0
+		-jobDuration: This is how long you will run the simulation for. In this case it was run for 30e3 ms. This is equivilant to 30 s.
+		-fileName: This is the name of the png file that this script will create. The png file will plot the iterations vs. value of myVariedParam. It will also plot a line showing the points that are closest to the value you are trying to obtain. This is good for visualizing if the simulation is converging to a good value or if the simulation should be run again with a better starting point. 
+		-numRandomDraws: This is the number of random draws that are given per iteration. In this instance, there are 3. This means 3 random draws will be given during each iteration. The draws will be centered around the best value given from the iteration before (or in the case of the first iteration, around the given variedParamTruthVal)
+		-numIters: This is the number of iterations you will run. 
+		-sigmaScaleRate: This is a value used to help with figuring out how wide you will start you variation at first before you converge the value you are testing. It can be thought about as how large you will make your standard deviation around the mean value that you will test. 
+		-outputParamName: This just the name used to look at various outputs. This is to make the readability easier for the user. This could just have been easily looking at "Cai_amp" or "Cai_dia" or "Tau_Cai" if given the correct outputParamSearcher and outputParamMethod. In this case, the Nai was just being looked at as an average, so the lable Nai was used.
+		-outputParamSearcher: This is the name used in the ode file for the output param you will be comparing against. Could be such things as "V", "Cai", or "Ca_SR". In this case, Nai was being observed.
+		-outputParamMethod: This is the method you will use on the outputParamSearcher values. This could be such things as "amp" for amplitude, "max" or "min" for the max and min, "APD" for action potential duration, or "tau" to look at calcium transients. In this case, mean was used to look at the average of the Nai overtime to see if it converges to a single value. 
+		-outputParamTruthVal: This is the value that you will be getting your output to be compared against. After the simulation is run and the output parm is found and had the statistical analysis computed, that value is then compared to this value. The closer the run value is to this value, the better that run will be considered in the code as a new starting point for the next iteration.
+
+
+
+
+
+
 
