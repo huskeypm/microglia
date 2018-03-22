@@ -92,6 +92,7 @@ def writePickle(name,p,p_idx,s,s_idx,j,j_idx,t):
 
 import re
 def readPickle(name = "PCa0.75kss0.25.pkl",verbose=True,readSubset=None,readConcat=False):          
+  raised RuntimeError("Antiquated - use analyzeGotran") 
 
   if readConcat:
     print name 
@@ -124,6 +125,7 @@ def readPickle(name = "PCa0.75kss0.25.pkl",verbose=True,readSubset=None,readConc
 #         [state1,state2, ...] 
 def LoadPickles(caseDict,noOverwrite=False,
                 verbose=True,readSubset=None,readConcat=False):
+  raise RuntimeError("Antiquated - use analyzeGotran") 
   for key,case in caseDict.iteritems():
     if verbose:
       print "# ", key
@@ -479,6 +481,7 @@ def TwoDPlots(allKeys,allVars,outsMin, outsMax,label0="",label1="",state="Cai"):
 # returns a single array with quantity of interest (valsIdx) 
 # which is the time series of the idxName 
 def GetData(data,idxName):
+    raise RuntimeError("Antiquated - use analyzeGotran") 
     #print "getting data" 
     datac = empty()
     datac.t = data['t'] * ms_to_s   # can't guarantee units are in [ms]
