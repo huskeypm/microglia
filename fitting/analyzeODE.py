@@ -17,6 +17,8 @@ import scipy.fftpack as fftp
 runner.init()
 import os.path
 
+import analyzeGotran as anG 
+
 class empty:pass
 mM_to_uM = 1e3
 ms_to_s = 1e-3
@@ -92,7 +94,7 @@ def writePickle(name,p,p_idx,s,s_idx,j,j_idx,t):
 
 import re
 def readPickle(name = "PCa0.75kss0.25.pkl",verbose=True,readSubset=None,readConcat=False):          
-  raised RuntimeError("Antiquated - use analyzeGotran") 
+  raise RuntimeError("Antiquated - use analyzeGotran") 
 
   if readConcat:
     print name 
@@ -282,7 +284,7 @@ def threeDDataLoader(filePath,temp,percents_one,percents_two,loadedData,fullData
 
                         case.fileName = filePath + reducedFile
                         try:
-                            case.data = readPickle(case.fileName,verbose=False)
+                            case.data = anG.readPickle(case.fileName,verbose=False)
                             print case.fileName
 
                             s = case.data['s']
@@ -375,7 +377,7 @@ def ProcessOneDOutputs(var1Name,names,allVars,state="Cai",xlim=None,ylim=None,of
   print "WARNING: does not include time steps" 
   for i,name in enumerate(names):               
       print name
-      d = readPickle(name+".pickle")
+      d = anG.readPickle(name+".pickle")
       print np.shape(d['s'])
       s = d['s']
       si = s[:,runner.model.state_indices(state)]         
@@ -423,7 +425,7 @@ def ProcessTwoDOutputs(allKeys,allVars,state="Cai",ylims=None,stim_period=1000,n
         name =namer(var1Name,var1Val,var2Name,var2Val,stim_period=stim_period,tag=nameTag)+".pickle"
         #print name
         try: 
-          d = readPickle(name) 
+          d = anG.readPickle(name) 
         except: 
           print name + " was not found. Skipping" 
           continue 
@@ -706,12 +708,12 @@ def TransientBarPlots(cases,caseNames,resultsA,resultsB=False,tag=""):
 # Collect all data 
 def ProcessAllTransients(cases,caseTags,pacingInterval,tag="",\
                          cols=[],name=None,root=""):
-    baseline = readPickle(root+caseTags[0]+tag+".pickle")
-    caseA = readPickle(root+caseTags[1]+tag+".pickle")
-    caseB= readPickle(root+caseTags[2]+tag+".pickle")
+    baseline = anG.readPickle(root+caseTags[0]+tag+".pickle")
+    caseA = anG.readPickle(root+caseTags[1]+tag+".pickle")
+    caseB= anG.readPickle(root+caseTags[2]+tag+".pickle")
     #pca1p25vmax1p25 = readOut("PCa1.25ks1.00vMax1.25"+tag+".pickle")
     if len(cases)>3:
-      caseC = readPickle(root+caseTags[3]+tag+".pickle")
+      caseC = anG.readPickle(root+caseTags[3]+tag+".pickle")
 
     
     taus=[]

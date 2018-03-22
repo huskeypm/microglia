@@ -3,13 +3,14 @@ import analyzeODE as ao
 # Grabs stuff from previous run 
 #prevOut = "run_G_CaBk1.00_G_NaBk1.00_stim2000_1.pickle"
 #prevNum=1 # could probably grab this from pickleName
+import analyzeGotran as anG
 def InitializeNextInSequence(prevOut,prevNum,downsampleRate):
   # Determine new pickleoutName 
   nextNum=prevNum+1
   nextOut = prevOut.replace("_%d.pickle"%prevNum,"_%d.pickle"%nextNum)
 
   # Load in prev data 
-  data = ao.readPickle(prevOut) 
+  data = anG.readPickle(prevOut) 
   si = data['s']
   s_idx = data['s_idx']
   p = data['p']
@@ -113,7 +114,7 @@ def ConcatenateTrajs(pickleNames,writeCat=False,downsampleRate=1):
   allt = []
   tprev=0
   for i,pickleName in enumerate(pickleNames):
-    data = ao.readPickle(pickleName) 
+    data = anG.readPickle(pickleName) 
 
     si = data['s']
     s_idx = data['s_idx']
