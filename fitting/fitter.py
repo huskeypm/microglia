@@ -20,6 +20,7 @@ import analyzeODE as ao
 import copy
 import pandas as pd
 import taufitting as tf
+import analyzeGotran as aG
 
 ms_to_s = 1e-3
 
@@ -222,7 +223,7 @@ def ProcessWorkerOutputs(data,outputList,tag=99):
     #print "outputList: ", outputList
     #print "in the for loop"
     #print "obj.timeRange: ", obj.timeRange
-    dataSub = ao.GetData(data, obj.name)
+    dataSub = aG.GetData(data, obj.name)
 
     #print "dataSub: ", dataSub
     #print "dataSub.valsIdx: ", dataSub.valsIdx
@@ -247,7 +248,7 @@ def test():
     #print returnDict['results']
     data = returnDict['data']
     print data.keys()
-    dataSub = ao.GetData(data,"Cai")
+    dataSub = aG.GetData(data,"Cai")
     # probably also want to give this a range 
     output = np.mean(dataSub.valsIdx)
     print output

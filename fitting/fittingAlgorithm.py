@@ -12,6 +12,7 @@ import taufitting as tf
 import matplotlib.pylab as plt
 import fitter
 import daisychain as dc
+import analyzeGotran as aG
 
 
 class outputObj:
@@ -97,7 +98,7 @@ def ProcessWorkerOutputs(data,outputList,tag=99):
     #print "outputList: ", outputList
     #print "in the for loop"
     #print "obj.timeRange: ", obj.timeRange
-    dataSub = ao.GetData(data, obj.name)
+    dataSub = aG.GetData(data, obj.name)
 
     #print "dataSub: ", dataSub
     #print "dataSub.valsIdx: ", dataSub.valsIdx
@@ -244,6 +245,7 @@ def fittingAlgorithm(
       else:
           print "Restricting to one job only/assuming results are all that's needed"
           jobNum, results = workerParams(jobList[0])
+          raise RuntimeError("PKH Needs to fig - give dataframe save" )
       
       # Shouldn't have to write csv for these 
       myDataFrame = fitter.PandaData(jobOutputs,csvFile=None) # "example.csv")
