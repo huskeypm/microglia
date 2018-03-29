@@ -1,0 +1,741 @@
+\documentclass[a4paper,10.0pt]{article}
+\usepackage{fullpage}
+\usepackage{longtable,tabu}
+\usepackage{multicol}
+\usepackage{amsmath}
+\usepackage{mathpazo}
+\usepackage[mathpazo]{flexisym}
+\usepackage{breqn}
+\setkeys{breqn}{breakdepth={1}}
+
+
+\begin{document}
+{\fontsize{10.0}{12.0}\selectfont
+
+
+% ---------------- BEGIN PARAMETERS ---------------- %
+
+\section*{Parameters}
+
+\label{sec:ODE_Parameters}
+
+\begin{longtabu}{| l l l |}
+\caption[Parameter Table]{\textbf{Parameter Table}}\\
+\hline
+\multicolumn{1}{|c}{\textbf{Parameter\hspace{0.5cm}}} &
+\multicolumn{1}{c}{\textbf{Value\hspace{0.5cm}}} &
+\multicolumn{1}{c|}{\textbf{Description\hspace{0.5cm}}}\\ \hline
+\endfirsthead
+\multicolumn{3}{c}%
+{{\bfseries\tablename\ \thetable{} --- continued from previous page}}
+\\ \hline
+\multicolumn{1}{|c}{\textbf{Parameter\hspace{0.5cm}}} &
+\multicolumn{1}{c}{\textbf{Value\hspace{0.5cm}}} &
+\multicolumn{1}{c|}{\textbf{Description\hspace{0.5cm}}}\\ \hline
+\endhead
+\hline
+\multicolumn{3}{|r|}{{Continued on next page}}\\ \hline
+\endfoot
+\hline \hline
+\endlastfoot
+  $stim_{amplitude}$\hspace{0.5cm} & $10\;\mu\mathrm{M}$\hspace{0.5cm} & \hspace{0.5cm}\\
+  $stim_{duration}$\hspace{0.5cm} & $50\;\mathrm{s}$\hspace{0.5cm} & \hspace{0.5cm}\\
+  $stim_{period}$\hspace{0.5cm} & $240\;\mathrm{s}$\hspace{0.5cm} & \hspace{0.5cm}\\
+  $stim_{start}$\hspace{0.5cm} & $190\;\mathrm{s}$\hspace{0.5cm} & \hspace{0.5cm}\\
+  $F_{ptxf}$\hspace{0.5cm} & $1$\hspace{0.5cm} & \hspace{0.5cm}\\
+  $G_{ptxf}$\hspace{0.5cm} & $1$\hspace{0.5cm} & \hspace{0.5cm}\\
+  $H_{1 ptxf}$\hspace{0.5cm} & $13\!\times\!10 ^{-3}\;\mathrm{s}^{-1}$\hspace{0.5cm} & \hspace{0.5cm}\\
+  $H_{2 ptxf}$\hspace{0.5cm} & $0.35\;\mathrm{s}^{-1}$\hspace{0.5cm} & \hspace{0.5cm}\\
+  $H_{3 ptxf}$\hspace{0.5cm} & $1.4\;\mathrm{s}^{-1}$\hspace{0.5cm} & \hspace{0.5cm}\\
+  $H_{4 ptxf}$\hspace{0.5cm} & $1\!\times\!10 ^{-3}\;\mathrm{s}^{-1}$\hspace{0.5cm} & \hspace{0.5cm}\\
+  $L_{1 ptxf}$\hspace{0.5cm} & $10\!\times\!10 ^{-3}\;\mathrm{s}^{-1}$\hspace{0.5cm} & \hspace{0.5cm}\\
+  $L_{2 ptxf}$\hspace{0.5cm} & $40\!\times\!10 ^{-3}\;\mathrm{s}^{-1}$\hspace{0.5cm} & \hspace{0.5cm}\\
+  $L_{3 ptxf}$\hspace{0.5cm} & $0.5\;\mathrm{s}^{-1}$\hspace{0.5cm} & \hspace{0.5cm}\\
+  $k_{1 ptxf}$\hspace{0.5cm} & $0.4\;\mathrm{s}^{-1}$\hspace{0.5cm} & \hspace{0.5cm}\\
+  $k_{2 ptxf}$\hspace{0.5cm} & $600\!\times\!10 ^{3}\;\mathrm{M}\,\mathrm{s}$\hspace{0.5cm} & \hspace{0.5cm}\\
+  $k_{3 ptxf}$\hspace{0.5cm} & $0.5\;\mathrm{s}^{-1}$\hspace{0.5cm} & \hspace{0.5cm}\\
+  $k_{4 ptxf}$\hspace{0.5cm} & $500\!\times\!10 ^{3}\;\mathrm{M}\,\mathrm{s}$\hspace{0.5cm} & \hspace{0.5cm}\\
+  $k_{5 ptxf}$\hspace{0.5cm} & $0.6\;\mathrm{s}^{-1}$\hspace{0.5cm} & \hspace{0.5cm}\\
+  $k_{6 ptxf}$\hspace{0.5cm} & $400\!\times\!10 ^{3}\;\mathrm{M}\,\mathrm{s}$\hspace{0.5cm} & \hspace{0.5cm}\\
+  $H_{1 ptxs}$\hspace{0.5cm} & $1\!\times\!10 ^{-3}\;\mathrm{s}^{-1}$\hspace{0.5cm} & \hspace{0.5cm}\\
+  $H_{2 ptxs}$\hspace{0.5cm} & $10\!\times\!10 ^{-3}\;\mathrm{s}^{-1}$\hspace{0.5cm} & \hspace{0.5cm}\\
+  $H_{3 ptxs}$\hspace{0.5cm} & $0.5\;\mathrm{s}^{-1}$\hspace{0.5cm} & \hspace{0.5cm}\\
+  $H_{4 ptxs}$\hspace{0.5cm} & $0\;\mathrm{s}^{-1}$\hspace{0.5cm} & \hspace{0.5cm}\\
+  $L_{1 ptxs}$\hspace{0.5cm} & $100\!\times\!10 ^{-6}\;\mathrm{s}^{-1}$\hspace{0.5cm} & \hspace{0.5cm}\\
+  $L_{2 ptxs}$\hspace{0.5cm} & $4\!\times\!10 ^{-3}\;\mathrm{s}^{-1}$\hspace{0.5cm} & \hspace{0.5cm}\\
+  $L_{3 ptxs}$\hspace{0.5cm} & $0.5\;\mathrm{s}^{-1}$\hspace{0.5cm} & \hspace{0.5cm}\\
+  $k_{1 ptxs}$\hspace{0.5cm} & $0.3\;\mathrm{s}^{-1}$\hspace{0.5cm} & \hspace{0.5cm}\\
+  $k_{2 ptxs}$\hspace{0.5cm} & $70\!\times\!10 ^{3}\;\mathrm{M}\,\mathrm{s}$\hspace{0.5cm} & \hspace{0.5cm}\\
+  $k_{3 ptxs}$\hspace{0.5cm} & $5.4\;\mathrm{s}^{-1}$\hspace{0.5cm} & \hspace{0.5cm}\\
+  $k_{4 ptxs}$\hspace{0.5cm} & $100\!\times\!10 ^{3}\;\mathrm{M}\,\mathrm{s}$\hspace{0.5cm} & \hspace{0.5cm}\\
+  $k_{5 ptxs}$\hspace{0.5cm} & $1.58\;\mathrm{s}^{-1}$\hspace{0.5cm} & \hspace{0.5cm}\\
+  $k_{6 ptxs}$\hspace{0.5cm} & $7\!\times\!10 ^{3}\;\mathrm{M}\,\mathrm{s}$\hspace{0.5cm} & \hspace{0.5cm}\\
+  $CaA_{ptxf}$\hspace{0.5cm} & $82.4\!\times\!10 ^{-3}$\hspace{0.5cm} & \hspace{0.5cm}\\
+  $E_{12 ptxf}$\hspace{0.5cm} & $0\;\mathrm{V}$\hspace{0.5cm} & \hspace{0.5cm}\\
+  $E_{34 ptxf}$\hspace{0.5cm} & $0\;\mathrm{V}$\hspace{0.5cm} & \hspace{0.5cm}\\
+  $G_{12 ptxf}$\hspace{0.5cm} & $30\!\times\!10 ^{-9}\;\mathrm{C}\,\mathrm{s}\,\mathrm{V}$\hspace{0.5cm} & \hspace{0.5cm}\\
+  $G_{34 ptxf}$\hspace{0.5cm} & $80\!\times\!10 ^{-9}\;\mathrm{C}\,\mathrm{s}\,\mathrm{V}$\hspace{0.5cm} & \hspace{0.5cm}\\
+  $V_{ptxf}$\hspace{0.5cm} & $-60\!\times\!10 ^{-3}\;\mathrm{V}$\hspace{0.5cm} & \hspace{0.5cm}\\
+  $CaA_{ptxs}$\hspace{0.5cm} & $0.1$\hspace{0.5cm} & \hspace{0.5cm}\\
+  $E_{12 ptxs}$\hspace{0.5cm} & $0\;\mathrm{V}$\hspace{0.5cm} & \hspace{0.5cm}\\
+  $E_{34 ptxs}$\hspace{0.5cm} & $0\;\mathrm{V}$\hspace{0.5cm} & \hspace{0.5cm}\\
+  $G_{12 ptxs}$\hspace{0.5cm} & $15\!\times\!10 ^{-9}\;\mathrm{C}\,\mathrm{s}\,\mathrm{V}$\hspace{0.5cm} & \hspace{0.5cm}\\
+  $G_{34 ptxs}$\hspace{0.5cm} & $45\!\times\!10 ^{-9}\;\mathrm{C}\,\mathrm{s}\,\mathrm{V}$\hspace{0.5cm} & \hspace{0.5cm}\\
+  $V_{ptxs}$\hspace{0.5cm} & $-60\!\times\!10 ^{-3}\;\mathrm{V}$\hspace{0.5cm} & \hspace{0.5cm}\\
+  $F$\hspace{0.5cm} & $96.5\!\times\!10 ^{3}\;\mathrm{C}\,\mathrm{mol}^{-1}$\hspace{0.5cm} & \hspace{0.5cm}\\
+  $expF_{ptxf}$\hspace{0.5cm} & $0.1$\hspace{0.5cm} & \hspace{0.5cm}\\
+  $expF_{ptxs}$\hspace{0.5cm} & $0.1$\hspace{0.5cm} & \hspace{0.5cm}\\
+  $rHEK$\hspace{0.5cm} & $6.5\!\times\!10 ^{-6}\;\mathrm{m}$\hspace{0.5cm} & \hspace{0.5cm}\\
+  $rMiG$\hspace{0.5cm} & $2.6\!\times\!10 ^{-6}\;\mathrm{m}$\hspace{0.5cm} & \hspace{0.5cm}\\
+  $BmFura$\hspace{0.5cm} & $25\!\times\!10 ^{-6}\;\mathrm{M}$\hspace{0.5cm} & \hspace{0.5cm}\\
+  $CNt$\hspace{0.5cm} & $2\!\times\!10 ^{-6}\;\mathrm{M}$\hspace{0.5cm} & \hspace{0.5cm}\\
+  $CaMt$\hspace{0.5cm} & $3\!\times\!10 ^{-6}\;\mathrm{M}$\hspace{0.5cm} & \hspace{0.5cm}\\
+  $KoffFura$\hspace{0.5cm} & $23\;\mathrm{s}^{-1}$\hspace{0.5cm} & \hspace{0.5cm}\\
+  $KonFura$\hspace{0.5cm} & $150\!\times\!10 ^{6}\;\mathrm{M}\,\mathrm{s}$\hspace{0.5cm} & \hspace{0.5cm}\\
+  $kab$\hspace{0.5cm} & $10\!\times\!10 ^{12}\;\mathrm{M}^{-2}\,\mathrm{s}^{-1}$\hspace{0.5cm} & \hspace{0.5cm}\\
+  $kba$\hspace{0.5cm} & $10\;\mathrm{s}^{-1}$\hspace{0.5cm} & \hspace{0.5cm}\\
+  $kbc$\hspace{0.5cm} & $5\!\times\!10 ^{15}\;\mathrm{M}^{-2}\,\mathrm{s}^{-1}$\hspace{0.5cm} & \hspace{0.5cm}\\
+  $kcb$\hspace{0.5cm} & $500\;\mathrm{s}^{-1}$\hspace{0.5cm} & \hspace{0.5cm}\\
+  $koffA$\hspace{0.5cm} & $1\;\mathrm{s}^{-1}$\hspace{0.5cm} & \hspace{0.5cm}\\
+  $koffB$\hspace{0.5cm} & $1\;\mathrm{s}^{-1}$\hspace{0.5cm} & \hspace{0.5cm}\\
+  $konA$\hspace{0.5cm} & $10\!\times\!10 ^{9}\;\mathrm{M}^{-1}\,\mathrm{s}^{-1}$\hspace{0.5cm} & \hspace{0.5cm}\\
+  $konB$\hspace{0.5cm} & $2\!\times\!10 ^{12}\;\mathrm{M}^{-2}\,\mathrm{s}^{-1}$\hspace{0.5cm} & \hspace{0.5cm}\\
+  $BmCals$\hspace{0.5cm} & $140\!\times\!10 ^{-6}\;\mathrm{M}$\hspace{0.5cm} & \hspace{0.5cm}\\
+  $KoffCals$\hspace{0.5cm} & $65\!\times\!10 ^{3}\;\mathrm{s}^{-1}$\hspace{0.5cm} & \hspace{0.5cm}\\
+  $KonCals$\hspace{0.5cm} & $100\!\times\!10 ^{6}\;\mathrm{M}\,\mathrm{s}$\hspace{0.5cm} & \hspace{0.5cm}\\
+  $rV_{ER}$\hspace{0.5cm} & $87.5\!\times\!10 ^{-3}$\hspace{0.5cm} & \hspace{0.5cm}\\
+  $Cae_{NCX}$\hspace{0.5cm} & $2\!\times\!10 ^{-3}$\hspace{0.5cm} & \hspace{0.5cm}\\
+  $Fncx$\hspace{0.5cm} & $96.5\!\times\!10 ^{3}$\hspace{0.5cm} & \hspace{0.5cm}\\
+  $HNa_{NCX}$\hspace{0.5cm} & $3$\hspace{0.5cm} & \hspace{0.5cm}\\
+  $KdAct_{NCX}$\hspace{0.5cm} & $0.26$\hspace{0.5cm} & \hspace{0.5cm}\\
+  $KmCai_{NCX}$\hspace{0.5cm} & $3.59\!\times\!10 ^{-6}\;\mathrm{M}$\hspace{0.5cm} & \hspace{0.5cm}\\
+  $KmCao_{NCX}$\hspace{0.5cm} & $1.3\!\times\!10 ^{-3}\;\mathrm{M}$\hspace{0.5cm} & \hspace{0.5cm}\\
+  $KmNai_{NCX}$\hspace{0.5cm} & $12.3\!\times\!10 ^{-3}\;\mathrm{M}$\hspace{0.5cm} & \hspace{0.5cm}\\
+  $KmNao_{NCX}$\hspace{0.5cm} & $87.5\!\times\!10 ^{-3}\;\mathrm{M}$\hspace{0.5cm} & \hspace{0.5cm}\\
+  $Nae_{NCX}$\hspace{0.5cm} & $0.14$\hspace{0.5cm} & \hspace{0.5cm}\\
+  $Nai_{NCX}$\hspace{0.5cm} & $8\!\times\!10 ^{-3}$\hspace{0.5cm} & \hspace{0.5cm}\\
+  $Q10NCX$\hspace{0.5cm} & $1.57$\hspace{0.5cm} & \hspace{0.5cm}\\
+  $R$\hspace{0.5cm} & $8.31\;\mathrm{J}\,\mathrm{mol}\,\mathrm{K}$\hspace{0.5cm} & \hspace{0.5cm}\\
+  $T_{NCX}$\hspace{0.5cm} & $310\;\mathrm{K}$\hspace{0.5cm} & \hspace{0.5cm}\\
+  $VmaxNCX$\hspace{0.5cm} & $9\;\mathrm{A}\,\mathrm{F}^{-1}$\hspace{0.5cm} & \hspace{0.5cm}\\
+  $Vncx$\hspace{0.5cm} & $-60\!\times\!10 ^{-3}$\hspace{0.5cm} & \hspace{0.5cm}\\
+  $\eta_{NCX}$\hspace{0.5cm} & $0.35$\hspace{0.5cm} & \hspace{0.5cm}\\
+  $ksat_{NCX}$\hspace{0.5cm} & $0.27$\hspace{0.5cm} & \hspace{0.5cm}\\
+  $uniC_{NCX}$\hspace{0.5cm} & $10\!\times\!10 ^{-3}$\hspace{0.5cm} & \hspace{0.5cm}\\
+  $H_{SERCA}$\hspace{0.5cm} & $1.79$\hspace{0.5cm} & \hspace{0.5cm}\\
+  $Kmf_{SERCA}$\hspace{0.5cm} & $246\!\times\!10 ^{-9}\;\mu\mathrm{M}$\hspace{0.5cm} & \hspace{0.5cm}\\
+  $Kmr_{SERCA}$\hspace{0.5cm} & $1.7\!\times\!10 ^{-3}\;\mathrm{mM}$\hspace{0.5cm} & \hspace{0.5cm}\\
+  $Q10ERCa$\hspace{0.5cm} & $2.6$\hspace{0.5cm} & \hspace{0.5cm}\\
+  $T_{SERCA}$\hspace{0.5cm} & $310$\hspace{0.5cm} & \hspace{0.5cm}\\
+  $VmaxSERCA$\hspace{0.5cm} & $5.31\!\times\!10 ^{-3}\;\mathrm{M}\,\mathrm{s}^{-1}$\hspace{0.5cm} & \hspace{0.5cm}\\
+  $kb_{pp38}$\hspace{0.5cm} & $1.85\!\times\!10 ^{-3}\;\mathrm{s}^{-1}$\hspace{0.5cm} & \hspace{0.5cm}\\
+  $kf_{pp38}$\hspace{0.5cm} & $208\;\mathrm{M}\,\mathrm{s}$\hspace{0.5cm} & \hspace{0.5cm}\\
+  $CNt_{NFAT}$\hspace{0.5cm} & $2\!\times\!10 ^{3}\;\mathrm{nM}$\hspace{0.5cm} & \hspace{0.5cm}\\
+  $Ccn_{NFAT}$\hspace{0.5cm} & $1$\hspace{0.5cm} & \hspace{0.5cm}\\
+  $KmN_{NFAT}$\hspace{0.5cm} & $535\;\mathrm{nM}$\hspace{0.5cm} & \hspace{0.5cm}\\
+  $kf_{1 NFAT}$\hspace{0.5cm} & $76.9\!\times\!10 ^{-6}\;\mathrm{nM}\,\mathrm{s}$\hspace{0.5cm} & \hspace{0.5cm}\\
+  $kf_{2 NFAT}$\hspace{0.5cm} & $1.44\!\times\!10 ^{-3}\;\mathrm{s}^{-1}$\hspace{0.5cm} & \hspace{0.5cm}\\
+  $kf_{3 NFAT}$\hspace{0.5cm} & $362\!\times\!10 ^{-6}\;\mathrm{s}^{-1}$\hspace{0.5cm} & \hspace{0.5cm}\\
+  $kf_{4 NFAT}$\hspace{0.5cm} & $445\!\times\!10 ^{-6}\;\mathrm{s}^{-1}$\hspace{0.5cm} & \hspace{0.5cm}\\
+  $kr_{1 NFAT}$\hspace{0.5cm} & $19.3\!\times\!10 ^{-3}\;\mathrm{s}^{-1}$\hspace{0.5cm} & \hspace{0.5cm}\\
+  $kr_{3 NFAT}$\hspace{0.5cm} & $47.1\!\times\!10 ^{-6}\;\mathrm{nM}\,\mathrm{s}$\hspace{0.5cm} & \hspace{0.5cm}\\
+  $n_{NFAT}$\hspace{0.5cm} & $2.92$\hspace{0.5cm} & \hspace{0.5cm}\\
+  $IC50Caleak_{TNF}$\hspace{0.5cm} & $0.1\;\mu\mathrm{M}$\hspace{0.5cm} & \hspace{0.5cm}\\
+  $IC50NFAT1_{TNF}$\hspace{0.5cm} & $1.07\;\mathrm{nM}$\hspace{0.5cm} & \hspace{0.5cm}\\
+  $kdegRNA_{TNF}$\hspace{0.5cm} & $139\!\times\!10 ^{-6}\;\mathrm{s}^{-1}$\hspace{0.5cm} & \hspace{0.5cm}\\
+  $kdegTNF_{TNF}$\hspace{0.5cm} & $13.9\!\times\!10 ^{-3}\;\mathrm{s}^{-1}$\hspace{0.5cm} & \hspace{0.5cm}\\
+  $kfpp_{38 TNF}$\hspace{0.5cm} & $556\!\times\!10 ^{-6}\;\mathrm{M}\,\mathrm{s}$\hspace{0.5cm} & \hspace{0.5cm}\\
+  $kgeneexpf_{TNF}$\hspace{0.5cm} & $111\!\times\!10 ^{-6}\;\mathrm{molecule}\,\mathrm{s}$\hspace{0.5cm} & \hspace{0.5cm}\\
+  $kgeneexpr_{TNF}$\hspace{0.5cm} & $278\!\times\!10 ^{-6}\;\mathrm{s}^{-1}$\hspace{0.5cm} & \hspace{0.5cm}\\
+  $kmaxexo_{TNF}$\hspace{0.5cm} & $2.78\!\times\!10 ^{-3}\;\mathrm{M}\,\mathrm{s}$\hspace{0.5cm} & \hspace{0.5cm}\\
+  $ktrnscrpt_{TNF}$\hspace{0.5cm} & $278\!\times\!10 ^{-6}\;\mathrm{s}^{-1}$\hspace{0.5cm} & \hspace{0.5cm}\\
+  $ktrnsl_{TNF}$\hspace{0.5cm} & $27.8\!\times\!10 ^{-3}\;\mathrm{s}^{-1}$\hspace{0.5cm} & \hspace{0.5cm}\\
+  $nCaleak_{TNF}$\hspace{0.5cm} & $1.8$\hspace{0.5cm} & \hspace{0.5cm}\\
+  $nNFAT_{1 TNF}$\hspace{0.5cm} & $100$\hspace{0.5cm} & \hspace{0.5cm}\\
+  $CaExt$\hspace{0.5cm} & $2\!\times\!10 ^{-3}\;\mathrm{M}$\hspace{0.5cm} & \hspace{0.5cm}\\
+  $DCytoEx$\hspace{0.5cm} & $1\!\times\!10 ^{-3}\;\mathrm{s}^{-1}$\hspace{0.5cm} & \hspace{0.5cm}\\
+  $DERtoCy$\hspace{0.5cm} & $1\!\times\!10 ^{-3}\;\mathrm{s}^{-1}$\hspace{0.5cm} & \hspace{0.5cm}\\
+\hline
+\end{longtabu}
+
+
+% ----------------- END PARAMETERS ----------------- %
+
+% ---------------- BEGIN STATES ---------------- %
+
+\section*{Initial Values}
+
+\label{sec:ODE_States}
+
+\begin{longtabu}{| l l l |}
+\caption[State Table]{\textbf{State Table}}\\
+\hline
+\multicolumn{1}{|c}{\textbf{State\hspace{0.5cm}}} &
+\multicolumn{1}{c}{\textbf{Value\hspace{0.5cm}}} &
+\multicolumn{1}{c|}{\textbf{Description\hspace{0.5cm}}}\\ \hline
+\endfirsthead
+\multicolumn{3}{c}%
+{{\bfseries\tablename\ \thetable{} --- continued from previous page}}
+\\ \hline
+\multicolumn{1}{|c}{\textbf{State\hspace{0.5cm}}} &
+\multicolumn{1}{c}{\textbf{Value\hspace{0.5cm}}} &
+\multicolumn{1}{c|}{\textbf{Description\hspace{0.5cm}}}\\ \hline
+\endhead
+\hline
+\multicolumn{3}{|r|}{{Continued on next page}}\\ \hline
+\endfoot
+\hline \hline
+\endlastfoot
+  $D_{1 ptxf}$\hspace{0.5cm} & $0$\hspace{0.5cm} & \hspace{0.5cm}\\
+  $D_{2 ptxf}$\hspace{0.5cm} & $0$\hspace{0.5cm} & \hspace{0.5cm}\\
+  $D_{3 ptxf}$\hspace{0.5cm} & $0$\hspace{0.5cm} & \hspace{0.5cm}\\
+  $D_{4 ptxf}$\hspace{0.5cm} & $0$\hspace{0.5cm} & \hspace{0.5cm}\\
+  $C_{1 ptxf}$\hspace{0.5cm} & $1$\hspace{0.5cm} & \hspace{0.5cm}\\
+  $C_{2 ptxf}$\hspace{0.5cm} & $0$\hspace{0.5cm} & \hspace{0.5cm}\\
+  $C_{3 ptxf}$\hspace{0.5cm} & $0$\hspace{0.5cm} & \hspace{0.5cm}\\
+  $C_{4 ptxf}$\hspace{0.5cm} & $0$\hspace{0.5cm} & \hspace{0.5cm}\\
+  $Q_{1 ptxf}$\hspace{0.5cm} & $0$\hspace{0.5cm} & \hspace{0.5cm}\\
+  $Q_{2 ptxf}$\hspace{0.5cm} & $0$\hspace{0.5cm} & \hspace{0.5cm}\\
+  $Q_{3 ptxf}$\hspace{0.5cm} & $0$\hspace{0.5cm} & \hspace{0.5cm}\\
+  $Q_{4 ptxf}$\hspace{0.5cm} & $0$\hspace{0.5cm} & \hspace{0.5cm}\\
+  $N_{ptxf}$\hspace{0.5cm} & $0$\hspace{0.5cm} & \hspace{0.5cm}\\
+  $D_{1 ptxs}$\hspace{0.5cm} & $0$\hspace{0.5cm} & \hspace{0.5cm}\\
+  $D_{2 ptxs}$\hspace{0.5cm} & $0$\hspace{0.5cm} & \hspace{0.5cm}\\
+  $D_{3 ptxs}$\hspace{0.5cm} & $0$\hspace{0.5cm} & \hspace{0.5cm}\\
+  $D_{4 ptxs}$\hspace{0.5cm} & $0$\hspace{0.5cm} & \hspace{0.5cm}\\
+  $C_{1 ptxs}$\hspace{0.5cm} & $1$\hspace{0.5cm} & \hspace{0.5cm}\\
+  $C_{2 ptxs}$\hspace{0.5cm} & $0$\hspace{0.5cm} & \hspace{0.5cm}\\
+  $C_{3 ptxs}$\hspace{0.5cm} & $0$\hspace{0.5cm} & \hspace{0.5cm}\\
+  $C_{4 ptxs}$\hspace{0.5cm} & $0$\hspace{0.5cm} & \hspace{0.5cm}\\
+  $Q_{1 ptxs}$\hspace{0.5cm} & $0$\hspace{0.5cm} & \hspace{0.5cm}\\
+  $Q_{2 ptxs}$\hspace{0.5cm} & $0$\hspace{0.5cm} & \hspace{0.5cm}\\
+  $Q_{3 ptxs}$\hspace{0.5cm} & $0$\hspace{0.5cm} & \hspace{0.5cm}\\
+  $Q_{4 ptxs}$\hspace{0.5cm} & $0$\hspace{0.5cm} & \hspace{0.5cm}\\
+  $Ca_{2 CaM}$\hspace{0.5cm} & $0\;\mathrm{M}$\hspace{0.5cm} & \hspace{0.5cm}\\
+  $Ca_{4 CaM}$\hspace{0.5cm} & $0\;\mathrm{M}$\hspace{0.5cm} & \hspace{0.5cm}\\
+  $Ca_{4 CN}$\hspace{0.5cm} & $0\;\mathrm{M}$\hspace{0.5cm} & \hspace{0.5cm}\\
+  $CaF$\hspace{0.5cm} & $7.79\!\times\!10 ^{-6}\;\mathrm{M}$\hspace{0.5cm} & \hspace{0.5cm}\\
+  $CaMCN$\hspace{0.5cm} & $0\;\mathrm{M}$\hspace{0.5cm} & \hspace{0.5cm}\\
+  $CaS$\hspace{0.5cm} & $679\!\times\!10 ^{-6}\;\mathrm{M}$\hspace{0.5cm} & \hspace{0.5cm}\\
+  $NCX$\hspace{0.5cm} & $0$\hspace{0.5cm} & \hspace{0.5cm}\\
+  $SERCA$\hspace{0.5cm} & $0$\hspace{0.5cm} & \hspace{0.5cm}\\
+  $pp_{38}$\hspace{0.5cm} & $0\;\mathrm{molecule}$\hspace{0.5cm} & \hspace{0.5cm}\\
+  $p_{38}$\hspace{0.5cm} & $50\;\mathrm{molecule}$\hspace{0.5cm} & \hspace{0.5cm}\\
+  $NFATpc$\hspace{0.5cm} & $0.99\;\mathrm{M}$\hspace{0.5cm} & \hspace{0.5cm}\\
+  $NFATNc$\hspace{0.5cm} & $112\!\times\!10 ^{-6}\;\mathrm{M}$\hspace{0.5cm} & \hspace{0.5cm}\\
+  $NFATNn$\hspace{0.5cm} & $58.1\!\times\!10 ^{-3}\;\mathrm{M}$\hspace{0.5cm} & \hspace{0.5cm}\\
+  $NFATpn$\hspace{0.5cm} & $46.4\!\times\!10 ^{-3}\;\mathrm{M}$\hspace{0.5cm} & \hspace{0.5cm}\\
+  $DNA_{TNF}$\hspace{0.5cm} & $50\;\mathrm{molecule}$\hspace{0.5cm} & \hspace{0.5cm}\\
+  $mRNA_{TNF}$\hspace{0.5cm} & $0\;\mathrm{molecule}$\hspace{0.5cm} & \hspace{0.5cm}\\
+  $DNATNF$\hspace{0.5cm} & $0\;\mathrm{molecule}$\hspace{0.5cm} & \hspace{0.5cm}\\
+  $TNFa$\hspace{0.5cm} & $100\;\mathrm{molecule}$\hspace{0.5cm} & \hspace{0.5cm}\\
+  $TNFa_{release}$\hspace{0.5cm} & $0\;\mathrm{molecule}$\hspace{0.5cm} & \hspace{0.5cm}\\
+  $CaCytoEx$\hspace{0.5cm} & $0\;\mathrm{M}$\hspace{0.5cm} & \hspace{0.5cm}\\
+  $CaERtoCy$\hspace{0.5cm} & $0\;\mathrm{M}$\hspace{0.5cm} & \hspace{0.5cm}\\
+  $CaER$\hspace{0.5cm} & $480\!\times\!10 ^{-6}\;\mathrm{M}$\hspace{0.5cm} & \hspace{0.5cm}\\
+  $Cai$\hspace{0.5cm} & $69.4\!\times\!10 ^{-9}\;\mathrm{M}$\hspace{0.5cm} & \hspace{0.5cm}\\
+  $V$\hspace{0.5cm} & $0$\hspace{0.5cm} & \hspace{0.5cm}\\
+\hline
+\end{longtabu}
+
+
+% ----------------- END STATES ----------------- %
+
+% ---------------- BEGIN COMPONENTS ---------------- %
+
+\section*{Components}
+\label{sec:ODE_Components}
+
+\textbf{MSMp2x4}\\
+\label{comp:MSMp2x4}
+\begin{dgroup}
+  \begin{dmath}
+    \label{eq:stim_amplitude2}
+    stim_{amplitude2} = 1\!\times\!10 ^{-6} stim_{amplitude}\\
+  \end{dmath}
+  \begin{dmath}
+    \label{eq:ATPptxf}
+    ATPptxf = \begin{cases} stim_{amplitude2} & \text{for}\: t - stim_{period} \lfloor{\frac{t}{stim_{period}}}\rfloor \geq stim_{start} \wedge t - stim_{period} \lfloor{\frac{t}{stim_{period}}}\rfloor \leq stim_{duration} + stim_{start} \\0 & \text{otherwise} \end{cases}\\
+  \end{dmath}
+  \begin{dmath}
+    \label{eq:dD1_ptxf_dt}
+    \frac{dD_{1 ptxf}}{dt} = k_{1 ptxf} D_{2 ptxf} - \left(H_{1 ptxf} + 3 k_{2 ptxf} ATPptxf\right) D_{1 ptxf}\\
+  \end{dmath}
+  \begin{dmath}
+    \label{eq:dD2_ptxf_dt}
+    \frac{dD_{2 ptxf}}{dt} = H_{2 ptxf} C_{2 ptxf} - \left(k_{1 ptxf} + 2 k_{4 ptxf} ATPptxf\right) D_{2 ptxf} + 2 k_{3 ptxf} D_{3 ptxf} + 3 k_{2 ptxf} ATPptxf D_{1 ptxf}\\
+  \end{dmath}
+  \begin{dmath}
+    \label{eq:dD3_ptxf_dt}
+    \frac{dD_{3 ptxf}}{dt} = H_{2 ptxf} Q_{1 ptxf} - \left(2 k_{3 ptxf} + k_{6 ptxf} ATPptxf\right) D_{3 ptxf} + 3 k_{5 ptxf} D_{4 ptxf} + 2 k_{4 ptxf} ATPptxf D_{2 ptxf}\\
+  \end{dmath}
+  \begin{dmath}
+    \label{eq:dD4_ptxf_dt}
+    \frac{dD_{4 ptxf}}{dt} = H_{2 ptxf} Q_{2 ptxf} - \left(H_{3 ptxf} + 3 k_{5 ptxf}\right) D_{4 ptxf} + k_{6 ptxf} ATPptxf D_{3 ptxf}\\
+  \end{dmath}
+  \begin{dmath}
+    \label{eq:dC1_ptxf_dt}
+    \frac{dC_{1 ptxf}}{dt} = H_{1 ptxf} D_{1 ptxf} + H_{4 ptxf} N_{ptxf} + L_{1 ptxf} C_{4 ptxf} + G_{ptxf} k_{1 ptxf} C_{2 ptxf} - 3 F_{ptxf} k_{2 ptxf} ATPptxf C_{1 ptxf}\\
+  \end{dmath}
+  \begin{dmath}
+    \label{eq:dC2_ptxf_dt}
+    \frac{dC_{2 ptxf}}{dt} = - \left(H_{2 ptxf} + G_{ptxf} k_{1 ptxf} + 2 F_{ptxf} k_{4 ptxf} ATPptxf\right) C_{2 ptxf} + 2 G_{ptxf} k_{3 ptxf} Q_{1 ptxf} + 3 F_{ptxf} k_{2 ptxf} ATPptxf C_{1 ptxf}\\
+  \end{dmath}
+  \begin{dmath}
+    \label{eq:dC3_ptxf_dt}
+    \frac{dC_{3 ptxf}}{dt} = - \left(G_{ptxf} k_{1 ptxf} + 2 F_{ptxf} k_{2 ptxf} ATPptxf\right) C_{3 ptxf} + 2 G_{ptxf} k_{1 ptxf} Q_{4 ptxf} + 3 F_{ptxf} k_{2 ptxf} ATPptxf C_{4 ptxf}\\
+  \end{dmath}
+  \begin{dmath}
+    \label{eq:dC4_ptxf_dt}
+    \frac{dC_{4 ptxf}}{dt} = - \left(L_{1 ptxf} + 3 F_{ptxf} k_{2 ptxf} ATPptxf\right) C_{4 ptxf} + G_{ptxf} k_{1 ptxf} C_{3 ptxf}\\
+  \end{dmath}
+  \begin{dmath}
+    \label{eq:dQ1_ptxf_dt}
+    \frac{dQ_{1 ptxf}}{dt} = - \left(H_{2 ptxf} + 2 G_{ptxf} k_{3 ptxf} + F_{ptxf} k_{6 ptxf} ATPptxf\right) Q_{1 ptxf} + 3 G_{ptxf} k_{5 ptxf} Q_{2 ptxf} + 2 F_{ptxf} k_{4 ptxf} ATPptxf C_{2 ptxf}\\
+  \end{dmath}
+  \begin{dmath}
+    \label{eq:dQ2_ptxf_dt}
+    \frac{dQ_{2 ptxf}}{dt} = L_{2 ptxf} Q_{3 ptxf} - \left(H_{2 ptxf} + L_{3 ptxf} \left(1 - G_{ptxf}\right) + 3 G_{ptxf} k_{5 ptxf}\right) Q_{2 ptxf} + F_{ptxf} k_{6 ptxf} ATPptxf Q_{1 ptxf}\\
+  \end{dmath}
+  \begin{dmath}
+    \label{eq:dQ3_ptxf_dt}
+    \frac{dQ_{3 ptxf}}{dt} = - \left(L_{2 ptxf} + 3 G_{ptxf} k_{1 ptxf}\right) Q_{3 ptxf} + L_{3 ptxf} \left(1 - G_{ptxf}\right) Q_{2 ptxf} + F_{ptxf} k_{2 ptxf} ATPptxf Q_{4 ptxf}\\
+  \end{dmath}
+  \begin{dmath}
+    \label{eq:dQ4_ptxf_dt}
+    \frac{dQ_{4 ptxf}}{dt} = - \left(2 G_{ptxf} k_{1 ptxf} + F_{ptxf} k_{2 ptxf} ATPptxf\right) Q_{4 ptxf} + 3 G_{ptxf} k_{1 ptxf} Q_{3 ptxf} + 2 F_{ptxf} k_{2 ptxf} ATPptxf C_{3 ptxf}\\
+  \end{dmath}
+  \begin{dmath}
+    \label{eq:dN_ptxf_dt}
+    \frac{dN_{ptxf}}{dt} = H_{3 ptxf} D_{4 ptxf} - H_{4 ptxf} N_{ptxf}\\
+  \end{dmath}
+\end{dgroup}
+\textbf{MSMp2x7}\\
+\label{comp:MSMp2x7}
+\begin{dgroup}
+  \begin{dmath}
+    \label{eq:stim_amplitude2}
+    stim_{amplitude2} = 4.12\!\times\!10 ^{-6} e^{4.8\!\times\!10 ^{-3} stim_{amplitude}}\\
+  \end{dmath}
+  \begin{dmath}
+    \label{eq:ATPptxs}
+    ATPptxs = \begin{cases} stim_{amplitude2} & \text{for}\: t - stim_{period} \lfloor{\frac{t}{stim_{period}}}\rfloor \geq stim_{start} \wedge t - stim_{period} \lfloor{\frac{t}{stim_{period}}}\rfloor \leq stim_{duration} + stim_{start} \\0 & \text{otherwise} \end{cases}\\
+  \end{dmath}
+  \begin{dmath}
+    \label{eq:dD1_ptxs_dt}
+    \frac{dD_{1 ptxs}}{dt} = k_{1 ptxs} D_{2 ptxs} - \left(H_{1 ptxs} + 3 k_{2 ptxs} ATPptxs\right) D_{1 ptxs}\\
+  \end{dmath}
+  \begin{dmath}
+    \label{eq:dD2_ptxs_dt}
+    \frac{dD_{2 ptxs}}{dt} = H_{2 ptxs} C_{2 ptxs} - \left(H_{4 ptxs} + k_{1 ptxs} + 2 k_{4 ptxs} ATPptxs\right) D_{2 ptxs} + 2 k_{3 ptxs} D_{3 ptxs} + 3 k_{2 ptxs} ATPptxs D_{1 ptxs}\\
+  \end{dmath}
+  \begin{dmath}
+    \label{eq:dD3_ptxs_dt}
+    \frac{dD_{3 ptxs}}{dt} = H_{3 ptxs} Q_{1 ptxs} - \left(2 k_{3 ptxs} + k_{6 ptxs} ATPptxs\right) D_{3 ptxs} + 3 k_{5 ptxs} D_{4 ptxs} + 2 k_{4 ptxs} ATPptxs D_{2 ptxs}\\
+  \end{dmath}
+  \begin{dmath}
+    \label{eq:dD4_ptxs_dt}
+    \frac{dD_{4 ptxs}}{dt} = H_{2 ptxs} Q_{2 ptxs} - 3 k_{5 ptxs} D_{4 ptxs} + k_{6 ptxs} ATPptxs D_{3 ptxs}\\
+  \end{dmath}
+  \begin{dmath}
+    \label{eq:dC1_ptxs_dt}
+    \frac{dC_{1 ptxs}}{dt} = H_{1 ptxs} D_{1 ptxs} + L_{1 ptxs} C_{4 ptxs} + k_{1 ptxs} C_{2 ptxs} - 3 k_{2 ptxs} ATPptxs C_{1 ptxs}\\
+  \end{dmath}
+  \begin{dmath}
+    \label{eq:dC2_ptxs_dt}
+    \frac{dC_{2 ptxs}}{dt} = H_{4 ptxs} D_{2 ptxs} - \left(H_{2 ptxs} + k_{1 ptxs} + 2 k_{4 ptxs} ATPptxs\right) C_{2 ptxs} + 2 k_{3 ptxs} Q_{1 ptxs} + 3 k_{2 ptxs} ATPptxs C_{1 ptxs}\\
+  \end{dmath}
+  \begin{dmath}
+    \label{eq:dC3_ptxs_dt}
+    \frac{dC_{3 ptxs}}{dt} = - \left(k_{1 ptxs} + 2 k_{2 ptxs} ATPptxs\right) C_{3 ptxs} + 2 k_{1 ptxs} Q_{4 ptxs} + 3 k_{2 ptxs} ATPptxs C_{4 ptxs}\\
+  \end{dmath}
+  \begin{dmath}
+    \label{eq:dC4_ptxs_dt}
+    \frac{dC_{4 ptxs}}{dt} = k_{1 ptxs} C_{3 ptxs} - \left(L_{1 ptxs} + 3 k_{2 ptxs} ATPptxs\right) C_{4 ptxs}\\
+  \end{dmath}
+  \begin{dmath}
+    \label{eq:dQ1_ptxs_dt}
+    \frac{dQ_{1 ptxs}}{dt} = - \left(H_{3 ptxs} + 2 k_{3 ptxs} + k_{6 ptxs} ATPptxs\right) Q_{1 ptxs} + 3 k_{5 ptxs} Q_{2 ptxs} + 2 k_{4 ptxs} ATPptxs C_{2 ptxs}\\
+  \end{dmath}
+  \begin{dmath}
+    \label{eq:dQ2_ptxs_dt}
+    \frac{dQ_{2 ptxs}}{dt} = L_{2 ptxs} Q_{3 ptxs} - \left(H_{2 ptxs} + L_{3 ptxs} + 3 k_{5 ptxs}\right) Q_{2 ptxs} + k_{6 ptxs} ATPptxs Q_{1 ptxs}\\
+  \end{dmath}
+  \begin{dmath}
+    \label{eq:dQ3_ptxs_dt}
+    \frac{dQ_{3 ptxs}}{dt} = L_{3 ptxs} Q_{2 ptxs} - \left(L_{2 ptxs} + 3 k_{1 ptxs}\right) Q_{3 ptxs} + k_{2 ptxs} ATPptxs Q_{4 ptxs}\\
+  \end{dmath}
+  \begin{dmath}
+    \label{eq:dQ4_ptxs_dt}
+    \frac{dQ_{4 ptxs}}{dt} = - \left(2 k_{1 ptxs} + k_{2 ptxs} ATPptxs\right) Q_{4 ptxs} + 3 k_{1 ptxs} Q_{3 ptxs} + 2 k_{2 ptxs} ATPptxs C_{3 ptxs}\\
+  \end{dmath}
+\end{dgroup}
+\textbf{Ip2x4}\\
+\label{comp:Ip2x4}
+\begin{dgroup}
+  \begin{dmath}
+    \label{eq:I_ptxf}
+    I_{ptxf} = G_{12 ptxf} \left(V_{ptxf} - E_{12 ptxf}\right) \left(Q_{1 ptxf} + Q_{2 ptxf}\right) + G_{34 ptxf} \left(V_{ptxf} - E_{34 ptxf}\right) \left(Q_{3 ptxf} + Q_{4 ptxf}\right)\\
+  \end{dmath}
+\end{dgroup}
+\textbf{Ip2x7}\\
+\label{comp:Ip2x7}
+\begin{dgroup}
+  \begin{dmath}
+    \label{eq:I_ptxs}
+    I_{ptxs} = G_{12 ptxs} \left(V_{ptxs} - E_{12 ptxs}\right) \left(Q_{1 ptxs} + Q_{2 ptxs}\right) + G_{34 ptxs} \left(V_{ptxs} - E_{34 ptxs}\right) \left(Q_{3 ptxs} + Q_{4 ptxs}\right)\\
+  \end{dmath}
+\end{dgroup}
+\textbf{Jp2x}\\
+\label{comp:Jp2x}
+\begin{dgroup}
+  \begin{dmath}
+    \label{eq:AHEK}
+    AHEK = 12.6 rHEK^{2}\\
+  \end{dmath}
+  \begin{dmath}
+    \label{eq:AMiG}
+    AMiG = 12.6 rMiG^{2}\\
+  \end{dmath}
+  \begin{dmath}
+    \label{eq:VHEK}
+    VHEK = 3.14\!\times\!10 ^{3} rHEK^{3}\\
+  \end{dmath}
+  \begin{dmath}
+    \label{eq:VMiG}
+    VMiG = 3.14\!\times\!10 ^{3} rMiG^{3}\\
+  \end{dmath}
+  \begin{dmath}
+    \label{eq:VcytHEK}
+    VcytHEK = 0.65 VHEK\\
+  \end{dmath}
+  \begin{dmath}
+    \label{eq:VcytMiG}
+    VcytMiG = 0.4 VMiG\\
+  \end{dmath}
+  \begin{dmath}
+    \label{eq:VERMiG}
+    VERMiG = 35\!\times\!10 ^{-3} VMiG\\
+  \end{dmath}
+  \begin{dmath}
+    \label{eq:J_ptxf}
+    J_{ptxf} = - \frac{expF_{ptxf} AMiG I_{ptxf}}{2 F AHEK VcytMiG}\\
+  \end{dmath}
+  \begin{dmath}
+    \label{eq:J_ptxs}
+    J_{ptxs} = - \frac{expF_{ptxs} AMiG I_{ptxs}}{2 F AHEK VcytMiG}\\
+  \end{dmath}
+\end{dgroup}
+\textbf{Buffer\_cyto}\\
+\label{comp:Buffer_cyto}
+\begin{dgroup}
+  \begin{dmath}
+    \label{eq:CaM}
+    CaM = CaMt - Ca_{2 CaM} - Ca_{4 CaM} - CaMCN\\
+  \end{dmath}
+  \begin{dmath}
+    \label{eq:Ca2_CN}
+    Ca_{2 CN} = CNt - Ca_{4 CN} - CaMCN\\
+  \end{dmath}
+  \begin{dmath}
+    \label{eq:dCa2_CaM}
+    dCa_{2 CaM} = kcb Ca_{4 CaM} - kba Ca_{2 CaM} + kab Cai^{2} CaM - kbc Cai^{2} Ca_{2 CaM}\\
+  \end{dmath}
+  \begin{dmath}
+    \label{eq:dCa2_CaM_dt}
+    \frac{dCa_{2 CaM}}{dt} = dCa_{2 CaM}\\
+  \end{dmath}
+  \begin{dmath}
+    \label{eq:dCa4_CaM}
+    dCa_{4 CaM} = koffA CaMCN - kcb Ca_{4 CaM} + kbc Cai^{2} Ca_{2 CaM} - konA Ca_{4 CN} Ca_{4 CaM}\\
+  \end{dmath}
+  \begin{dmath}
+    \label{eq:dCa4_CaM_dt}
+    \frac{dCa_{4 CaM}}{dt} = dCa_{4 CaM}\\
+  \end{dmath}
+  \begin{dmath}
+    \label{eq:dCa4_CN}
+    dCa_{4 CN} = koffA CaMCN - koffB Ca_{4 CN} + konB Cai^{2} Ca_{2 CN} - konA Ca_{4 CN} Ca_{4 CaM}\\
+  \end{dmath}
+  \begin{dmath}
+    \label{eq:dCa4_CN_dt}
+    \frac{dCa_{4 CN}}{dt} = dCa_{4 CN}\\
+  \end{dmath}
+  \begin{dmath}
+    \label{eq:dCaMCN}
+    dCaMCN = - koffA CaMCN + konA Ca_{4 CN} Ca_{4 CaM}\\
+  \end{dmath}
+  \begin{dmath}
+    \label{eq:dCaF}
+    dCaF = - KoffFura CaF + KonFura \left(BmFura - CaF\right) Cai\\
+  \end{dmath}
+  \begin{dmath}
+    \label{eq:dCaF_dt}
+    \frac{dCaF}{dt} = dCaF\\
+  \end{dmath}
+  \begin{dmath}
+    \label{eq:dCaMCN_dt}
+    \frac{dCaMCN}{dt} = dCaMCN\\
+  \end{dmath}
+\end{dgroup}
+\textbf{Buffer\_ER}\\
+\label{comp:Buffer_ER}
+\begin{dgroup}
+  \begin{dmath}
+    \label{eq:dCaS}
+    dCaS = - KoffCals CaS + KonCals \left(- CaS + \frac{BmCals}{rV_{ER}}\right) CaER\\
+  \end{dmath}
+  \begin{dmath}
+    \label{eq:dCaS_dt}
+    \frac{dCaS}{dt} = dCaS\\
+  \end{dmath}
+\end{dgroup}
+\textbf{NCX}\\
+\label{comp:NCX}
+\begin{dgroup}
+  \begin{dmath}
+    \label{eq:QNCX}
+    QNCX = Q10NCX^{-31 + \frac{T_{NCX}}{10}}\\
+  \end{dmath}
+  \begin{dmath}
+    \label{eq:Cm}
+    Cm = uniC_{NCX} AMiG\\
+  \end{dmath}
+  \begin{dmath}
+    \label{eq:Ka}
+    Ka = \frac{1}{1 + \frac{KdAct_{NCX}}{1\!\times\!10 ^{18} Cai^{3}}}\\
+  \end{dmath}
+  \begin{dmath}
+    \label{eq:Z}
+    Z = \frac{Fncx Vncx}{R T_{NCX}}\\
+  \end{dmath}
+  \begin{dmath}
+    \label{eq:delta}
+    \delta = Cae_{NCX} Nai_{NCX}^{HNa_{NCX}}\\
+  \end{dmath}
+  \begin{dmath}
+    \label{eq:sigma}
+    \sigma = Nae_{NCX}^{HNa_{NCX}} Cai\\
+  \end{dmath}
+  \begin{dmath}
+    \label{eq:top_NCX}
+    top_{NCX} = VmaxNCX \left(\delta e^{\eta_{NCX} Z} - e^{\left(-1 + \eta_{NCX}\right) Z} \sigma\right) Ka QNCX\\
+  \end{dmath}
+  \begin{dmath}
+    \label{eq:bot_NCX}
+    bot_{NCX} = \left(1 + ksat_{NCX} Z e^{-1 + \eta_{NCX}}\right) \left(KmCao_{NCX} Nai_{NCX}^{HNa_{NCX}} + KmCai_{NCX} Nae_{NCX}^{HNa_{NCX}} \left(1 + \left(\frac{Nai_{NCX}}{KmNai_{NCX}}\right)^{HNa_{NCX}}\right) + KmNao_{NCX}^{HNa_{NCX}} \left(1 + \frac{Cai}{KmCai_{NCX}}\right) Cai + \delta + \sigma\right)\\
+  \end{dmath}
+  \begin{dmath}
+    \label{eq:INCX}
+    INCX = \frac{top_{NCX}}{bot_{NCX}}\\
+  \end{dmath}
+  \begin{dmath}
+    \label{eq:JNCX}
+    JNCX = \frac{Cm INCX}{F VMiG}\\
+  \end{dmath}
+  \begin{dmath}
+    \label{eq:dNCX_dt}
+    \frac{dNCX}{dt} = 0\\
+  \end{dmath}
+\end{dgroup}
+\textbf{SERCA\_ER}\\
+\label{comp:SERCA_ER}
+\begin{dgroup}
+  \begin{dmath}
+    \label{eq:rV_SERCA}
+    rV_{SERCA} = 87.5\!\times\!10 ^{-3}\\
+  \end{dmath}
+  \begin{dmath}
+    \label{eq:QERCa}
+    QERCa = Q10ERCa^{-31 + \frac{T_{SERCA}}{10}}\\
+  \end{dmath}
+  \begin{dmath}
+    \label{eq:top_SERCA}
+    top_{SERCA} = \left(\frac{Cai}{Kmf_{SERCA}}\right)^{H_{SERCA}} - \left(\frac{CaER}{Kmr_{SERCA}}\right)^{H_{SERCA}}\\
+  \end{dmath}
+  \begin{dmath}
+    \label{eq:bottom_SERCA}
+    bottom_{SERCA} = 1 + \left(\frac{Cai}{Kmf_{SERCA}}\right)^{H_{SERCA}} + \left(\frac{CaER}{Kmr_{SERCA}}\right)^{H_{SERCA}}\\
+  \end{dmath}
+  \begin{dmath}
+    \label{eq:JERtoCyt}
+    JERtoCyt = \frac{VmaxSERCA QERCa}{bottom_{SERCA}} top_{SERCA}\\
+  \end{dmath}
+  \begin{dmath}
+    \label{eq:JCyttoER}
+    JCyttoER = rV_{SERCA} JERtoCyt\\
+  \end{dmath}
+  \begin{dmath}
+    \label{eq:dSERCA_dt}
+    \frac{dSERCA}{dt} = 0\\
+  \end{dmath}
+\end{dgroup}
+\textbf{p-p38}\\
+\label{comp:p-p38}
+\begin{dgroup}
+  \begin{dmath}
+    \label{eq:dpp38_dt}
+    \frac{dpp_{38}}{dt} = - kb_{pp38} pp_{38} + kf_{pp38} Cai p_{38}\\
+  \end{dmath}
+  \begin{dmath}
+    \label{eq:dp38_dt}
+    \frac{dp_{38}}{dt} = kb_{pp38} pp_{38} - kf_{pp38} Cai p_{38}\\
+  \end{dmath}
+\end{dgroup}
+\textbf{NFAT}\\
+\label{comp:NFAT}
+\begin{dgroup}
+  \begin{dmath}
+    \label{eq:Cai_NFAT}
+    Cai_{NFAT} = 1\!\times\!10 ^{9} Cai\\
+  \end{dmath}
+  \begin{dmath}
+    \label{eq:CaMCN_NFAT}
+    CaMCN_{NFAT} = 1\!\times\!10 ^{9} CaMCN\\
+  \end{dmath}
+  \begin{dmath}
+    \label{eq:actN_NFAT}
+    actN_{NFAT} = \frac{CaMCN_{NFAT}}{CNt_{NFAT}}\\
+  \end{dmath}
+  \begin{dmath}
+    \label{eq:J1_NFAT}
+    J_{1 NFAT} = kf_{1 NFAT} CaMCN_{NFAT} NFATpc - kr_{1 NFAT} \left(1 - actN_{NFAT}\right) NFATNc\\
+  \end{dmath}
+  \begin{dmath}
+    \label{eq:J2_NFAT}
+    J_{2 NFAT} = kf_{2 NFAT} NFATNc\\
+  \end{dmath}
+  \begin{dmath}
+    \label{eq:J3_NFAT}
+    J_{3 NFAT} = kf_{3 NFAT} \left(1 - actN_{NFAT}\right) NFATNn - kr_{3 NFAT} CaMCN_{NFAT} NFATpn\\
+  \end{dmath}
+  \begin{dmath}
+    \label{eq:J4_NFAT}
+    J_{4 NFAT} = kf_{4 NFAT} NFATpn\\
+  \end{dmath}
+  \begin{dmath}
+    \label{eq:dNFATpc_dt}
+    \frac{dNFATpc}{dt} = - J_{1 NFAT} + \frac{J_{4 NFAT}}{Ccn_{NFAT}}\\
+  \end{dmath}
+  \begin{dmath}
+    \label{eq:dNFATNc_dt}
+    \frac{dNFATNc}{dt} = - J_{2 NFAT} + J_{1 NFAT}\\
+  \end{dmath}
+  \begin{dmath}
+    \label{eq:dNFATNn_dt}
+    \frac{dNFATNn}{dt} = - J_{3 NFAT} + Ccn_{NFAT} J_{2 NFAT}\\
+  \end{dmath}
+  \begin{dmath}
+    \label{eq:dNFATpn_dt}
+    \frac{dNFATpn}{dt} = - J_{4 NFAT} + J_{3 NFAT}\\
+  \end{dmath}
+\end{dgroup}
+\textbf{TNFa}\\
+\label{comp:TNFa}
+\begin{dgroup}
+  \begin{dmath}
+    \label{eq:Cai_TNF}
+    Cai_{TNF} = 1\!\times\!10 ^{6} Cai\\
+  \end{dmath}
+  \begin{dmath}
+    \label{eq:Rtranscript_TNF}
+    Rtranscript_{TNF} = \frac{ktrnscrpt_{TNF} DNA_{TNF}}{1 + \left(\frac{IC50NFAT1_{TNF}}{NFATNn}\right)^{nNFAT_{1 TNF}}}\\
+  \end{dmath}
+  \begin{dmath}
+    \label{eq:Rtranslate_TNF}
+    Rtranslate_{TNF} = ktrnsl_{TNF} mRNA_{TNF}\\
+  \end{dmath}
+  \begin{dmath}
+    \label{eq:RdegTNF_TNF}
+    RdegTNF_{TNF} = kdegTNF_{TNF} TNFa\\
+  \end{dmath}
+  \begin{dmath}
+    \label{eq:RdegRNA_TNF}
+    RdegRNA_{TNF} = kdegRNA_{TNF} mRNA_{TNF}\\
+  \end{dmath}
+  \begin{dmath}
+    \label{eq:Rgeneexp_TNF}
+    Rgeneexp_{TNF} = - kgeneexpr_{TNF} DNATNF + kgeneexpf_{TNF} DNA_{TNF} TNFa\\
+  \end{dmath}
+  \begin{dmath}
+    \label{eq:Rpp38_TNF}
+    Rpp_{38 TNF} = kfpp_{38 TNF} pp_{38}\\
+  \end{dmath}
+  \begin{dmath}
+    \label{eq:Rexo_TNF}
+    Rexo_{TNF} = \frac{kmaxexo_{TNF} Cai_{TNF} TNFa}{1 + \left(\frac{IC50Caleak_{TNF}}{Cai_{TNF}}\right)^{nCaleak_{TNF}}}\\
+  \end{dmath}
+  \begin{dmath}
+    \label{eq:dDNA_TNF_dt}
+    \frac{dDNA_{TNF}}{dt} = - Rgeneexp_{TNF}\\
+  \end{dmath}
+  \begin{dmath}
+    \label{eq:dmRNA_TNF_dt}
+    \frac{dmRNA_{TNF}}{dt} = - RdegRNA_{TNF} + Rtranscript_{TNF}\\
+  \end{dmath}
+  \begin{dmath}
+    \label{eq:dDNATNF_dt}
+    \frac{dDNATNF}{dt} = Rgeneexp_{TNF}\\
+  \end{dmath}
+  \begin{dmath}
+    \label{eq:dTNFa_dt}
+    \frac{dTNFa}{dt} = - RdegTNF_{TNF} - Rexo_{TNF} - Rgeneexp_{TNF} + Rpp_{38 TNF} + Rtranslate_{TNF}\\
+  \end{dmath}
+  \begin{dmath}
+    \label{eq:dTNFa_release_dt}
+    \frac{dTNFa_{release}}{dt} = Rexo_{TNF}\\
+  \end{dmath}
+\end{dgroup}
+\textbf{Leakage}\\
+\label{comp:Leakage}
+\begin{dgroup}
+  \begin{dmath}
+    \label{eq:dCaCytoEx}
+    dCaCytoEx = DCytoEx \left(- Cai + CaER\right)\\
+  \end{dmath}
+  \begin{dmath}
+    \label{eq:dCaCytoEx_dt}
+    \frac{dCaCytoEx}{dt} = dCaCytoEx\\
+  \end{dmath}
+  \begin{dmath}
+    \label{eq:dCaERtoCy}
+    dCaERtoCy = DERtoCy \left(CaExt - Cai\right)\\
+  \end{dmath}
+  \begin{dmath}
+    \label{eq:dCaERtoCy_dt}
+    \frac{dCaERtoCy}{dt} = dCaERtoCy\\
+  \end{dmath}
+\end{dgroup}
+\textbf{Ca\_cyto}\\
+\label{comp:Ca_cyto}
+\begin{dgroup}
+  \begin{dmath}
+    \label{eq:dCai_dt}
+    \frac{dCai}{dt} = - JCyttoER - dCa_{2 CaM} - dCa_{4 CN} - dCa_{4 CaM} - dCaCytoEx - dCaF + JNCX + J_{ptxf} + J_{ptxs} + dCaERtoCy\\
+  \end{dmath}
+\end{dgroup}
+\textbf{Ca\_ER}\\
+\label{comp:Ca_ER}
+\begin{dgroup}
+  \begin{dmath}
+    \label{eq:dCaER_dt}
+    \frac{dCaER}{dt} = - dCaERtoCy - dCaS + JERtoCyt\\
+  \end{dmath}
+\end{dgroup}
+\textbf{Cell}\\
+\label{comp:Cell}
+\begin{dgroup}
+  \begin{dmath}
+    \label{eq:dV_dt}
+    \frac{dV}{dt} = 0\\
+  \end{dmath}
+\end{dgroup}
+
+
+
+% ----------------- END COMPONENTS ----------------- %
+
+}% end fontsize
+
+
+\end{document}
