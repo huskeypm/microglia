@@ -10,7 +10,7 @@ parameters("Cell",
 	  
 states("Cell",
        V = ScalarParam(-8.556885e1, unit="mV"),
-       logpATP = ScalarParam(-3, unit="logM"))
+       logpATP = ScalarParam(-6, unit="logM"))
 
 states("Jrel sr",
        R = 0.9,           
@@ -35,7 +35,7 @@ parameters("Jrel sr",
 
 expressions("Cell")
 dV_dt = 0 # need to leave this as a state, since the runner tries to record these data
-dlogpATP_dt = 0.007 *  (sin(2*3.141 * (time-2000)/stim_period))  # Oscilation between -6 and -3
+dlogpATP_dt = 0.008 *  (sin(1*3.141 * (time-63)/63))  # Oscilation between -6 and -3
 cATP = 10 ** (logpATP)
 
 

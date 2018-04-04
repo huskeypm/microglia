@@ -718,7 +718,7 @@ if __name__ == "__main__":
       stim=sys.argv[i+1] 
 
     if(arg=="-jit"):
-      useJIT = True
+      useJIT = False
 
   # execute
   if sweep:

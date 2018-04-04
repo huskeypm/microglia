@@ -1,0 +1,116 @@
+####  03/16/2018 Update ########################################################
+# Original Python code was written by Ben Chun								   #
+## rP2X4-13state-HEK293T-stimulation-cycle.ipynb located in Ben's Bitbucket   ##
+################################################################################
+
+###################################################################################
+# Benchmarking "Allosteric Regulation of the P2X4 Recepter Channel Pore Dilation" #
+# 	Authors:Zemkova, Khadra, Rokic, Tvrdonova, Sherman, and Stojikovic			  #
+##### Model Specification 												  #########
+####### 1. Cell type: HEK293T										###############
+####### 2. rP2X4													###############
+####### 3. 13-state model											###############
+###################################################################################
+
+parameters("stimulation",
+    stim_start = ScalarParam(190, unit="s"),
+    stim_period = ScalarParam(2000, unit="s"),
+    stim_duration = ScalarParam(63, unit="s"),
+    stim_amplitude = ScalarParam(10, unit="uM")
+    #ATP = 10e-6
+    )
+
+parameters("MSM",
+    k1_ptxf = ScalarParam(0.4, unit="s**-1"),
+    k2_ptxf = ScalarParam(600000, unit="(M*s)**-1"),
+    k3_ptxf = ScalarParam(0.5, unit="s**-1"),
+    k4_ptxf = ScalarParam(500000, unit="(M*s)**-1"),
+    k5_ptxf = ScalarParam(0.6, unit="s**-1"),
+    k6_ptxf = ScalarParam(400000, unit="(M*s)**-1"),
+    L1_ptxf = ScalarParam(0.01, unit="s**-1"),
+    L2_ptxf = ScalarParam(0.04, unit="s**-1"),
+    L3_ptxf = ScalarParam(0.5, unit="s**-1"),
+    H1_ptxf = ScalarParam(0.013, unit="s**-1"),
+    H2_ptxf = ScalarParam(0.35, unit="s**-1"),
+    H3_ptxf = ScalarParam(1.4, unit="s**-1"),
+    H4_ptxf = ScalarParam(0.001, unit="s**-1"),
+    F_ptxf = 1,
+    G_ptxf = 1
+    )
+
+parameters("Ip2x4",
+    G12_ptxf = ScalarParam(3e-8, unit="C*(s*V)**-1"),
+    G34_ptxf = ScalarParam(8e-8, unit="C*(s*V)**-1"),
+    V_ptxf = ScalarParam(-0.06, unit="V"),
+    E12_ptxf = ScalarParam(0, unit="V"),
+    E34_ptxf = ScalarParam(0, unit="V"),
+    CaA_ptxf = 0.0824 # fraction of current contributed by Calcium transport
+    )
+
+parameters("Jp2x4",
+    F = ScalarParam(96485.33289, unit="C*mol**-1"),
+    rHEK = ScalarParam(6.5e-6, unit="m"),
+    rMiG = ScalarParam(2.6e-6, unit="m"),
+    expF_ptxf = 0.1
+    )
+
+states("MSM",
+    D1_ptxf = 0.0,
+    D2_ptxf = 0.0,
+    D3_ptxf = 0.0,
+    D4_ptxf = 0.0,
+    C1_ptxf = 1.0,
+    C2_ptxf = 0.0,
+    C3_ptxf = 0.0,
+    C4_ptxf = 0.0,
+    Q1_ptxf = 0.0,
+    Q2_ptxf = 0.0,
+    Q3_ptxf = 0.0,
+    Q4_ptxf = 0.0,
+    N_ptxf = 0.0
+    #log10ATP = ScalarParam(-6, unit="logM")
+    )
+
+states("Cell",
+    CaPKH = 0.1,
+    V = 0
+    #log10ATP = ScalarParam(-3, unit="logM")
+    )
+
+expressions("MSM")
+#dlog10ATP_dt = 0.004*(sin(1*3.141*(time-stim_period)/stim_period))
+#ATP = 10**(log10ATP)
+#ATP2 = 4.11863563*exp(ATP*0.00479906)
+stim_amplitude2 = stim_amplitude*1e-6
+ATP = Conditional(And(Ge(time - floor(time/stim_period)*stim_period, stim_start), Le(time - floor(time/stim_period)*stim_period, stim_start + stim_duration), ), stim_amplitude2, 0) # M
+
+dD1_ptxf_dt = k1_ptxf*D2_ptxf - (3*k2_ptxf*ATP + H1_ptxf)*D1_ptxf
+dD2_ptxf_dt = 3*k2_ptxf*ATP*D1_ptxf + 2*k3_ptxf*D3_ptxf + H2_ptxf*C2_ptxf - (k1_ptxf + 2*k4_ptxf*ATP)*D2_ptxf
+dD3_ptxf_dt = 2*k4_ptxf*ATP*D2_ptxf + 3*k5_ptxf*D4_ptxf + H2_ptxf*Q1_ptxf - (2*k3_ptxf + k6_ptxf*ATP)*D3_ptxf
+dD4_ptxf_dt = k6_ptxf*ATP*D3_ptxf + H2_ptxf*Q2_ptxf - (3*k5_ptxf + H3_ptxf)*D4_ptxf
+dC1_ptxf_dt = H1_ptxf*D1_ptxf + k1_ptxf*G_ptxf*C2_ptxf + L1_ptxf*C4_ptxf + H4_ptxf*N_ptxf - 3*k2_ptxf*ATP*F_ptxf*C1_ptxf
+dC2_ptxf_dt = 3*k2_ptxf*ATP*F_ptxf*C1_ptxf + 2*k3_ptxf*G_ptxf*Q1_ptxf - (k1_ptxf*G_ptxf + 2*k4_ptxf*ATP*F_ptxf + H2_ptxf)*C2_ptxf
+dC3_ptxf_dt = 3*k2_ptxf*ATP*F_ptxf*C4_ptxf + 2*k1_ptxf*G_ptxf*Q4_ptxf - (k1_ptxf*G_ptxf + 2*k2_ptxf*ATP*F_ptxf)*C3_ptxf
+dC4_ptxf_dt = k1_ptxf*G_ptxf*C3_ptxf - (L1_ptxf + 3*k2_ptxf*ATP*F_ptxf)*C4_ptxf
+dQ1_ptxf_dt = 2*k4_ptxf*ATP*F_ptxf*C2_ptxf + 3*k5_ptxf*G_ptxf*Q2_ptxf - (2*k3_ptxf*G_ptxf + k6_ptxf*ATP*F_ptxf + H2_ptxf)*Q1_ptxf
+dQ2_ptxf_dt = k6_ptxf*ATP*F_ptxf*Q1_ptxf + L2_ptxf*Q3_ptxf - (3*k5_ptxf*G_ptxf + L3_ptxf*(1-G_ptxf) + H2_ptxf)*Q2_ptxf
+dQ3_ptxf_dt = k2_ptxf*ATP*F_ptxf*Q4_ptxf + L3_ptxf*(1-G_ptxf)*Q2_ptxf - (3*k1_ptxf*G_ptxf + L2_ptxf)*Q3_ptxf
+dQ4_ptxf_dt = 2*k2_ptxf*ATP*F_ptxf*C3_ptxf + 3*k1_ptxf*G_ptxf*Q3_ptxf - (2*k1_ptxf*G_ptxf + k2_ptxf*ATP*F_ptxf)*Q4_ptxf
+dN_ptxf_dt = H3_ptxf*D4_ptxf - H4_ptxf*N_ptxf
+
+expressions("Ip2x4")
+I_ptxf =(G12_ptxf*(Q1_ptxf + Q2_ptxf)*(V_ptxf - E12_ptxf) + G34_ptxf*(Q3_ptxf + Q4_ptxf)*(V_ptxf - E34_ptxf))*10**9 # in [nA]
+
+expressions("Jp2x4")
+AHEK = 4*3.141592654*(rHEK)**2 # surface area of HEK293 cell in [sq. meter]
+AMiG = 4*3.141592654*(rMiG)**2 # surface area of microglia in [sq. meter]
+VHEK = 1000*(4/3)*3.141592654*(rHEK)**3 # volume of HEK293 cell in [L]
+VMiG = 1000*(4/3)*3.141592654*(rMiG)**3 # volume of microglia in [L]
+VcytHEK = VHEK*0.65 # [L] The volume of cytoplasm in HEK293 cells -> This fraction was taken from Shannon-Bers paper
+VcytMiG = VMiG*0.40 # [L] The volume of cytoplasm in microglia -> This fraction was estimated from the figure (Liaury).
+VERMiG = VMiG*0.035 # [L] The volume of ER lumen in microglia -> This fraction was taken from Shannon-Bers paper
+J_ptxf = -(I_ptxf/VcytMiG)*(AMiG/AHEK)/(2*F)*expF_ptxf # [mol/(L*s) = M/s]
+
+expressions("Cell")
+dV_dt = 0
+dCaPKH_dt = J_ptxf

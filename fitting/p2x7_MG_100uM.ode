@@ -1,0 +1,103 @@
+####  03/16/2018 Update ########################################################
+# Original Python code was written by Ben Chun								   #
+## MSMp2x7.py/rP2X7-HEK293T-ATP located in Ben's Bitbucket   ##
+################################################################################
+
+###################################################################################
+##### Model Specification 												  #########
+####### 1. Cell type: HEK293T										###############
+####### 2. rP2X7													###############
+####### 3. 12-state model											###############
+###################################################################################
+
+parameters("stimulation",
+    stim_start = ScalarParam(0, unit="s"),
+    stim_period = ScalarParam(2000, unit="s"),
+    stim_duration = ScalarParam(120, unit="s"),
+    stim_amplitude = ScalarParam(100, unit="uM"))
+
+parameters("MSM",
+    k1_ptxs = ScalarParam(1.04398, unit="s**-1"),
+    k2_ptxs = ScalarParam(10589.6, unit="(M*s)**-1"),
+    k3_ptxs = ScalarParam(15, unit="s**-1"),
+    k4_ptxs = ScalarParam(39789.9, unit="(M*s)**-1"),
+    k5_ptxs = ScalarParam(6.483, unit="s**-1"),
+    k6_ptxs = ScalarParam(2431.6, unit="(M*s)**-1"),
+    L1_ptxs = ScalarParam(0.000586, unit="s**-1"),
+    L2_ptxs = ScalarParam(0.012, unit="s**-1"),
+    L3_ptxs = ScalarParam(0.18, unit="s**-1"),
+    H1_ptxs = ScalarParam(0.00050, unit="s**-1"),
+    H2_ptxs = ScalarParam(0.042, unit="s**-1"),
+    H3_ptxs = ScalarParam(1.72, unit="s**-1"),
+    H4_ptxs = ScalarParam(0.0, unit="s**-1")
+    )
+
+parameters("Ip2x7",
+    G12_ptxs = ScalarParam(1.5e-8, unit="C*(s*V)**-1"),
+    G34_ptxs = ScalarParam(4.5e-8, unit="C*(s*V)**-1"),
+    V_ptxs = ScalarParam(-0.06, unit="V"),
+    E12_ptxs = ScalarParam(0, unit="V"),
+    E34_ptxs = ScalarParam(0, unit="V"),
+    CaA_ptxs = 0.1 # fraction of current contributed by Calcium transport
+    )
+
+parameters("Jp2x7",
+    F = ScalarParam(96485.33289, unit="C*mol**-1"),
+    rHEK = ScalarParam(6.5e-6, unit="m"),
+    rMiG = ScalarParam(2.6e-6, unit="m"),
+    expF_ptxs = 0.1
+    )
+
+states("MSM",
+    D1_ptxs = 0.0,
+    D2_ptxs = 0.0,
+    D3_ptxs = 0.0,
+    D4_ptxs = 0.0,
+    C1_ptxs = 1.0,
+    C2_ptxs = 0.0,
+    C3_ptxs = 0.0,
+    C4_ptxs = 0.0,
+    Q1_ptxs = 0.0,
+    Q2_ptxs = 0.0,
+    Q3_ptxs = 0.0,
+    Q4_ptxs = 0.0
+    )
+
+states("Cell",
+    CaPKH = 0.1,
+    V = 0)
+
+expressions("MSM")
+#ATP = stim_amplitude*10**-6
+stim_amplitude2 = 4.11863563*exp(stim_amplitude*0.00479906)*1e-6
+ATP = Conditional(And(Ge(time - floor(time/stim_period)*stim_period, stim_start), Le(time - floor(time/stim_period)*stim_period, stim_start + stim_duration), ), stim_amplitude2, 0) # M
+
+dD1_ptxs_dt = k1_ptxs*D2_ptxs - (3*k2_ptxs*ATP + H1_ptxs)*D1_ptxs #
+dD2_ptxs_dt = 3*k2_ptxs*ATP*D1_ptxs + 2*k3_ptxs*D3_ptxs + H2_ptxs*C2_ptxs - (k1_ptxs + 2*k4_ptxs*ATP + H4_ptxs)*D2_ptxs #
+dD3_ptxs_dt = 2*k4_ptxs*ATP*D2_ptxs + 3*k5_ptxs*D4_ptxs + H3_ptxs*Q1_ptxs - (2*k3_ptxs + k6_ptxs*ATP)*D3_ptxs #
+dD4_ptxs_dt = k6_ptxs*ATP*D3_ptxs + H2_ptxs*Q2_ptxs - 3*k5_ptxs*D4_ptxs #
+dC1_ptxs_dt = H1_ptxs*D1_ptxs + k1_ptxs*C2_ptxs + L1_ptxs*C4_ptxs - 3*k2_ptxs*ATP*C1_ptxs #
+dC2_ptxs_dt = H4_ptxs*D2_ptxs + 3*k2_ptxs*ATP*C1_ptxs + 2*k3_ptxs*Q1_ptxs - (k1_ptxs + 2*k4_ptxs*ATP + H2_ptxs)*C2_ptxs #
+dC3_ptxs_dt = 3*k2_ptxs*ATP*C4_ptxs + 2*k1_ptxs*Q4_ptxs - (k1_ptxs + 2*k2_ptxs*ATP)*C3_ptxs #
+dC4_ptxs_dt = k1_ptxs*C3_ptxs - (L1_ptxs + 3*k2_ptxs*ATP)*C4_ptxs #
+dQ1_ptxs_dt = 2*k4_ptxs*ATP*C2_ptxs + 3*k5_ptxs*Q2_ptxs - (2*k3_ptxs + k6_ptxs*ATP + H3_ptxs)*Q1_ptxs #
+dQ2_ptxs_dt = k6_ptxs*ATP*Q1_ptxs + L2_ptxs*Q3_ptxs - (3*k5_ptxs + L3_ptxs + H2_ptxs)*Q2_ptxs #
+dQ3_ptxs_dt = k2_ptxs*ATP*Q4_ptxs + L3_ptxs*Q2_ptxs - (3*k1_ptxs + L2_ptxs)*Q3_ptxs #
+dQ4_ptxs_dt = 2*k2_ptxs*ATP*C3_ptxs + 3*k1_ptxs*Q3_ptxs - (2*k1_ptxs + k2_ptxs*ATP)*Q4_ptxs #
+
+expressions("Ip2x7")
+I_ptxs = (G12_ptxs*(Q1_ptxs + Q2_ptxs)*(V_ptxs - E12_ptxs) + G34_ptxs*(Q3_ptxs + Q4_ptxs)*(V_ptxs - E34_ptxs))*10**9 # in [nA]
+
+expressions("Jp2x7")
+AHEK = 4*3.141592654*(rHEK)**2 # surface area of HEK293 cell in [sq. meter]
+AMiG = 4*3.141592654*(rMiG)**2 # surface area of microglia in [sq. meter]
+VHEK = 1000*(4/3)*3.141592654*(rHEK)**3 # volume of HEK293 cell in [L]
+VMiG = 1000*(4/3)*3.141592654*(rMiG)**3 # volume of microglia in [L]
+VcytHEK = VHEK*0.65 # [L] The volume of cytoplasm in HEK293 cells -> This fraction was taken from Shannon-Bers paper
+VcytMiG = VMiG*0.40 # [L] The volume of cytoplasm in microglia -> This fraction was estimated from the figure (Liaury).
+VERMiG = VMiG*0.035 # [L] The volume of ER lumen in microglia -> This fraction was taken from Shannon-Bers paper
+J_ptxs = -(I_ptxs/VcytMiG)*(AMiG/AHEK)/(2*F)*expF_ptxs # [mol/(L*s) = M/s]
+
+expressions("Cell")
+dV_dt = 0
+dCaPKH_dt = J_ptxs

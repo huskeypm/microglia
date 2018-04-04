@@ -13,10 +13,10 @@
 ###################################################################################
 
 parameters("stimulation",
-    stim_start = ScalarParam(190, unit="s"),
-    stim_period = ScalarParam(240, unit="s"),
-    stim_duration = ScalarParam(50, unit="s"),
-    stim_amplitude = ScalarParam(10, unit="uM")
+    stim_start = ScalarParam(10, unit="s"),
+    stim_period = ScalarParam(5000, unit="s"),
+    stim_duration = ScalarParam(480, unit="s"),
+    stim_amplitude = ScalarParam(100, unit="uM")
     )
 
 parameters("MSMp2x4",
@@ -116,13 +116,13 @@ parameters("NCX",
     KdAct_NCX = ScalarParam(0.256, unit=""),      # [uM]
     HNa_NCX = ScalarParam(3),
     Q10NCX = ScalarParam(1.57),
-    uniC_NCX = ScalarParam(1e-2, unit=""),         # [F/m**2] unit conductance
-    Vncx = ScalarParam(-0.06, unit=""),       # [V] -> the holding potential (used in NCX calculation as well)
-    Fncx = ScalarParam(96485.33289, unit=""), # Faraday constant in [C/mol])
+    uniC_NCX = ScalarParam(1e-2, unit="F*m**-2"),         # [F/m**2] unit conductance
+    Vncx = ScalarParam(-0.06, unit="V"),       # [V] -> the holding potential (used in NCX calculation as well)
+    Fncx = ScalarParam(96485.33289, unit="C/mol"), # Faraday constant in [C/mol])
     ## Fixted substance concentrations
-    Nae_NCX = ScalarParam(145e-3, unit=""),       # [M] Exocytosolic Na free concentration
-    Nai_NCX = ScalarParam(8e-3, unit=""),         # [M] Cytosolic Na free concentration -> Neuroglia p.190 Fig 16.4 the range from 8-20 mM
-    Cae_NCX = ScalarParam(2e-3, unit="")           # [M] Exocytosolic Ca free concentration
+    Nae_NCX = ScalarParam(145e-3, unit="M"),       # [M] Exocytosolic Na free concentration
+    Nai_NCX = ScalarParam(8e-3, unit="M"),         # [M] Cytosolic Na free concentration -> Neuroglia p.190 Fig 16.4 the range from 8-20 mM
+    Cae_NCX = ScalarParam(2e-3, unit="M")           # [M] Exocytosolic Ca free concentration
     )
 
 parameters("SERCA_ER",
@@ -172,8 +172,8 @@ parameters("TNFa",
 
 parameters("Leakage",
     CaExt = ScalarParam(2e-3, unit="M"),      # External Ca concentration in [M]
-    DCytoEx = ScalarParam(0.001, unit="s**-1"),    # Diffusion constant of Ca from Cytosol to External
-    DERtoCy = ScalarParam(0.001, unit="s**-1")     # Diffusion constant of Ca from ER to Cytosol
+    DCytoEx = ScalarParam(0.0, unit="s**-1"),    # Diffusion constant of Ca from Cytosol to External
+    DERtoCy = ScalarParam(0.0, unit="s**-1")     # Diffusion constant of Ca from ER to Cytosol
     )
 
 states("MSMp2x4",
@@ -265,8 +265,10 @@ states("Cell",
     )
 
 expressions("MSMp2x4")
-stim_amplitude2 = stim_amplitude*1e-6
+stim_amplitude2 = stim_amplitude*10**-6
 ATPptxf = Conditional(And(Ge(time - floor(time/stim_period)*stim_period, stim_start), Le(time - floor(time/stim_period)*stim_period, stim_start + stim_duration), ), stim_amplitude2, 0) # M
+#dlogATPptxf_dt = 0.004*(sin(1*3.141*(time-stim_period)/stim_period))
+#ATPptxf = 10**(logATPptxf)
 
 dD1_ptxf_dt = k1_ptxf*D2_ptxf - (3*k2_ptxf*ATPptxf + H1_ptxf)*D1_ptxf
 dD2_ptxf_dt = 3*k2_ptxf*ATPptxf*D1_ptxf + 2*k3_ptxf*D3_ptxf + H2_ptxf*C2_ptxf - (k1_ptxf + 2*k4_ptxf*ATPptxf)*D2_ptxf
@@ -283,8 +285,11 @@ dQ4_ptxf_dt = 2*k2_ptxf*ATPptxf*F_ptxf*C3_ptxf + 3*k1_ptxf*G_ptxf*Q3_ptxf - (2*k
 dN_ptxf_dt = H3_ptxf*D4_ptxf - H4_ptxf*N_ptxf
 
 expressions("MSMp2x7")
-stim_amplitude2 = 4.11863563*exp(stim_amplitude*0.00479906)*1e-6
+stim_amplitude2 = 4.11863563*exp(stim_amplitude*0.00479906)*10**-6
 ATPptxs = Conditional(And(Ge(time - floor(time/stim_period)*stim_period, stim_start), Le(time - floor(time/stim_period)*stim_period, stim_start + stim_duration), ), stim_amplitude2, 0) # M
+#dlogATPptxs_dt = 0.004*(sin(1*3.141*(time-stim_period)/stim_period))
+#ATP = 10**(logATPptxs)*10**-6
+#ATPptxs = 4.11863563*exp(ATP*0.00479906)*10**-6
 
 dD1_ptxs_dt = k1_ptxs*D2_ptxs - (3*k2_ptxs*ATPptxs + H1_ptxs)*D1_ptxs #
 dD2_ptxs_dt = 3*k2_ptxs*ATPptxs*D1_ptxs + 2*k3_ptxs*D3_ptxs + H2_ptxs*C2_ptxs - (k1_ptxs + 2*k4_ptxs*ATPptxs + H4_ptxs)*D2_ptxs #

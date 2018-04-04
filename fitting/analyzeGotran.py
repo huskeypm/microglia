@@ -81,9 +81,8 @@ def GetData(data,idxName):
       datac.v = data['s'] 
       datac.v_idx = datac.s_idx
     else:
-      msg="State/flux %s not found"%idxName
-      raise RuntimeError(msg) 
-      #datac.v =None
+      print idxName, " not found"
+      datac.v =None
 
     idx = datac.v_idx.index(idxName)
     datac.valsIdx = datac.v[:,idx] 

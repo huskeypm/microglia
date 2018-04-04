@@ -21,6 +21,7 @@ import copy
 import pandas as pd
 import taufitting as tf
 import analyzeGotran as aG
+import fitProfile as fp
 
 ms_to_s = 1e-3
 
@@ -199,6 +200,30 @@ def ProcessDataArray(dataSub,mode,timeRange=[0,1e3],key=None):
           result = APDTimeidx * 0.1 * ms_to_s
           #result = (daMaxHalfPlace - daMaxPlace) * 0.1 * ms_to_s
           #result = valueTimeSeries[daMaxPlace] - valueTimeSeries[daMaxHalfPlace]
+      elif mode == "prop2x4":
+          tptxf = np.array([0,0.75,6,11.25,18.75,30.75,75])*10**-3
+          Iptxf = np.array([0,-2.34,-0.73,-0.30,-0.14,-0.084,-0.01687763713])
+          modelptxf = [timeSeries, valueTimeSeries]
+          litptxf = [tptxf, Iptxf]
+          result = fp.test(litptxf,modelptxf)
+      elif mode == "prop2x7100":
+          tptxs == np.array([0,6.41221374,30.6870229,53.12977099,95.26717557,119.5419847,123.6641221,127.7862595])*10**-3
+          Iptxs == np.array([0,-0.006428571429,-0.01303571429,-0.01428571429,-0.01345238095,-0.01255952381,-0.0008333333333,-0.000119047619])
+          modelptxs = [timeSeries, valueTimeSeries]
+          litptxs = [tptxs, Iptxs]
+          result = fp.test(litptxs,modelptxs)
+      elif mode == "prop2x7320":
+          tptxs == np.array([0,1.832061069,11.45038168,16.48854962,67.78625954,119.0839695,122.7480916,127.7862595])*10**-3
+          Iptxs == np.array([0,-0.03928571429,-0.05142857143,-0.05142857143,-0.04464285714,-0.04107142857,-0.002321428571,-0.00125])
+          modelptxs = [timeSeries, valueTimeSeries]
+          litptxs = [tptxs, Iptxs]
+          result = fp.test(litptxs,modelptxs)
+      elif mode == "prop2x71000":
+          tptxs == np.array([0,0,7.328244275,25.64885496,32.97709924,53.58778626,79.23664122,94.80916031,107.1755725,118.6259542,120.9160305,122.2900763])*10**-3
+          Iptxs == np.array([0,-0.0505952381,-0.06845238095,-0.08035714286,-0.09523809524,-0.2083333333,-0.5863095238,-0.8392857143,-0.8988095238,-0.9077380952,0.03273809524,0.002976190476])
+          modelptxs = [timeSeries, valueTimeSeries]
+          litptxs = [tptxs, Iptxs]
+          result = fp.test(litptxs,modelptxs)
       elif mode == "tau":
 	  #tRange = timeSeries[idxMin:idxMax] - timeSeries[idxMin] 
 	  #waveMax = np.argmax(valueTimeSeries)

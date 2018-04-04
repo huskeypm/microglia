@@ -23,4 +23,5 @@ def test(lit_data,model_data): # indpnt = independent variable, dpnt = dependent
     for i in iters:
         err2 = err2 + (lit_yset[i] - est_yset[i])**2
 
+    err2 = err2*100
     return err2
