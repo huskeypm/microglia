@@ -1,0 +1,259 @@
+####  03/16/2018 Update ########################################################
+# Original Python code was written by Ben Chun								   #
+## rP2X4-13state-HEK293T-stimulation-cycle.ipynb located in Ben's Bitbucket   ##
+################################################################################
+
+###################################################################################
+# Benchmarking "Allosteric Regulation of the P2X4 Recepter Channel Pore Dilation" #
+# 	Authors:Zemkova, Khadra, Rokic, Tvrdonova, Sherman, and Stojikovic			  #
+##### Model Specification 												  #########
+####### 1. Cell type: HEK293T										###############
+####### 2. rP2X4, rP2X7												###############
+####### 3. 13-state model, 12 state model							###############
+###################################################################################
+
+parameters("Buffer_cyto",
+    BmFura = ScalarParam(0.025e-3, unit="M"), # [M] -> Shannon-Bers: Fluo-3 (Cytoplasm)
+    KonFura = ScalarParam(15e7, unit="(M*s)**-1"),    # [1/(M*s)] -> Chemical Calcium Indicators: Fura-2 (Cytoplasm)
+    KoffFura = ScalarParam(23, unit="s**-1"),     # [1/s] -> Chemical Calcium Indicators: Fura-2 (Cytoplasm)
+    # Constants for CaM-CN calculation: taken from the work of Bazzazi et al. by Rachel
+    kba  = ScalarParam(10, unit="s**-1"),        # [s-1]
+    kab = ScalarParam(1e13, unit="M**-2*s**-1"),       # [M-2*s-1]
+    kcb = ScalarParam(500, unit="s**-1"),        # [s-1]
+    kbc = ScalarParam(500e13, unit="M**-2*s**-1"),     # [M-2*s-1]
+    koffA = ScalarParam(1.0, unit="s**-1"),      # [s-1]
+    konA = ScalarParam(1e10, unit="M**-1*s**-1"),      # [M-1*s-1]
+    konB = ScalarParam(2e12, unit="M**-2*s**-1"),      # [M-2*s-1]
+    koffB = ScalarParam(1, unit="s**-1"),        # [s-1]
+    CNt = ScalarParam(2e-6, unit="M"),       #[M]
+    CaMt = ScalarParam(3e-6, unit="M")       #[M]
+    )
+
+parameters("Buffer_ER",
+    BmCals = ScalarParam(0.14e-3, unit="M"),   # [M] -> Shannon-Bers: Calsequestrin (ER)
+    KonCals = ScalarParam(10e7, unit="(M*s)**-1"),    # [1/(M*s)] -> Shannon-Bers: Calsequestrin (ER)
+    KoffCals = ScalarParam(65000, unit="s**-1"),   # [1/s] -> Shannon-Bers: Calsequestrin (ER))
+    rV_ER = ScalarParam(0.0875)
+    )
+
+parameters("NCX",
+    R = ScalarParam(8.314, unit="J*(mol*K)**-1"),          # [J/mol-k]
+    T_NCX = ScalarParam(310, unit="K"),                    # K
+    VmaxNCX = ScalarParam(9.0, unit="A*F**-1"),            # [A/F] modifeid from 9
+    KmCai_NCX = ScalarParam(3.59e-6, unit="M"),            # [M]
+    KmCao_NCX = ScalarParam(1.3e-3, unit="M"),             # [M]
+    KmNai_NCX = ScalarParam(12.29e-3, unit="M"),           # [M]
+    KmNao_NCX = ScalarParam(87.5e-3, unit="M"),            # [M]
+    ksat_NCX = ScalarParam(0.27),
+    eta_NCX = ScalarParam(0.35),
+    KdAct_NCX = ScalarParam(0.256, unit=""),      # [uM]
+    HNa_NCX = ScalarParam(3),
+    Q10NCX = ScalarParam(1.57),
+    uniC_NCX = ScalarParam(1e-2, unit="F*m**-2"),         # [F/m**2] unit conductance
+    Vncx = ScalarParam(-0.06, unit="V"),       # [V] -> the holding potential (used in NCX calculation as well)
+    Fncx = ScalarParam(96485.33289, unit="C/mol"), # Faraday constant in [C/mol])
+    ## Fixted substance concentrations
+    Nae_NCX = ScalarParam(145e-3, unit="M"),       # [M] Exocytosolic Na free concentration
+    Nai_NCX = ScalarParam(8e-3, unit="M"),         # [M] Cytosolic Na free concentration -> Neuroglia p.190 Fig 16.4 the range from 8-20 mM
+    Cae_NCX = ScalarParam(2e-3, unit="M")           # [M] Exocytosolic Ca free concentration
+    )
+
+parameters("SERCA_ER",
+    Q10ERCa = ScalarParam(2.6),
+    VmaxSERCA = ScalarParam(5.3114e-3, unit="M*s**-1"),       # [M/s] taken from script but their literature reported differently: This may need to be adjusted
+    Kmf_SERCA = ScalarParam(0.246e-6, unit="uM"),        # [uM]
+    Kmr_SERCA = ScalarParam(1.7e-3, unit="mM"),          # [mM]
+    H_SERCA = ScalarParam(1.787),
+    T_SERCA = ScalarParam(310)                # K
+    )
+
+parameters("p-p38",
+    kb_pp38 = ScalarParam(0.0018518519, unit="s**-1"),
+    kf_pp38 = ScalarParam(208.33333333, unit="(M*s)**-1")
+    )
+
+parameters("NFAT",
+    kf1_NFAT = ScalarParam(7.69e-5, unit="(nM*s)**-1"),    # [1/(nMs)] Adjusted from 7.69e-6 1/(nM-s)
+    # This parameter was adjusted to fit the concentration of NFAT at the
+    # steady state listed in Coolings paper, which is reported by Tomida et al.
+    kr1_NFAT = ScalarParam(1.93e-2, unit="s**-1"),   # [1/s]
+    kf2_NFAT = ScalarParam(1.44e-3, unit="s**-1"),   # [1/s]
+    kf3_NFAT = ScalarParam(3.62e-4, unit="s**-1"),   # [1/s]
+    kr3_NFAT = ScalarParam(4.71e-5, unit="(nM*s)**-1"),   # [1/(nMs)]
+    kf4_NFAT = ScalarParam(4.45e-4, unit="s**-1"),   # [1/s]
+    KmN_NFAT = ScalarParam(535, unit="nM"),        # [nM]
+    n_NFAT = ScalarParam(2.92),
+    Ccn_NFAT = ScalarParam(1),          # Volume ratio of Cytosol to Nucleus
+    CNt_NFAT = ScalarParam(2e3, unit="nM")             # in [nM] Total number of calcineurin: this value is the same as used in    buffer calculation
+    )
+
+parameters("TNFa",
+    ktrnscrpt_TNF = ScalarParam(277.78e-6, unit="s**-1"),   # 1/3600            # [1/s]: k for transcription of mRNA from DNA per molecule
+    ktrnsl_TNF = ScalarParam(27.7778e-3, unit="s**-1"),     # 100/3600          # [1/s]: k for translation of TNFa from mRNA per molecule
+    kdegTNF_TNF = ScalarParam(13.8889e-3, unit="s**-1"),    # 50/3600           # [1/s]: the rate of degradation of TNFa per molecule
+    kdegRNA_TNF = ScalarParam(138.88889e-6, unit="s**-1"),   # 0.5/3600          # [1/s]: the rate of degradation of mRNA per molecule
+    kgeneexpf_TNF = ScalarParam(111.11e-6, unit="(molecule*s)**-1"),   # 1/(3600*2.5)      # [1/(molecule-s)]: Gene expression
+    kgeneexpr_TNF = ScalarParam(277.78e-6, unit="s**-1"),   # 1/3600            # [1/s]:
+    kfpp38_TNF = ScalarParam(555.5556e-6, unit="(M*s)**-1"),    # 2/3600            # 2 count per 3600 seconds
+    ### Hill equation related constants for activation of DNA dynamics/TNFa release
+    kmaxexo_TNF = ScalarParam(2.777778e-3, unit="(M*s)**-1"),    # 5/1800             # [1/(M-s)]: R max of exocytosis of TNFa 150 15 15 10 1
+    nCaleak_TNF = ScalarParam(1.8),
+    nNFAT1_TNF = ScalarParam(100),             # Hill coefficient of NFAT related to transcription activation
+    IC50NFAT1_TNF = ScalarParam(1.07, unit="nM"),         # [nM] Transcription related
+    IC50Caleak_TNF = ScalarParam(0.1, unit="uM")         # [uM]: TNFa leaks related 4e-7 4e-7 1e-7 1e-7 1e-7
+    )
+
+parameters("Leakage",
+    CaExt = ScalarParam(2e-3, unit="M"),      # External Ca concentration in [M]
+    DCytoEx = ScalarParam(0.0, unit="s**-1"),    # Diffusion constant of Ca from Cytosol to External
+    DERtoCy = ScalarParam(0.0, unit="s**-1")     # Diffusion constant of Ca from ER to Cytosol
+    )
+
+parameters("ptx",
+    MaxFlux = ScalarParam(0.000301, unit="M/s")
+    )
+
+states("Ca_cyto",
+    Cai = ScalarParam(3.5538633608641e-08, unit="M")        # M
+    )
+
+states("Buffer_cyto",
+    CaF = ScalarParam(4.70406410592e-06, unit="M"),         # M
+    Ca2_CaM = ScalarParam(0, unit="M"),                   # M
+    Ca4_CaM = ScalarParam(0, unit="M"),                   # M
+    Ca4_CN = ScalarParam(0, unit="M"),                    # M
+    CaMCN = ScalarParam(0, unit="M")                       # M
+    )
+
+states("Ca_ER",
+    CaER = ScalarParam(0.000245592183505, unit="M")       # M
+    )
+
+states("Buffer_ER",
+    CaS = ScalarParam(0.000438757171897, unit="M")        # M
+    )
+
+states("SERCA_ER",
+    SERCA = 0
+    )
+
+states("NFAT",
+    NFATpc = ScalarParam(0.994682667758, unit="M"),        # nM
+    NFATpn = ScalarParam(0.0463772043925, unit="M"),       # nM
+    NFATNc = ScalarParam(0.000112322167638, unit="M"),     # nM
+    NFATNn = ScalarParam(0.0581439005689, unit="M")        # nM
+    )
+
+states("NCX",
+    NCX = 0
+    )
+
+states("p-p38",
+    pp38 = ScalarParam(0, unit="molecule"),                      # molecule
+    p38 = ScalarParam(50, unit="molecule")                        # molecule
+    )
+
+states("TNFa",
+    DNA_TNF = ScalarParam(50, unit="molecule"),                  # molecule
+    DNATNF = ScalarParam(0, unit="molecule"),                    # molecule
+    mRNA_TNF = ScalarParam(0, unit="molecule"),                  # molecule
+    TNFa = ScalarParam(100, unit="molecule"),                    # molecule
+    TNFa_release = ScalarParam(0, unit="molecule")               # molecule
+    )
+
+states("Leakage",
+    CaCytoEx = ScalarParam(0, unit="M"), # in [M]
+    CaERtoCy = ScalarParam(0, unit="M")  # in [M]
+    )
+
+states("Cell",
+    V = 0
+    )
+
+expressions("Buffer_cyto")
+CaM = CaMt - (Ca2_CaM + Ca4_CaM + CaMCN)
+Ca2_CN = CNt - (Ca4_CN + CaMCN)
+dCa2_CaM = kab*CaM*(Cai**2) - kba*Ca2_CaM + kcb*Ca4_CaM - kbc*Ca2_CaM*(Cai**2)
+dCa2_CaM_dt = dCa2_CaM
+dCa4_CaM = kbc*(Cai**2)*Ca2_CaM - kcb*Ca4_CaM + koffA*CaMCN - konA*Ca4_CaM*Ca4_CN
+dCa4_CaM_dt = dCa4_CaM
+dCa4_CN = konB*(Cai**2)*Ca2_CN - koffB*Ca4_CN + koffA*CaMCN - konA*Ca4_CaM*Ca4_CN
+dCa4_CN_dt = dCa4_CN
+dCaMCN = konA*Ca4_CaM*Ca4_CN - koffA*CaMCN
+dCaF = KonFura*Cai*(BmFura - CaF) - KoffFura*CaF
+dCaF_dt = dCaF
+dCaMCN_dt = dCaMCN
+
+expressions("Buffer_ER")
+dCaS = KonCals*CaER*(BmCals/rV_ER - CaS) - KoffCals*CaS
+dCaS_dt = dCaS
+
+expressions("NCX")
+QNCX = Q10NCX**((T_NCX-310)/10)
+Cm = uniC_NCX*AMiG      # [F] total conductance of microglia
+Ka = 1/(1+(KdAct_NCX/(Cai*10**6)**3))
+Z = (Vncx*Fncx)/(R*T_NCX)      # [J/C*C/mol]/[J/(mol-K)*K]
+delta = (Nai_NCX**HNa_NCX)*Cae_NCX
+sigma = (Nae_NCX**HNa_NCX)*Cai
+top_NCX = Ka*QNCX*VmaxNCX*(exp(eta_NCX*Z)*delta - exp((eta_NCX-1)*Z)*sigma)
+bot_NCX = (KmCai_NCX*(Nae_NCX**HNa_NCX)*(1+(Nai_NCX/KmNai_NCX)**HNa_NCX) + (KmNao_NCX**HNa_NCX)*Cai*(1+(Cai/KmCai_NCX)) + KmCao_NCX*(Nai_NCX**HNa_NCX) + delta + sigma)*(1 + ksat_NCX*exp((eta_NCX-1))*Z)
+## Current and influx via NCX
+INCX = top_NCX/bot_NCX            # [A/F]
+JNCX = (INCX*Cm)/(VMiG*F) # [M/s]
+dNCX_dt = 0
+
+expressions("SERCA_ER")
+rV_SERCA = 0.035/0.4        # Volume ratio of ER to Cytosol
+QERCa = Q10ERCa**((T_SERCA-310)/10)
+top_SERCA = ((Cai/Kmf_SERCA)**H_SERCA) - ((CaER/Kmr_SERCA)**H_SERCA)
+bottom_SERCA = 1 + ((Cai/Kmf_SERCA)**H_SERCA) + ((CaER/Kmr_SERCA)**H_SERCA)
+JERtoCyt = QERCa*VmaxSERCA*top_SERCA/bottom_SERCA
+JCyttoER = JERtoCyt*rV_SERCA
+dSERCA_dt = 0
+
+expressions("p-p38")
+dpp38_dt = -kb_pp38*pp38 + kf_pp38*p38*Cai
+dp38_dt = kb_pp38*pp38 - kf_pp38*p38*Cai
+
+expressions("NFAT")
+Cai_NFAT = Cai*(1e9)                    # in [nM]
+CaMCN_NFAT = CaMCN*(1e9)                # in [nM]
+actN_NFAT = CaMCN_NFAT/CNt_NFAT
+J1_NFAT = kf1_NFAT*NFATpc*CaMCN_NFAT - kr1_NFAT*NFATNc*(1 - actN_NFAT)
+J2_NFAT = NFATNc*kf2_NFAT
+J3_NFAT = kf3_NFAT*NFATNn*(1-actN_NFAT) - kr3_NFAT*NFATpn*CaMCN_NFAT
+J4_NFAT = NFATpn*kf4_NFAT
+dNFATpc_dt = J4_NFAT/Ccn_NFAT - J1_NFAT     # in [nM]
+dNFATNc_dt = J1_NFAT - J2_NFAT              # in [nM]
+dNFATNn_dt = J2_NFAT*Ccn_NFAT - J3_NFAT     # in [nM]
+dNFATpn_dt = J3_NFAT - J4_NFAT              # in [nM]
+
+expressions("TNFa")
+Cai_TNF = Cai*10**6
+Rtranscript_TNF = ktrnscrpt_TNF/(1+(IC50NFAT1_TNF/(NFATNn))**nNFAT1_TNF)*DNA_TNF
+Rtranslate_TNF = ktrnsl_TNF*mRNA_TNF
+RdegTNF_TNF = kdegTNF_TNF*TNFa
+RdegRNA_TNF = kdegRNA_TNF*mRNA_TNF
+Rgeneexp_TNF = kgeneexpf_TNF*DNA_TNF*TNFa - kgeneexpr_TNF*DNATNF # DNATNF is the complex of DNA and TNF
+Rpp38_TNF = kfpp38_TNF*pp38
+Rexo_TNF = (kmaxexo_TNF/(1+(IC50Caleak_TNF/(Cai_TNF))**nCaleak_TNF))*TNFa*Cai_TNF
+dDNA_TNF_dt = -Rgeneexp_TNF
+dmRNA_TNF_dt = Rtranscript_TNF - RdegRNA_TNF
+dDNATNF_dt = Rgeneexp_TNF
+dTNFa_dt = Rtranslate_TNF + Rpp38_TNF - RdegTNF_TNF - Rgeneexp_TNF - Rexo_TNF
+dTNFa_release_dt = Rexo_TNF
+
+expressions("Leakage")
+dCaCytoEx = DCytoEx*(CaER - Cai)
+dCaCytoEx_dt = dCaCytoEx
+dCaERtoCy = DERtoCy*(CaExt - Cai)
+dCaERtoCy_dt = dCaERtoCy
+
+expressions("Ca_ER")
+dCaER_dt = JERtoCyt - dCaS - dCaERtoCy
+
+expressions("Ca_cyto")
+dCai_dt = MaxFlux*exp(-time/3600) - JCyttoER + JNCX - dCa2_CaM - dCa4_CaM - dCa4_CN - dCaF + dCaERtoCy - dCaCytoEx
+
+expressions("Cell")
+dV_dt = 0
