@@ -37,6 +37,8 @@ parameters("Buffer_ER",
     )
 
 parameters("NCX",
+    rHEK = ScalarParam(6.5e-6, unit="m"),                 # radius of HKE
+    rMiG = ScalarParam(2.6e-6, unit="m"),                 # radius of Microglia
     R = ScalarParam(8.314, unit="J*(mol*K)**-1"),          # [J/mol-k]
     T_NCX = ScalarParam(310, unit="K"),                    # K
     VmaxNCX = ScalarParam(9.0, unit="A*F**-1"),            # [A/F] modifeid from 9
@@ -189,6 +191,13 @@ dCaS = KonCals*CaER*(BmCals/rV_ER - CaS) - KoffCals*CaS
 dCaS_dt = dCaS
 
 expressions("NCX")
+AHEK = 4*3.141592654*(rHEK)**2 # surface area of HEK293 cell in [sq. meter]
+AMiG = 4*3.141592654*(rMiG)**2 # surface area of microglia in [sq. meter]
+VHEK = 1000*(4/3)*3.141592654*(rHEK)**3 # volume of HEK293 cell in [L]
+VMiG = 1000*(4/3)*3.141592654*(rMiG)**3 # volume of microglia in [L]
+VcytHEK = VHEK*0.65 # [L] The volume of cytoplasm in HEK293 cells -> This fraction was taken from Shannon-Bers paper
+VcytMiG = VMiG*0.40 # [L] The volume of cytoplasm in microglia -> This fraction was estimated from the figure (Liaury).
+VERMiG = VMiG*0.035 # [L] The volume of ER lumen in microglia -> This fraction was taken from Shannon-Bers paper
 QNCX = Q10NCX**((T_NCX-310)/10)
 Cm = uniC_NCX*AMiG      # [F] total conductance of microglia
 Ka = 1/(1+(KdAct_NCX/(Cai*10**6)**3))
@@ -199,7 +208,7 @@ top_NCX = Ka*QNCX*VmaxNCX*(exp(eta_NCX*Z)*delta - exp((eta_NCX-1)*Z)*sigma)
 bot_NCX = (KmCai_NCX*(Nae_NCX**HNa_NCX)*(1+(Nai_NCX/KmNai_NCX)**HNa_NCX) + (KmNao_NCX**HNa_NCX)*Cai*(1+(Cai/KmCai_NCX)) + KmCao_NCX*(Nai_NCX**HNa_NCX) + delta + sigma)*(1 + ksat_NCX*exp((eta_NCX-1))*Z)
 ## Current and influx via NCX
 INCX = top_NCX/bot_NCX            # [A/F]
-JNCX = (INCX*Cm)/(VMiG*F) # [M/s]
+JNCX = (INCX*Cm)/(VMiG*Fncx) # [M/s]
 dNCX_dt = 0
 
 expressions("SERCA_ER")
@@ -253,7 +262,7 @@ expressions("Ca_ER")
 dCaER_dt = JERtoCyt - dCaS - dCaERtoCy
 
 expressions("Ca_cyto")
-dCai_dt = MaxFlux*exp(-time/3600) - JCyttoER + JNCX - dCa2_CaM - dCa4_CaM - dCa4_CN - dCaF + dCaERtoCy - dCaCytoEx
+dCai_dt = MaxFlux*exp(-time) - JCyttoER + JNCX - dCa2_CaM - dCa4_CaM - dCa4_CN - dCaF + dCaERtoCy - dCaCytoEx
 
 expressions("Cell")
 dV_dt = 0
