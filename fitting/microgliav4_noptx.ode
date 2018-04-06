@@ -12,6 +12,14 @@
 ####### 3. 13-state model, 12 state model							###############
 ###################################################################################
 
+
+parameters("stimulation",
+    stim_start = ScalarParam(10, unit="s"),
+    stim_period = ScalarParam(5000, unit="s"),
+    stim_duration = ScalarParam(480, unit="s"),
+    stim_amplitude = ScalarParam(100, unit="uM")
+    )
+
 parameters("Buffer_cyto",
     BmFura = ScalarParam(0.025e-3, unit="M"), # [M] -> Shannon-Bers: Fluo-3 (Cytoplasm)
     KonFura = ScalarParam(15e7, unit="(M*s)**-1"),    # [1/(M*s)] -> Chemical Calcium Indicators: Fura-2 (Cytoplasm)
@@ -112,7 +120,7 @@ parameters("Leakage",
     )
 
 parameters("ptx",
-    MaxFlux = ScalarParam(0.000301, unit="M/s")
+    MaxFlux = ScalarParam(0.02232, unit="M/s")
     )
 
 states("Ca_cyto",
