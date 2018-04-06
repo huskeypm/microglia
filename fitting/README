@@ -51,9 +51,18 @@ An example of code used with fittingAlgorithm.py:
 		-outputParamMethod: This is the method you will use on the outputParamSearcher values. This could be such things as "amp" for amplitude, "max" or "min" for the max and min, "APD" for action potential duration, or "tau" to look at calcium transients. In this case, mean was used to look at the average of the Nai overtime to see if it converges to a single value. 
 		-outputParamTruthVal: This is the value that you will be getting your output to be compared against. After the simulation is run and the output parm is found and had the statistical analysis computed, that value is then compared to this value. The closer the run value is to this value, the better that run will be considered in the code as a new starting point for the next iteration.
 
+Ben's Note 
 
-
-
+There are two types of excutable bash files. 
+1. Fitter (To be continued)
+# Gotran_Fitter_p2x4.bash
+2. Sensitivity Analysis
+# Gotran_SA.bash or Gotran_SA_holly.bash 
+	- They are the same files. 
+	- This file will generate 9 pickle files with different Ca influx rate. 
+	The max influx rate was obtained from the simulation at 0.1 uM ATP with 1 hr stimulation. 
+	The reason for such a low ATP concentration is that Gotran code exceedingly overshots the Ca concentration once the influx rate goes beyond 0.00186 M/s. 
+	- daisy.py is located in gotran directory. 
 
 
 
