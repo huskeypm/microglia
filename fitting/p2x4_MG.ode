@@ -13,9 +13,9 @@
 ###################################################################################
 
 parameters("stimulation",
-    stim_start = ScalarParam(190, unit="s"),
-    stim_period = ScalarParam(2000, unit="s"),
-    stim_duration = ScalarParam(63, unit="s"),
+    #stim_start = ScalarParam(100, unit="s"),
+    stim_period = ScalarParam(100, unit="s"),
+    stim_duration = ScalarParam(100, unit="s"),
     stim_amplitude = ScalarParam(10, unit="uM")
     #ATP = 10e-6
     )
@@ -67,8 +67,8 @@ states("MSM",
     Q2_ptxf = 0.0,
     Q3_ptxf = 0.0,
     Q4_ptxf = 0.0,
-    N_ptxf = 0.0
-    #log10ATP = ScalarParam(-6, unit="logM")
+    N_ptxf = 0.0,
+    log10ATP = ScalarParam(-6, unit="logM")
     )
 
 states("Cell",
@@ -78,11 +78,13 @@ states("Cell",
     )
 
 expressions("MSM")
-#dlog10ATP_dt = 0.004*(sin(1*3.141*(time-stim_period)/stim_period))
-#ATP = 10**(log10ATP)
+stim_start = stim_period/2
+stim_period2 = stim_period/4
+dlog10ATP_dt = 0.8*(sin(1*3.141*(time-stim_period2)/stim_period2))
+ATP2 = Conditional(Le(time,0.33*stim_start),0,10**(log10ATP)*stim_amplitude)
 #ATP2 = 4.11863563*exp(ATP*0.00479906)
 stim_amplitude2 = stim_amplitude*1e-6
-ATP = Conditional(And(Ge(time - floor(time/stim_period)*stim_period, stim_start), Le(time - floor(time/stim_period)*stim_period, stim_start + stim_duration), ), stim_amplitude2, 0) # M
+ATP = Conditional(And(Ge(time - floor(time/(stim_period))*(stim_period), stim_start), Le(time - floor(time/(stim_period))*(stim_period), stim_start + (stim_period/2)), ), stim_amplitude2, ATP2) # M
 
 dD1_ptxf_dt = k1_ptxf*D2_ptxf - (3*k2_ptxf*ATP + H1_ptxf)*D1_ptxf
 dD2_ptxf_dt = 3*k2_ptxf*ATP*D1_ptxf + 2*k3_ptxf*D3_ptxf + H2_ptxf*C2_ptxf - (k1_ptxf + 2*k4_ptxf*ATP)*D2_ptxf

@@ -13,9 +13,9 @@
 ###################################################################################
 
 parameters("stimulation",
-    stim_start = ScalarParam(10, unit="s"),
+    #stim_start = ScalarParam(10, unit="s"),
     stim_period = ScalarParam(5000, unit="s"),
-    stim_duration = ScalarParam(480, unit="s"),
+    #stim_duration = ScalarParam(480, unit="s"),
     stim_amplitude = ScalarParam(100, unit="uM")
     )
 
@@ -204,7 +204,7 @@ states("MSMp2x7",
     Q1_ptxs = 0.0,
     Q2_ptxs = 0.0,
     Q3_ptxs = 0.0,
-    Q4_ptxs = 0.0
+    Q4_ptxs = 0.0,
     )
 
 states("Ca_cyto",
@@ -261,15 +261,24 @@ states("Leakage",
     )
 
 states("Cell",
-    V = 0
+    V = 0,
+    logATP = -6
     )
 
-expressions("MSMp2x4")
-stim_amplitude2 = stim_amplitude*10**-6
-ATPptxf = Conditional(And(Ge(time - floor(time/stim_period)*stim_period, stim_start), Le(time - floor(time/stim_period)*stim_period, stim_start + stim_duration), ), stim_amplitude2, 0) # M
-#dlogATPptxf_dt = 0.004*(sin(1*3.141*(time-stim_period)/stim_period))
-#ATPptxf = 10**(logATPptxf)
+expressions("Cell")
+dV_dt = 0
+stim_start = stim_period/2
+stim_period2 = stim_period/4
+ATP71 = 4.11863563*exp(stim_amplitude*0.00479906)
+stim_amplitude_ptxs = ATP71*10**-6
+stim_amplitude_ptxf = stim_amplitude*1e-6
+dlogATP_dt = 0.8*(sin(1*3.141*(time-stim_period2)/stim_period2))
+ATP41 = Conditional(Le(time,0.33*stim_start),0,10**(logATP)*stim_amplitude)
+ATP72 = Conditional(Le(time,0.33*stim_start),0,ATP71*10**(logATP))
+ATPptxf = Conditional(And(Ge(time - floor(time/(stim_period))*(stim_period), stim_start), Le(time - floor(time/(stim_period))*(stim_period), stim_period), ), stim_amplitude_ptxf, ATP41)
+ATPptxs = Conditional(And(Ge(time - floor(time/(stim_period))*(stim_period), stim_start), Le(time - floor(time/(stim_period))*(stim_period), stim_period), ), stim_amplitude_ptxs, ATP72)
 
+expressions("MSMp2x4")
 dD1_ptxf_dt = k1_ptxf*D2_ptxf - (3*k2_ptxf*ATPptxf + H1_ptxf)*D1_ptxf
 dD2_ptxf_dt = 3*k2_ptxf*ATPptxf*D1_ptxf + 2*k3_ptxf*D3_ptxf + H2_ptxf*C2_ptxf - (k1_ptxf + 2*k4_ptxf*ATPptxf)*D2_ptxf
 dD3_ptxf_dt = 2*k4_ptxf*ATPptxf*D2_ptxf + 3*k5_ptxf*D4_ptxf + H2_ptxf*Q1_ptxf - (2*k3_ptxf + k6_ptxf*ATPptxf)*D3_ptxf
@@ -285,12 +294,6 @@ dQ4_ptxf_dt = 2*k2_ptxf*ATPptxf*F_ptxf*C3_ptxf + 3*k1_ptxf*G_ptxf*Q3_ptxf - (2*k
 dN_ptxf_dt = H3_ptxf*D4_ptxf - H4_ptxf*N_ptxf
 
 expressions("MSMp2x7")
-stim_amplitude2 = 4.11863563*exp(stim_amplitude*0.00479906)*10**-6
-ATPptxs = Conditional(And(Ge(time - floor(time/stim_period)*stim_period, stim_start), Le(time - floor(time/stim_period)*stim_period, stim_start + stim_duration), ), stim_amplitude2, 0) # M
-#dlogATPptxs_dt = 0.004*(sin(1*3.141*(time-stim_period)/stim_period))
-#ATP = 10**(logATPptxs)*10**-6
-#ATPptxs = 4.11863563*exp(ATP*0.00479906)*10**-6
-
 dD1_ptxs_dt = k1_ptxs*D2_ptxs - (3*k2_ptxs*ATPptxs + H1_ptxs)*D1_ptxs #
 dD2_ptxs_dt = 3*k2_ptxs*ATPptxs*D1_ptxs + 2*k3_ptxs*D3_ptxs + H2_ptxs*C2_ptxs - (k1_ptxs + 2*k4_ptxs*ATPptxs + H4_ptxs)*D2_ptxs #
 dD3_ptxs_dt = 2*k4_ptxs*ATPptxs*D2_ptxs + 3*k5_ptxs*D4_ptxs + H3_ptxs*Q1_ptxs - (2*k3_ptxs + k6_ptxs*ATPptxs)*D3_ptxs #
@@ -406,5 +409,3 @@ dCaER_dt = JERtoCyt - dCaS - dCaERtoCy
 expressions("Ca_cyto")
 dCai_dt = J_ptxf + J_ptxs - JCyttoER + JNCX - dCa2_CaM - dCa4_CaM - dCa4_CN - dCaF + dCaERtoCy - dCaCytoEx
 
-expressions("Cell")
-dV_dt = 0
