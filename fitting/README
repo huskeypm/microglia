@@ -63,6 +63,12 @@ There are two types of excutable bash files.
 	The max influx rate was obtained from the simulation at 0.1 uM ATP with 1 hr stimulation. 
 	The reason for such a low ATP concentration is that Gotran code exceedingly overshots the Ca concentration once the influx rate goes beyond 0.00186 M/s. 
 	- daisy.py is located in gotran directory. 
+	
+$ sbatch Gotran_SA.bash
+
+or 
+
+$ sbatch Gotran_SA_holly.bash
 
 
 
