@@ -16,7 +16,8 @@ gotranrun simpleRyR.ode --plot_y O  --tstop=2000 --dt 0.1 --parameters Ca_jct 1e
 # aqctual val, 0.5 
 python fittingAlgorithm.py -odeModel simpleRyR.ode -myVariedParam kiCa -variedParamTruthVal 3.0 -jobDuration 2e3 -fileName This_Is_A_Test.png -numRandomDraws 10 -numIters 9 -sigmaScaleRate 0.15 -outputParamName pO -outputParamSearcher O -outputParamMethod max -outputParamTruthVal 2.05e-5
 
-
+# run with daisychain.py
+python daisychain.py -t 0.1 -jit -odeName p2x4_MG.ode -T 10000 -iters 1 -outBase "name.pickle"
 
 
 
