@@ -70,5 +70,16 @@ or
 
 $ sbatch Gotran_SA_holly.bash
 
+3. Step function is implemented. 
+# microgliav3.ode, p2x4_MG.ode, and p2x7_MG.ode
+Basically, what I have done is combining log+sin/cosin to smooth out the edge of pulses.
+There is no sudden jump in solving ODE so the code runs very smoothly. 
 
+To test, run this: 
+$ gotranrun microgliav3.ode --plot_y Cai --tstop=20000 --dt=0.1 --parameter stim_period 480 stim_amplitude 1000
 
+For this version, stim_time and resting time are from stim_period. 
+Specifically, for the first half of stim_period, the system undergoes stimulation (excluding the first initial state)
+whereas, for the next half of the period, the system undergoes resting state. 
+
+This can be further implemented 
