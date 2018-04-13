@@ -66,7 +66,7 @@ def workerParams(jobDict):
                      varDict = varDict,
                      dt=0.1,
                      dtn=dtn,
-                     stim_period=1000.0,
+                     stim_period=240.0,
                      returnDict=returnDict)
 
     #print "after runParamsFast"
