@@ -198,25 +198,25 @@ def ProcessDataArray(dataSub,mode,timeRange=[0,1e3],key=None):
           Iptxf = np.array([0,-2.34,-0.73,-0.30,-0.14,-0.084,-0.01687763713])
           modeldata = [timeSeries, valueTimeSeries]
           litdata = [tptxf, Iptxf]
-          result = fp.test(litdata,modeldata)
+          result = fp.test(litdata,modeldata)*100
       elif mode == "ptxso":
-          tpx = np.array([0,6.4,30.7,53.1,95.3,119.5,123.7,127.8])*10**-3
+          tpx = (np.array([0,6.4,30.7,53.1,95.3,119.5,123.7,127.8]))
           Ipx = np.array([0,-0.006,-0.013,-0.014,-0.013,-0.012,-0.00083,-0.00012])
           modeldata = [timeSeries, valueTimeSeries]
           litdata = [tpx, Ipx]
-          result = fp.test(litdata,modeldata)
+          result = fp.test(litdata,modeldata)*100
       elif mode == "ptxst":
- 	  tpx = np.array([0,1.8,11.5,16.5,67.8,119.1,122.7,127.8])*10**-3
+ 	  tpx = (np.array([0,1.8,11.5,16.5,67.8,119.1,122.7,127.8])+120)*10**-3
           Ipx = np.array([0,-0.039,-0.051,-0.051,-0.045,-0.041,-0.0023,-0.0013])
           modeldata = [timeSeries, valueTimeSeries]
           litdata = [tpx, Ipx]
           result = fp.test(litdata,modeldata)
       elif mode == "ptxsth":
- 	  tpx = np.array([0,0,7.33,25.65,32.98,53.59,79.2,94.81,107.18,118.6,120.9,122.29])*10**-3
-          Ipx = np.array([0,-0.051,-0.068,-0.080,-0.095,-0.21,-0.59,-0.84,-0.90,-0.033,-0.0030])
+ 	  tpx = np.array([0,0,7.328244275,25.64885496,32.97709924,53.58778626,79.23664122,94.80916031,107.1755725,118.6259542,120.9160305,122.2900763])*10**-3
+          Ipx = np.array([0,-0.0505952381,-0.06845238095,-0.08035714286,-0.09523809524,-0.2083333333,-0.5863095238,-0.8392857143,-0.8988095238,-0.9077380952,0.03273809524,0.002976190476])
           modeldata = [timeSeries, valueTimeSeries]
           litdata = [tpx, Ipx]
-          result = fp.test(litdata,modeldata)
+          result = fp.test(litdata,modeldata)*100
       else:
           raise RuntimeError("%s is not yet implemented"%output.mode)
 

@@ -14,43 +14,44 @@
 
 parameters("stimulation",
     #stim_start = ScalarParam(10, unit="s"),
-    stim_period = ScalarParam(5000, unit="s"),
+    stim_period = ScalarParam(400, unit="s"),
+    pre_rest = ScalarParam(1000, unit="s"),
     #stim_duration = ScalarParam(480, unit="s"),
-    stim_amplitude = ScalarParam(100, unit="uM")
+    stim_amplitude = ScalarParam(1000, unit="uM")
     )
 
 parameters("MSMp2x4",
-    k1_ptxf = ScalarParam(0.4, unit="s**-1"),
-    k2_ptxf = ScalarParam(600000, unit="(M*s)**-1"),
-    k3_ptxf = ScalarParam(0.5, unit="s**-1"),
-    k4_ptxf = ScalarParam(500000, unit="(M*s)**-1"),
-    k5_ptxf = ScalarParam(0.6, unit="s**-1"),
-    k6_ptxf = ScalarParam(400000, unit="(M*s)**-1"),
+    k1_ptxf = ScalarParam(0.2, unit="s**-1"),
+    k2_ptxf = ScalarParam(8000000, unit="(M*s)**-1"),
+    k3_ptxf = ScalarParam(0.1, unit="s**-1"),
+    k4_ptxf = ScalarParam(900000000, unit="(M*s)**-1"),
+    k5_ptxf = ScalarParam(0.03, unit="s**-1"),
+    k6_ptxf = ScalarParam(9000000, unit="(M*s)**-1"),
     L1_ptxf = ScalarParam(0.01, unit="s**-1"),
     L2_ptxf = ScalarParam(0.04, unit="s**-1"),
     L3_ptxf = ScalarParam(0.5, unit="s**-1"),
     H1_ptxf = ScalarParam(0.013, unit="s**-1"),
-    H2_ptxf = ScalarParam(0.35, unit="s**-1"),
-    H3_ptxf = ScalarParam(1.4, unit="s**-1"),
-    H4_ptxf = ScalarParam(0.001, unit="s**-1"),
+    H2_ptxf = ScalarParam(0.1, unit="s**-1"),
+    H3_ptxf = ScalarParam(1.56, unit="s**-1"),
+    H4_ptxf = ScalarParam(0.005, unit="s**-1"),
     F_ptxf = ScalarParam(1),
     G_ptxf = ScalarParam(1)
     )
 
 parameters("MSMp2x7",
-    k1_ptxs = ScalarParam(0.3, unit="s**-1"),
-    k2_ptxs = ScalarParam(70000, unit="(M*s)**-1"),
-    k3_ptxs = ScalarParam(5.4, unit="s**-1"),
-    k4_ptxs = ScalarParam(100000, unit="(M*s)**-1"),
-    k5_ptxs = ScalarParam(1.58, unit="s**-1"),
-    k6_ptxs = ScalarParam(7000, unit="(M*s)**-1"),
-    L1_ptxs = ScalarParam(0.0001, unit="s**-1"),
-    L2_ptxs = ScalarParam(0.004, unit="s**-1"),
-    L3_ptxs = ScalarParam(0.5, unit="s**-1"),
-    H1_ptxs = ScalarParam(0.001, unit="s**-1"),
-    H2_ptxs = ScalarParam(0.01, unit="s**-1"),
-    H3_ptxs = ScalarParam(0.5, unit="s**-1"),
-    H4_ptxs = ScalarParam(0, unit="s**-1")
+    k1_ptxs = ScalarParam(0.0394, unit="s**-1"),
+    k2_ptxs = ScalarParam(2198.52, unit="(M*s)**-1"),
+    k3_ptxs = ScalarParam(0.495, unit="s**-1"),
+    k4_ptxs = ScalarParam(2155.31, unit="(M*s)**-1"),
+    k5_ptxs = ScalarParam(0.57, unit="s**-1"),
+    k6_ptxs = ScalarParam(96.997, unit="(M*s)**-1"),
+    L1_ptxs = ScalarParam(0.491, unit="s**-1"),
+    L2_ptxs = ScalarParam(0.170, unit="s**-1"),
+    L3_ptxs = ScalarParam(0.051, unit="s**-1"),
+    H1_ptxs = ScalarParam(2.437, unit="s**-1"),
+    H2_ptxs = ScalarParam(0.00001, unit="s**-1"),
+    H3_ptxs = ScalarParam(0.0294, unit="s**-1"),
+    H4_ptxs = ScalarParam(0.3, unit="s**-1")
     )
 
 parameters("Ip2x4",
@@ -164,10 +165,10 @@ parameters("TNFa",
     kfpp38_TNF = ScalarParam(555.5556e-6, unit="(M*s)**-1"),    # 2/3600            # 2 count per 3600 seconds
     ### Hill equation related constants for activation of DNA dynamics/TNFa release
     kmaxexo_TNF = ScalarParam(2.777778e-3, unit="(M*s)**-1"),    # 5/1800             # [1/(M-s)]: R max of exocytosis of TNFa 150 15 15 10 1
-    nCaleak_TNF = ScalarParam(1.8),
-    nNFAT1_TNF = ScalarParam(100),             # Hill coefficient of NFAT related to transcription activation
-    IC50NFAT1_TNF = ScalarParam(1.07, unit="nM"),         # [nM] Transcription related
-    IC50Caleak_TNF = ScalarParam(0.1, unit="uM")         # [uM]: TNFa leaks related 4e-7 4e-7 1e-7 1e-7 1e-7
+    nCaleak_TNF = ScalarParam(0.5),
+    nNFAT1_TNF = ScalarParam(80),             # Hill coefficient of NFAT related to transcription activation
+    IC50NFAT1_TNF = ScalarParam(0.5, unit="nM"),         # [nM] Transcription related
+    IC50Caleak_TNF = ScalarParam(0.6, unit="uM")         # [uM]: TNFa leaks related 4e-7 4e-7 1e-7 1e-7 1e-7
     )
 
 parameters("Leakage",
@@ -269,15 +270,21 @@ expressions("Cell")
 dV_dt = 0
 stim_start = stim_period/2
 stim_period2 = stim_period/4
+ntime = Conditional(Le((time-pre_rest),0),0,(time-pre_rest))
+STC = Conditional(Le((time-pre_rest),0),0,1)
+dlogATP_dt = 1*(sin(1*3.141*(ntime-stim_period2)/stim_period2))*STC
+#dlogATP_dt = 1*(sin(1*3.141*(ntime-stim_period2)/stim_period2))
+#ATP = 10**(logATP)*stim_amplitude
 ATP71 = 4.11863563*exp(stim_amplitude*0.00479906)
 stim_amplitude_ptxs = ATP71*10**-6
 stim_amplitude_ptxf = stim_amplitude*1e-6
-dlogATP_dt = 1*(sin(1*3.141*(time-stim_period2)/stim_period2))
-ATP = 10**(logATP)
-ATP41 = Conditional(Le(time,0.33*stim_start),0,10**(logATP)*stim_amplitude)
-ATP72 = Conditional(Le(time,0.33*stim_start),0,ATP71*10**(logATP))
-ATPptxf = Conditional(And(Ge(time - floor(time/(stim_period))*(stim_period), stim_start), Le(time - floor(time/(stim_period))*(stim_period), stim_period), ), stim_amplitude_ptxf, ATP41)
-ATPptxs = Conditional(And(Ge(time - floor(time/(stim_period))*(stim_period), stim_start), Le(time - floor(time/(stim_period))*(stim_period), stim_period), ), stim_amplitude_ptxs, ATP72)
+
+ATP41 = Conditional(Le(ntime,0.33*stim_start),0,10**(logATP)*stim_amplitude)
+ATP72 = Conditional(Le(ntime,0.33*stim_start),0,ATP71*10**(logATP))
+
+stim_period3 = stim_period 
+ATPptxf = Conditional(And(Ge(ntime - floor(ntime/(stim_period3))*(stim_period3), stim_start), Le(ntime - floor(time/(stim_period3))*(stim_period3), stim_period), ), stim_amplitude_ptxf, ATP41)
+ATPptxs = Conditional(And(Ge(ntime - floor(ntime/(stim_period3))*(stim_period3), stim_start), Le(ntime - floor(time/(stim_period3))*(stim_period3), stim_period), ), stim_amplitude_ptxs, ATP72)
 
 expressions("MSMp2x4")
 dD1_ptxf_dt = k1_ptxf*D2_ptxf - (3*k2_ptxf*ATPptxf + H1_ptxf)*D1_ptxf

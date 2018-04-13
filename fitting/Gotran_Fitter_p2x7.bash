@@ -23,29 +23,30 @@ python -c "import gotran"
 
 cd /home/bch265/microglia/microglia/fitting
 
-duration=120
+duration=240
 iters=2
-finalstep=2
+finalstep=5
 sigma="0.001"
 
-array[0]=70000
-array[1]=100000
-array[2]=7000
-array[3]=".3"
-array[4]="5.4"
-array[5]="1.58"
-array[6]=".0001"
-array[7]=".004"
+array[0]=".3"
+array[1]="5.4"
+array[2]="1.58"
+array[3]=".0001"
+array[4]=".004"
+array[5]=".5"
+array[6]=".001"
+array[7]=".01"
 array[8]=".5"
-array[9]=".001"
-array[10]=".01"
-array[11]=".5"
-array[12]="0"
+array[9]="0"
+array[10]=70000
+array[11]=100000
+array[12]=7000
+
 
 for (( i=1; i<=$finalstep; i++))
   do
     j=0
-    for name in k2_ptxs k4_ptxs k6_ptxs k1_ptxs k3_ptxs k5_ptxs L1_ptxs L2_ptxs L3_ptxs H1_ptxs H2_ptxs H3_ptxs H4_ptxs
+    for name in k1_ptxs k3_ptxs k5_ptxs L1_ptxs L2_ptxs L3_ptxs H1_ptxs H2_ptxs H3_ptxs H4_ptxs k2_ptxs k4_ptxs k6_ptxs
       do
         python fittingAlgorithm.py -odeModel p2x7_MG.ode -myVariedParam $name -variedParamTruthVal ${array[$j]} -jobDuration $duration -fileName This_Is_A_Test.png -numRandomDraws 10 -numIters $iters -sigmaScaleRate $sigma -outputParamName I_ptxs -outputParamSearcher I_ptxs -outputParamMethod ptxso -outputParamTruthVal 0 >& log.ptxs1
 
@@ -60,7 +61,7 @@ for (( i=1; i<=$finalstep; i++))
   done
 
 k=0
-for name in k2_ptxs k4_ptxs k6_ptxs k1_ptxs k3_ptxs k5_ptxs L1_ptxs L2_ptxs L3_ptxs H1_ptxs H2_ptxs H3_ptxs H4_ptxs
+for name in k1_ptxs k3_ptxs k5_ptxs L1_ptxs L2_ptxs L3_ptxs H1_ptxs H2_ptxs H3_ptxs H4_ptxs k2_ptxs k4_ptxs k6_ptxs
 	  do
 	    echo "new rate constant for $name is ${array[$k]}" >> ptxs1.results
     k=$(($k+1))

@@ -23,9 +23,9 @@ python -c "import gotran"
 
 cd /home/bch265/microglia/microglia/fitting
 
-duration=63
-iters=10
-finalstep=10
+duration=75
+iters=2
+finalstep=5
 sigma="0.001"
 
 array[0]=600000
@@ -44,7 +44,7 @@ for (( i=1; i<=$finalstep; i++))
     j=0
     for name in k2_ptxf k4_ptxf k6_ptxf k1_ptxf k3_ptxf k5_ptxf H1_ptxf H2_ptxf H3_ptxf H4_ptxf
       do
-        python fittingAlgorithm.py -odeModel p2x4_MG.ode -myVariedParam $name -variedParamTruthVal ${array[$j]} -jobDuration $duration -fileName This_Is_A_Test.png -numRandomDraws 10 -numIters $iters -sigmaScaleRate $sigma -outputParamName I_ptxf -outputParamSearcher I_ptxf -outputParamMethod pro -outputParamTruthVal 0 >& log.ptxf
+        python fittingAlgorithm.py -odeModel p2x4_MG_test.ode -myVariedParam $name -variedParamTruthVal ${array[$j]} -jobDuration $duration -fileName This_Is_A_Test.png -numRandomDraws 10 -numIters $iters -sigmaScaleRate $sigma -outputParamName I_ptxf -outputParamSearcher I_ptxf -outputParamMethod pro -outputParamTruthVal 0 >& log.ptxf
 
         GUESS="$(bc <<< scale=6 ;grep bestVarDict log.ptxf | tail -1 | awk '{print $3}' | grep -Eo '[0-9\.]+')"
         echo "result of $name: $GUESS from trial number $i"

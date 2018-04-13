@@ -1,4 +1,6 @@
- -l nodes=1:ppn=64
+#!/bin/bash
+
+#PBS -l nodes=1:ppn=64
 #PBS -q short
 #PBS -m abe
 
@@ -21,14 +23,14 @@ python -c "import gotran"
 
 cd /home/bch265/microglia/microglia/fitting
 
-python daisychain.py -t 0.1 -jit -odeName microgliav4_noptx.ode -T 3600 -iters 1 -var MaxFlux 0.00186 -name ./noP2X_100 
-python daisychain.py -t 0.1 -jit -odeName microgliav4_noptx.ode -T 3600 -iters 1 -var MaxFlux 0.00177 -name ./noP2X_95 
-python daisychain.py -t 0.1 -jit -odeName microgliav4_noptx.ode -T 3600 -iters 1 -var MaxFlux 0.0013 -name ./noP2X_70 
-python daisychain.py -t 0.1 -jit -odeName microgliav4_noptx.ode -T 3600 -iters 1 -var MaxFlux 0.0011 -name ./noP2X_60 
-python daisychain.py -t 0.1 -jit -odeName microgliav4_noptx.ode -T 3600 -iters 1 -var MaxFlux 0.00093 -name ./noP2X_50
-python daisychain.py -t 0.1 -jit -odeName microgliav4_noptx.ode -T 3600 -iters 1 -var MaxFlux 0.00074 -name ./noP2X_40
-python daisychain.py -t 0.1 -jit -odeName microgliav4_noptx.ode -T 3600 -iters 1 -var MaxFlux 0.00056 -name ./noP2X_30
-python daisychain.py -t 0.1 -jit -odeName microgliav4_noptx.ode -T 3600 -iters 1 -var MaxFlux 0.000093 -name ./noP2X_5
-python daisychain.py -t 0.1 -jit -odeName microgliav4_noptx.ode -T 3600 -iters 1 -var MaxFlux 0.0 -name ./noP2X_0 
+python daisychain.py -t 0.1 -jit -odeName microgliav4_noptx.ode -T 3600 -iters 1 -var CNt_NFAT 4e3 -name ./noP2X_CNt_4uM 
+python daisychain.py -t 0.1 -jit -odeName microgliav4_noptx.ode -T 3600 -iters 1 -var CNt_NFAT 3e3 -name ./noP2X_CNt_3uM 
+python daisychain.py -t 0.1 -jit -odeName microgliav4_noptx.ode -T 3600 -iters 1 -var CNt_NFAT 2.4e3 -name ./noP2X_CNt_2.4uM 
+python daisychain.py -t 0.1 -jit -odeName microgliav4_noptx.ode -T 3600 -iters 1 -var CNt_NFAT 2.2e3 -name ./noP2X_CNt_2.2uM 
+python daisychain.py -t 0.1 -jit -odeName microgliav4_noptx.ode -T 3600 -iters 1 -var CNt_NFAT 2e3 -name ./noP2X_CNt_2uM
+python daisychain.py -t 0.1 -jit -odeName microgliav4_noptx.ode -T 3600 -iters 1 -var CNt_NFAT 1.8e3 -name ./noP2X_CNt_1.8uM
+python daisychain.py -t 0.1 -jit -odeName microgliav4_noptx.ode -T 3600 -iters 1 -var CNt_NFAT 1.6e3 -name ./noP2X_CNt_1.6uM
+python daisychain.py -t 0.1 -jit -odeName microgliav4_noptx.ode -T 3600 -iters 1 -var CNt_NFAT 1e3 -name ./noP2X_CNt_1uM
+python daisychain.py -t 0.1 -jit -odeName microgliav4_noptx.ode -T 3600 -iters 1 -var CNt_NFAT 0e3 -name ./noP2X_CNt_0uM 
 
 #mail -s "job is done" "bending456@gmail.com"
