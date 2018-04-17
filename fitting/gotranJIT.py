@@ -162,12 +162,13 @@ def main(filename, params):
         mxstep = 1000
         mxstep = 2000 
         results = odeint(rhs, y0, tsteps, Dfun=jac, args=(model_params,),\
-                         mxstep=2000,hmax=.03,rtol=1e-12, atol=1e-12)
+                         mxstep=mxstep)#,hmax=.03,rtol=1e-12, atol=1e-12)
 
     else:
 
         # Get generated forward method
         forward = getattr(module, "forward_"+params.solver)
+        #forward = getattr(module, params.solver)
         
         results = [y0]
         states = y0.copy()

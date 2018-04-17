@@ -94,6 +94,7 @@ def daisychain(\
       
       # hack
       #stateDict["V"]=50 works 
+      mxsteps = 2000
       rs.runParamsFast(odeName=odeName,name=nextName,
                        varDict=paramDict,stateDict=stateDict,dt=dt,dtn=dtn,\
                        stim_period=stim_period,mxsteps=mxsteps,downsampleRate=downsampleRate)
