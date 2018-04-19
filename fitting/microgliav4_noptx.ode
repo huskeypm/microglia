@@ -93,8 +93,8 @@ parameters("NFAT",
     kf4_NFAT = ScalarParam(4.45e-4, unit="s**-1"),   # [1/s]
     KmN_NFAT = ScalarParam(535, unit="nM"),        # [nM]
     n_NFAT = ScalarParam(2.92),
-    Ccn_NFAT = ScalarParam(1),          # Volume ratio of Cytosol to Nucleus
-    CNt_NFAT = ScalarParam(2e3, unit="nM")             # in [nM] Total number of calcineurin: this value is the same as used in    buffer calculation
+    Ccn_NFAT = ScalarParam(1)          # Volume ratio of Cytosol to Nucleus
+    #CNt_NFAT = ScalarParam(2e3, unit="nM")             # in [nM] Total number of calcineurin: this value is the same as used in    buffer calculation
     )
 
 parameters("TNFa",
@@ -107,10 +107,10 @@ parameters("TNFa",
     kfpp38_TNF = ScalarParam(555.5556e-6, unit="(M*s)**-1"),    # 2/3600            # 2 count per 3600 seconds
     ### Hill equation related constants for activation of DNA dynamics/TNFa release
     kmaxexo_TNF = ScalarParam(2.777778e-3, unit="(M*s)**-1"),    # 5/1800             # [1/(M-s)]: R max of exocytosis of TNFa 150 15 15 10 1
-    nCaleak_TNF = ScalarParam(1.8),
-    nNFAT1_TNF = ScalarParam(100),             # Hill coefficient of NFAT related to transcription activation
-    IC50NFAT1_TNF = ScalarParam(1.07, unit="nM"),         # [nM] Transcription related
-    IC50Caleak_TNF = ScalarParam(0.1, unit="uM")         # [uM]: TNFa leaks related 4e-7 4e-7 1e-7 1e-7 1e-7
+    nCaleak_TNF = ScalarParam(3),
+    nNFAT1_TNF = ScalarParam(80),            # Hill coefficient of NFAT related to transcription activation
+    IC50NFAT1_TNF = ScalarParam(0.5, unit="nM"),         # [nM] Transcription related
+    IC50Caleak_TNF = ScalarParam(0.6, unit="uM")         # [uM]: TNFa leaks related 4e-7 4e-7 1e-7 1e-7 1e-7
     )
 
 parameters("Leakage",
@@ -120,7 +120,8 @@ parameters("Leakage",
     )
 
 parameters("ptx",
-    MaxFlux = ScalarParam(0.02232, unit="M/s")
+    MaxFlux = ScalarParam(0.00186, unit="M/s"),
+    FluxFactor = ScalarParam(1) # this varies from 0 to 1
     )
 
 states("Ca_cyto",
@@ -148,10 +149,10 @@ states("SERCA_ER",
     )
 
 states("NFAT",
-    NFATpc = ScalarParam(0.994682667758, unit="M"),        # nM
-    NFATpn = ScalarParam(0.0463772043925, unit="M"),       # nM
-    NFATNc = ScalarParam(0.000112322167638, unit="M"),     # nM
-    NFATNn = ScalarParam(0.0581439005689, unit="M")        # nM
+    NFATpc = ScalarParam(0.994682667758, unit="nM"),        # nM
+    NFATpn = ScalarParam(0.0463772043925, unit="nM"),       # nM
+    NFATNc = ScalarParam(0.000112322167638, unit="nM"),     # nM
+    NFATNn = ScalarParam(0.0581439005689, unit="nM")        # nM
     )
 
 states("NCX",
@@ -233,9 +234,8 @@ dpp38_dt = -kb_pp38*pp38 + kf_pp38*p38*Cai
 dp38_dt = kb_pp38*pp38 - kf_pp38*p38*Cai
 
 expressions("NFAT")
-Cai_NFAT = Cai*(1e9)                    # in [nM]
 CaMCN_NFAT = CaMCN*(1e9)                # in [nM]
-actN_NFAT = CaMCN_NFAT/CNt_NFAT
+actN_NFAT = CaMCN/CNt
 J1_NFAT = kf1_NFAT*NFATpc*CaMCN_NFAT - kr1_NFAT*NFATNc*(1 - actN_NFAT)
 J2_NFAT = NFATNc*kf2_NFAT
 J3_NFAT = kf3_NFAT*NFATNn*(1-actN_NFAT) - kr3_NFAT*NFATpn*CaMCN_NFAT
@@ -253,7 +253,8 @@ RdegTNF_TNF = kdegTNF_TNF*TNFa
 RdegRNA_TNF = kdegRNA_TNF*mRNA_TNF
 Rgeneexp_TNF = kgeneexpf_TNF*DNA_TNF*TNFa - kgeneexpr_TNF*DNATNF # DNATNF is the complex of DNA and TNF
 Rpp38_TNF = kfpp38_TNF*pp38
-Rexo_TNF = (kmaxexo_TNF/(1+(IC50Caleak_TNF/(Cai_TNF))**nCaleak_TNF))*TNFa*Cai_TNF
+#Rexo_TNF = (kmaxexo_TNF/(1+(IC50Caleak_TNF/(Cai_TNF))**nCaleak_TNF))*TNFa*Cai_TNF
+Rexo_TNF = (kmaxexo_TNF/(1+(IC50Caleak_TNF/(Cai_TNF))**nCaleak_TNF))*TNFa
 dDNA_TNF_dt = -Rgeneexp_TNF
 dmRNA_TNF_dt = Rtranscript_TNF - RdegRNA_TNF
 dDNATNF_dt = Rgeneexp_TNF
@@ -270,7 +271,7 @@ expressions("Ca_ER")
 dCaER_dt = JERtoCyt - dCaS - dCaERtoCy
 
 expressions("Ca_cyto")
-dCai_dt = MaxFlux*exp(-time) - JCyttoER + JNCX - dCa2_CaM - dCa4_CaM - dCa4_CN - dCaF + dCaERtoCy - dCaCytoEx
+dCai_dt = FluxFactor*MaxFlux*exp(-time) - JCyttoER + JNCX - dCa2_CaM - dCa4_CaM - dCa4_CN - dCaF + dCaERtoCy - dCaCytoEx
 
 expressions("Cell")
 dV_dt = 0

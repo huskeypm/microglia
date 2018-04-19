@@ -23,33 +23,34 @@ python -c "import gotran"
 
 cd /home/bch265/microglia/microglia/fitting
 
-duration=120
-iters=4
-finalstep=10
+duration=240
+iters=2
+finalstep=2
 sigma="0.001"
 
-array[0]=70000
-array[1]=100000
-array[2]=7000
-array[3]=".3"
-array[4]="5.4"
-array[5]="1.58"
-array[6]=".0001"
-array[7]=".004"
-array[8]=".5"
-array[9]=".001"
-array[10]=".01"
-array[11]=".5"
-array[12]="0"
+array[0]=".008"
+array[1]="0.33"
+array[2]="0.16"
+array[3]=".55"
+array[4]=".0002"
+array[5]=".025"
+array[6]="3.41"
+array[7]=".00035"
+array[8]=".029"
+array[9]="0"
+array[10]=3891
+array[11]=5214
+array[12]=233
+
 
 for (( i=1; i<=$finalstep; i++))
   do
     j=0
-    for name in k2_ptxs k4_ptxs k6_ptxs k1_ptxs k3_ptxs k5_ptxs L1_ptxs L2_ptxs L3_ptxs H1_ptxs H2_ptxs H3_ptxs H4_ptxs
+    for name in k1_ptxs k3_ptxs k5_ptxs L1_ptxs L2_ptxs L3_ptxs H1_ptxs H2_ptxs H3_ptxs H4_ptxs k2_ptxs k4_ptxs k6_ptxs
       do
-        python fittingAlgorithm.py -odeModel p2x7_MG.ode -myVariedParam $name -variedParamTruthVal ${array[$j]} -jobDuration $duration -fileName This_Is_A_Test.png -numRandomDraws 10 -numIters $iters -sigmaScaleRate $sigma -outputParamName I_ptxs -outputParamSearcher I_ptxs -outputParamMethod prop2x7100 -outputParamTruthVal 0 >& log.txt
+        python fittingAlgorithm.py -odeModel p2x7_MG.ode -myVariedParam $name -variedParamTruthVal ${array[$j]} -jobDuration $duration -fileName This_Is_A_Test.png -numRandomDraws 10 -numIters $iters -sigmaScaleRate $sigma -outputParamName I_ptxs -outputParamSearcher I_ptxs -outputParamMethod ptxso -outputParamTruthVal 0 >& log.ptxs1
 
-        GUESS="$(bc <<< scale=6 ;grep bestVarDict log.txt | tail -1 | awk '{print $3}' | grep -Eo '[0-9\.]+')"
+        GUESS="$(bc <<< scale=6 ;grep bestVarDict log.ptxs1 | tail -1 | awk '{print $3}' | grep -Eo '[0-9\.]+')"
         echo "result of $name: $GUESS from trial number $i"
         echo "previous ${array[$j]} and current $GUESS "
 
@@ -60,10 +61,10 @@ for (( i=1; i<=$finalstep; i++))
   done
 
 k=0
-for name in k2_ptxs k4_ptxs k6_ptxs k1_ptxs k3_ptxs k5_ptxs L1_ptxs L2_ptxs L3_ptxs H1_ptxs H2_ptxs H3_ptxs H4_ptxs
+for name in k1_ptxs k3_ptxs k5_ptxs L1_ptxs L2_ptxs L3_ptxs H1_ptxs H2_ptxs H3_ptxs H4_ptxs k2_ptxs k4_ptxs k6_ptxs
 	  do
-	    echo "new rate constant for $name is ${array[$k]}" >> log.results
+	    echo "new rate constant for $name is ${array[$k]}" >> ptxs1.results
     k=$(($k+1))
   done
 
-echo "$(grep jobFitnesses log.txt | tail -1)" >> log.results
+echo "$(grep jobFitnesses log.ptxs1 | tail -1)" >> ptxs1.results

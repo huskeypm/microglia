@@ -10,9 +10,11 @@ see https://pkh.as.uky.edu/wiki/gotran
 cd microglia/fitting
 # load configs
 source ../configgotran.bash
+
 # run 'simple' simulation 
 # to assess model performance 
 gotranrun simpleRyR.ode --plot_y O  --tstop=2000 --dt 0.1 --parameters Ca_jct 1e-3
+
 # aqctual val, 0.5 
 python fittingAlgorithm.py -odeModel simpleRyR.ode -myVariedParam kiCa -variedParamTruthVal 3.0 -jobDuration 2e3 -fileName This_Is_A_Test.png -numRandomDraws 10 -numIters 9 -sigmaScaleRate 0.15 -outputParamName pO -outputParamSearcher O -outputParamMethod max -outputParamTruthVal 2.05e-5
 
