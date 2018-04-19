@@ -162,7 +162,11 @@ def main(filename, params):
         mxstep = 1000
         mxstep = 2000 
         results = odeint(rhs, y0, tsteps, Dfun=jac, args=(model_params,),\
+<<<<<<< local
+                         mxstep=mxstep) #,hmax=.03,rtol=1e-12, atol=1e-12)
+=======
                          mxstep=mxstep)#,hmax=.03,rtol=1e-12, atol=1e-12)
+>>>>>>> other
 
     else:
 
