@@ -11,25 +11,25 @@
 ###################################################################################
 
 parameters("stimulation",
-    stim_start = ScalarParam(0, unit="s"),
-    stim_period = ScalarParam(2000, unit="s"),
-    stim_duration = ScalarParam(120, unit="s"),
+    #stim_start = ScalarParam(0, unit="s"),
+    stim_period = ScalarParam(240, unit="s"),
+    #stim_duration = ScalarParam(120, unit="s"),
     stim_amplitude = ScalarParam(100, unit="uM"))
 
 parameters("MSM",
-    k1_ptxs = ScalarParam(1.04398, unit="s**-1"),
-    k2_ptxs = ScalarParam(10589.6, unit="(M*s)**-1"),
-    k3_ptxs = ScalarParam(15, unit="s**-1"),
-    k4_ptxs = ScalarParam(39789.9, unit="(M*s)**-1"),
-    k5_ptxs = ScalarParam(6.483, unit="s**-1"),
-    k6_ptxs = ScalarParam(2431.6, unit="(M*s)**-1"),
-    L1_ptxs = ScalarParam(0.000586, unit="s**-1"),
-    L2_ptxs = ScalarParam(0.012, unit="s**-1"),
-    L3_ptxs = ScalarParam(0.18, unit="s**-1"),
-    H1_ptxs = ScalarParam(0.00050, unit="s**-1"),
-    H2_ptxs = ScalarParam(0.042, unit="s**-1"),
-    H3_ptxs = ScalarParam(1.72, unit="s**-1"),
-    H4_ptxs = ScalarParam(0.0, unit="s**-1")
+    k1_ptxs = ScalarParam(0.0394, unit="s**-1"),
+    k2_ptxs = ScalarParam(2198.52, unit="(M*s)**-1"),
+    k3_ptxs = ScalarParam(0.453, unit="s**-1"),
+    k4_ptxs = ScalarParam(2155.31, unit="(M*s)**-1"),
+    k5_ptxs = ScalarParam(0.17, unit="s**-1"),
+    k6_ptxs = ScalarParam(96.997, unit="(M*s)**-1"),
+    L1_ptxs = ScalarParam(0.491, unit="s**-1"),
+    L2_ptxs = ScalarParam(0.170, unit="s**-1"),
+    L3_ptxs = ScalarParam(0.051, unit="s**-1"),
+    H1_ptxs = ScalarParam(2.437, unit="s**-1"),
+    H2_ptxs = ScalarParam(0.00081, unit="s**-1"),
+    H3_ptxs = ScalarParam(0.0294, unit="s**-1"),
+    H4_ptxs = ScalarParam(0.1, unit="s**-1")
     )
 
 parameters("Ip2x7",
@@ -60,7 +60,8 @@ states("MSM",
     Q1_ptxs = 0.0,
     Q2_ptxs = 0.0,
     Q3_ptxs = 0.0,
-    Q4_ptxs = 0.0
+    Q4_ptxs = 0.0,
+    log10ATP = ScalarParam(-6, unit="logM")
     )
 
 states("Cell",
@@ -68,9 +69,13 @@ states("Cell",
     V = 0)
 
 expressions("MSM")
-#ATP = stim_amplitude*10**-6
-stim_amplitude2 = 4.11863563*exp(stim_amplitude*0.00479906)*1e-6
-ATP = Conditional(And(Ge(time - floor(time/stim_period)*stim_period, stim_start), Le(time - floor(time/stim_period)*stim_period, stim_start + stim_duration), ), stim_amplitude2, 0) # M
+stim_start = stim_period/2
+stim_period2 = stim_period/4
+ATPptxs = 4.11863563*exp(stim_amplitude*0.00479906)
+stim_amplitude2 = ATPptxs*10**-6
+dlog10ATP_dt = 0.8*(sin(1*3.141*(time-stim_period2)/stim_period2))
+ATP2 = Conditional(Le(time,0.33*stim_start),0,ATPptxs*10**(log10ATP))
+ATP = Conditional(And(Ge(time - floor(time/(stim_period))*(stim_period), stim_start), Le(time - floor(time/(stim_period))*(stim_period), stim_start + (stim_period/2)), ), stim_amplitude2, ATP2) # M
 
 dD1_ptxs_dt = k1_ptxs*D2_ptxs - (3*k2_ptxs*ATP + H1_ptxs)*D1_ptxs #
 dD2_ptxs_dt = 3*k2_ptxs*ATP*D1_ptxs + 2*k3_ptxs*D3_ptxs + H2_ptxs*C2_ptxs - (k1_ptxs + 2*k4_ptxs*ATP + H4_ptxs)*D2_ptxs #

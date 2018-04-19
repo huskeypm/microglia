@@ -201,7 +201,7 @@ def ProcessDataArray(dataSub,mode,timeRange=[0,1e3],key=None):
           #result = (daMaxHalfPlace - daMaxPlace) * 0.1 * ms_to_s
           #result = valueTimeSeries[daMaxPlace] - valueTimeSeries[daMaxHalfPlace]
       elif mode == "prop2x4":
-          tptxf = np.array([0,0.75,6,11.25,18.75,30.75,75])*10**-3
+          tptxf = np.array([0,0.75,6,11.25,18.75,30.75,75])#*10**-3
           Iptxf = np.array([0,-2.34,-0.73,-0.30,-0.14,-0.084,-0.01687763713])
           modelptxf = [timeSeries, valueTimeSeries]
           litptxf = [tptxf, Iptxf]
