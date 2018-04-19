@@ -115,7 +115,7 @@ parameters("TNFa",
 
 parameters("Leakage",
     CaExt = ScalarParam(2e-3, unit="M"),      # External Ca concentration in [M]
-    DCytoEx = ScalarParam(0.0, unit="s**-1"),    # Diffusion constant of Ca from Cytosol to External
+    DExtoCy = ScalarParam(0.00003822, unit="s**-1"),    # Diffusion constant of Ca from Cytosol to External
     DERtoCy = ScalarParam(0.0, unit="s**-1")     # Diffusion constant of Ca from ER to Cytosol
     )
 
@@ -173,7 +173,7 @@ states("TNFa",
     )
 
 states("Leakage",
-    CaCytoEx = ScalarParam(0, unit="M"), # in [M]
+    CaExtoCy = ScalarParam(0, unit="M"), # in [M]
     CaERtoCy = ScalarParam(0, unit="M")  # in [M]
     )
 
@@ -262,16 +262,18 @@ dTNFa_dt = Rtranslate_TNF + Rpp38_TNF - RdegTNF_TNF - Rgeneexp_TNF - Rexo_TNF
 dTNFa_release_dt = Rexo_TNF
 
 expressions("Leakage")
-dCaCytoEx = DCytoEx*(CaER - Cai)
-dCaCytoEx_dt = dCaCytoEx
-dCaERtoCy = DERtoCy*(CaExt - Cai)
+dCaExtoCy = DExtoCy*(CaExt - Cai)
+dCaExtoCy_dt = dCaExtoCy
+dCaERtoCy = DERtoCy*(CaER - Cai)
 dCaERtoCy_dt = dCaERtoCy
 
 expressions("Ca_ER")
 dCaER_dt = JERtoCyt - dCaS - dCaERtoCy
 
 expressions("Ca_cyto")
-dCai_dt = FluxFactor*MaxFlux*exp(-time) - JCyttoER + JNCX - dCa2_CaM - dCa4_CaM - dCa4_CN - dCaF + dCaERtoCy - dCaCytoEx
+#ntime = Conditional(And(Ge(time-floor(time/5)*5,2.5),Le(time-floor(time/5)*5,5),),(time-floor(time/5)*5),99999)
+#ntime = Conditional(Le(time,1000),99999,time-10)
+dCai_dt = FluxFactor*MaxFlux*exp(-time) - JCyttoER + JNCX - dCa2_CaM - dCa4_CaM - dCa4_CN - dCaF + dCaERtoCy + dCaExtoCy
 
 expressions("Cell")
 dV_dt = 0
