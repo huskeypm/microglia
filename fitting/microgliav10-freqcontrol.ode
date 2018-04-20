@@ -15,7 +15,7 @@
 parameters("stimulation",
     #stim_start = ScalarParam(10, unit="s"),
     stim_period = ScalarParam(100, unit="s"), # stim_duration = stim_period/2
-    pre_rest = ScalarParam(1000, unit="s"),
+    pre_rest = ScalarParam(100, unit="s"),
     stim_space = ScalarParam(900, unit="s"), # time duration between end of pulse and beginning of pulse
     size = ScalarParam(1), # default = 1
     stim_amplitude = ScalarParam(1000, unit="uM")
@@ -296,7 +296,16 @@ ATPptxf7 = Conditional(And(Ge(time,(rest_start+size*stim_period+5*total_space)),
 ATPptxf8 = Conditional(And(Ge(time,(rest_start+size*stim_period+6*total_space)),Le(time,(rest_start+7*total_space)),),0,ATPptxf7)
 ATPptxf9 = Conditional(And(Ge(time,(rest_start+size*stim_period+7*total_space)),Le(time,(rest_start+8*total_space)),),0,ATPptxf8)
 ATPptxf10 = Conditional(And(Ge(time,(rest_start+size*stim_period+8*total_space)),Le(time,(rest_start+9*total_space)),),0,ATPptxf9)
-ATPptxf = Conditional(And(Ge(time,(rest_start+size*stim_period+9*total_space)),Le(time,(rest_start+10*total_space)),),0,ATPptxf10)
+ATPptxf11 = Conditional(And(Ge(time,(rest_start+size*stim_period+9*total_space)),Le(time,(rest_start+10*total_space)),),0,ATPptxf10)
+ATPptxf12 = Conditional(And(Ge(time,(rest_start+size*stim_period+10*total_space)),Le(time,(rest_start+11*total_space)),),0,ATPptxf11)
+ATPptxf13 = Conditional(And(Ge(time,(rest_start+size*stim_period+11*total_space)),Le(time,(rest_start+12*total_space)),),0,ATPptxf12)
+ATPptxf14 = Conditional(And(Ge(time,(rest_start+size*stim_period+12*total_space)),Le(time,(rest_start+13*total_space)),),0,ATPptxf13)
+ATPptxf15 = Conditional(And(Ge(time,(rest_start+size*stim_period+13*total_space)),Le(time,(rest_start+14*total_space)),),0,ATPptxf14)
+ATPptxf16 = Conditional(And(Ge(time,(rest_start+size*stim_period+14*total_space)),Le(time,(rest_start+15*total_space)),),0,ATPptxf15)
+ATPptxf17 = Conditional(And(Ge(time,(rest_start+size*stim_period+15*total_space)),Le(time,(rest_start+16*total_space)),),0,ATPptxf16)
+ATPptxf18 = Conditional(And(Ge(time,(rest_start+size*stim_period+16*total_space)),Le(time,(rest_start+17*total_space)),),0,ATPptxf17)
+ATPptxf19 = Conditional(And(Ge(time,(rest_start+size*stim_period+17*total_space)),Le(time,(rest_start+18*total_space)),),0,ATPptxf18)
+ATPptxf = Conditional(And(Ge(time,(rest_start+size*stim_period+18*total_space)),Le(time,(rest_start+19*total_space)),),0,ATPptxf19)
 
 ATPptxs1 = Conditional(And(Ge(ntime - floor(ntime/(stim_period3))*(stim_period3), stim_start), Le(ntime - floor(ntime/(stim_period3))*(stim_period3), stim_period3), ), stim_amplitude_ptxs, ATP72)
 ATPptxs2 = Conditional(And(Ge(time,(rest_start+size*stim_period+0*total_space)),Le(time,(rest_start+1*total_space)),),0,ATPptxs1)
@@ -308,7 +317,16 @@ ATPptxs7 = Conditional(And(Ge(time,(rest_start+size*stim_period+5*total_space)),
 ATPptxs8 = Conditional(And(Ge(time,(rest_start+size*stim_period+6*total_space)),Le(time,(rest_start+7*total_space)),),0,ATPptxs7)
 ATPptxs9 = Conditional(And(Ge(time,(rest_start+size*stim_period+7*total_space)),Le(time,(rest_start+8*total_space)),),0,ATPptxs8)
 ATPptxs10 = Conditional(And(Ge(time,(rest_start+size*stim_period+8*total_space)),Le(time,(rest_start+9*total_space)),),0,ATPptxs9)
-ATPptxs = Conditional(And(Ge(time,(rest_start+size*stim_period+9*total_space)),Le(time,(rest_start+10*total_space)),),0,ATPptxs10)
+ATPptxs11 = Conditional(And(Ge(time,(rest_start+size*stim_period+9*total_space)),Le(time,(rest_start+10*total_space)),),0,ATPptxs10)
+ATPptxs12 = Conditional(And(Ge(time,(rest_start+size*stim_period+10*total_space)),Le(time,(rest_start+11*total_space)),),0,ATPptxs11)
+ATPptxs13 = Conditional(And(Ge(time,(rest_start+size*stim_period+11*total_space)),Le(time,(rest_start+12*total_space)),),0,ATPptxs12)
+ATPptxs14 = Conditional(And(Ge(time,(rest_start+size*stim_period+12*total_space)),Le(time,(rest_start+13*total_space)),),0,ATPptxs13)
+ATPptxs15 = Conditional(And(Ge(time,(rest_start+size*stim_period+13*total_space)),Le(time,(rest_start+14*total_space)),),0,ATPptxs14)
+ATPptxs16 = Conditional(And(Ge(time,(rest_start+size*stim_period+14*total_space)),Le(time,(rest_start+15*total_space)),),0,ATPptxs15)
+ATPptxs17 = Conditional(And(Ge(time,(rest_start+size*stim_period+15*total_space)),Le(time,(rest_start+16*total_space)),),0,ATPptxs16)
+ATPptxs18 = Conditional(And(Ge(time,(rest_start+size*stim_period+16*total_space)),Le(time,(rest_start+17*total_space)),),0,ATPptxs17)
+ATPptxs19 = Conditional(And(Ge(time,(rest_start+size*stim_period+17*total_space)),Le(time,(rest_start+18*total_space)),),0,ATPptxs18)
+ATPptxs = Conditional(And(Ge(time,(rest_start+size*stim_period+18*total_space)),Le(time,(rest_start+19*total_space)),),0,ATPptxs19)
 
 expressions("MSMp2x4")
 dD1_ptxf_dt = k1_ptxf*D2_ptxf - (3*k2_ptxf*ATPptxf + H1_ptxf)*D1_ptxf
