@@ -16,7 +16,7 @@ parameters("stimulation",
     #stim_start = ScalarParam(10, unit="s"),
     stim_period = ScalarParam(100, unit="s"), # stim_duration = stim_period/2
     pre_rest = ScalarParam(1000, unit="s"),
-    stim_space = ScalarParam(900, unit="s"), # time duration between end of pulse and beginning of pulse
+    stim_space = ScalarParam(0, unit="s"), # time duration between end of pulse and beginning of pulse
     size = ScalarParam(1), # default = 1
     stim_amplitude = ScalarParam(1000, unit="uM")
     )
@@ -282,6 +282,7 @@ stim_amplitude_ptxf = stim_amplitude*1e-6
 ATP41 = Conditional(Le(ntime,0.33*stim_start),0,10**(logATP)*stim_amplitude)
 ATP72 = Conditional(Le(ntime,0.33*stim_start),0,ATP71*10**(logATP))
 
+#stim_period3 = stim_period
 stim_period3 = stim_period*size
 total_space = stim_space + stim_period
 rest_start = pre_rest + stim_period/4
