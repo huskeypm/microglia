@@ -23,14 +23,24 @@ python -c "import gotran"
 
 cd /home/bch265/microglia/microglia/fitting
 
-python daisychain.py -t 0.1 -jit -odeName microgliav4_noptx.ode -T 3600 -iters 1 -var CNt_NFAT 4e3 -name ./noP2X_CNt_4uM 
-python daisychain.py -t 0.1 -jit -odeName microgliav4_noptx.ode -T 3600 -iters 1 -var CNt_NFAT 3e3 -name ./noP2X_CNt_3uM 
-python daisychain.py -t 0.1 -jit -odeName microgliav4_noptx.ode -T 3600 -iters 1 -var CNt_NFAT 2.4e3 -name ./noP2X_CNt_2.4uM 
-python daisychain.py -t 0.1 -jit -odeName microgliav4_noptx.ode -T 3600 -iters 1 -var CNt_NFAT 2.2e3 -name ./noP2X_CNt_2.2uM 
-python daisychain.py -t 0.1 -jit -odeName microgliav4_noptx.ode -T 3600 -iters 1 -var CNt_NFAT 2e3 -name ./noP2X_CNt_2uM
-python daisychain.py -t 0.1 -jit -odeName microgliav4_noptx.ode -T 3600 -iters 1 -var CNt_NFAT 1.8e3 -name ./noP2X_CNt_1.8uM
-python daisychain.py -t 0.1 -jit -odeName microgliav4_noptx.ode -T 3600 -iters 1 -var CNt_NFAT 1.6e3 -name ./noP2X_CNt_1.6uM
-python daisychain.py -t 0.1 -jit -odeName microgliav4_noptx.ode -T 3600 -iters 1 -var CNt_NFAT 1e3 -name ./noP2X_CNt_1uM
-python daisychain.py -t 0.1 -jit -odeName microgliav4_noptx.ode -T 3600 -iters 1 -var CNt_NFAT 0e3 -name ./noP2X_CNt_0uM 
+# This is the code for sensitivity analysis with pp38, CaM, CNt, P2X7, P2X4, and NFATpc. 
+# Frequency is set to 100 sec per cycle (50 secs of stimulation and 50 secs of relaxation).
+ # To adjust, add line 
+ # -var stim_period 100 (for 100 per cycle: default)
+# Pre_resting is set to 100 secs
+ # To adjust, add line
+ # -var pre_rest 100 (100 sec: default)
+# ATP concentration is set to 1 mM (1000)
+ # To adjust, add line
+ # -var stim_amplitude 1000 (1 mM: default in the unit of uM)
+
+for SA in SApp38 SAcn SAptxs SAptxf SAcm SAnfatpc
+  do
+    for num in "0.01" "0,1" "0.2" "0.3" "0.4" "0.5" "0.6" "0,7" "0.8" "0.9" "1" "2" "3" "4" "5" "6" "7" "8" "9" "10" 
+      do 
+      python daisychain.py -t 0.1 -jit -odeName microgliav10_freqcontrol.ode -T 3800 -iters 1 -var $SA $num -name ./SA.$SA.$num
+      done
+  done
+ 
 
 #mail -s "job is done" "bending456@gmail.com"
