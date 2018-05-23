@@ -87,7 +87,7 @@ parameters("Buffer_cyto",
     # Constants for CaM-CN calculation: taken from the work of Bazzazi et al. by Rachel
     kba  = ScalarParam(0.01, unit="ms**-1"),        # [s-1]
     kab = ScalarParam(0.01, unit="uM**-2*ms**-1"),       # [M-2*s-1]
-    kcb = ScalarParam(5, unit="ms**-1"),        # [s-1]
+    kcb = ScalarParam(0.5, unit="ms**-1"),        # [s-1]
     kbc = ScalarParam(5, unit="uM**-2*ms**-1"),     # [M-2*s-1]
     koffA = ScalarParam(1.0e-3, unit="ms**-1"),      # [s-1]
     konA = ScalarParam(10, unit="uM**-1*ms**-1"),      # [M-1*s-1]
