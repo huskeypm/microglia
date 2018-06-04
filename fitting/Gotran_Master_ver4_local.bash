@@ -7,13 +7,13 @@ export ODEFILE=microgliav17.ode
 export ODEFILEshort=microgliav19.ode
 export ODEFILEfreq=microgliav18-freq.ode
 
-ptxvalid=0  ### <---- 0 = OFF and 1 = ON
+ptxvalid=1  ### <---- 0 = OFF and 1 = ON
 caivalid=0 ### 8 min ST validation (Hide data related)
 no=0        ### No stimulation
 
 dura=0      ### Duration variation
-freq=1      ### Frequency variation
-rest=1      ### Resting variation
+freq=0      ### Frequency variation
+rest=0      ### Resting variation
 sens1=0      ### Sensitivity Analysis
 sens2=0
 
