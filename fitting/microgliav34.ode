@@ -27,13 +27,13 @@ parameters("MSMp2x4",
     k2_ptxf = ScalarParam(1000, unit="(M*ms)**-1"),
     k3_ptxf = ScalarParam(0.1e-2, unit="ms**-1"), #3.0
     k4_ptxf = ScalarParam(2000, unit="(M*ms)**-1"),
-    k5_ptxf = ScalarParam(25, unit="ms**-1"), #3.0e1 6.0e1 0.03e-3 25
+    k5_ptxf = ScalarParam(90, unit="ms**-1"), #3.0e1 6.0e1 0.03e-3 25
     k6_ptxf = ScalarParam(1000, unit="(M*ms)**-1"),
     L1_ptxf = ScalarParam(1.0e-5, unit="ms**-1"),
     L2_ptxf = ScalarParam(4.0e-5, unit="ms**-1"),
     L3_ptxf = ScalarParam(5.0e-4, unit="ms**-1"),
     H1_ptxf = ScalarParam(1.3e-5, unit="ms**-1"),
-    H2_ptxf = ScalarParam(1e-4, unit="ms**-1"), #1e-4 2e-4
+    H2_ptxf = ScalarParam(0.9e-4, unit="ms**-1"), #1e-4 2e-4
     H3_ptxf = ScalarParam(1.56e-3, unit="ms**-1"),
     H4_ptxf = ScalarParam(0.005e-3, unit="ms**-1"), #0.005e-3 0.0015e-3
     F_ptxf = ScalarParam(1),
@@ -49,11 +49,11 @@ parameters("MSMp2x7",
     k6_ptxs = ScalarParam(9.6997e-2, unit="(M*ms)**-1"),
     L1_ptxs = ScalarParam(4.91e-4, unit="ms**-1"),
     L2_ptxs = ScalarParam(1.70e-4, unit="ms**-1"),
-#    L3_ptxs = ScalarParam(5.1e-4, unit="ms**-1"),
-#    H1_ptxs = ScalarParam(2.437e-3, unit="ms**-1"),
-#    H2_ptxs = ScalarParam(1.0e-8, unit="ms**-1"),
     H3_ptxs = ScalarParam(2.94e-5, unit="ms**-1"),
-#    H4_ptxs = ScalarParam(3.0e-4, unit="ms**-1")
+    L3_ptxs = ScalarParam(5.1e-5, unit="ms**-1"),
+    H1_ptxs = ScalarParam(1e-6, unit="ms**-1"),
+    H2_ptxs = ScalarParam(8.1e-7, unit="ms**-1"),
+    H4_ptxs = ScalarParam(0, unit="ms**-1")
     )
 
 parameters("Ip2x4",
@@ -78,8 +78,8 @@ parameters("Jp2x",
     F = ScalarParam(96485.33289, unit="C*mol**-1"),
     rHEK = ScalarParam(6.5e-6, unit="m"),
     rMiG = ScalarParam(2.6e-6, unit="m"),
-    expF_ptxf = ScalarParam(0.020), # 0.012
-    expF_ptxs = ScalarParam(0.035),
+    expF_ptxf = ScalarParam(1), # 0.012
+    expF_ptxs = ScalarParam(1),
     CmHEK = ScalarParam(501.7, unit="pF"),
     CmMG = ScalarParam(12, unit="pF"),
     SAptxf = ScalarParam(1),
@@ -103,7 +103,14 @@ parameters("Buffer_cyto",
     CNt = ScalarParam(2, unit="uM"),       #[uM]
     CaMt = ScalarParam(3, unit="uM"),       #[uM]
     SAcn = ScalarParam(1),
-    SAcm = ScalarParam(1)
+    SAcm = ScalarParam(1),
+    ## Extra Buffers
+    konBex = ScalarParam(1.5, unit="uM*ms**-1"), # 1.5
+    koffBex = ScalarParam(0.1, unit="ms**-1"),
+    Bmaxex = ScalarParam(150000, unit="uM"), # 50
+    nex = ScalarParam(1),
+    kdBex = ScalarParam(0.11, unit="uM"),
+    nBex = ScalarParam(20) #18
     )
 
 parameters("Buffer_ER",
@@ -123,7 +130,7 @@ parameters("NCX",
     KmNao_NCX = ScalarParam(87.5e3, unit="uM"),            # [M]
     ksat_NCX = ScalarParam(0.27),
     eta_NCX = ScalarParam(0.55),
-    KdAct_NCX = ScalarParam(0.20, unit="uM"),      # [uM] 0.26
+    KdAct_NCX = ScalarParam(0.18, unit="uM"),      # [uM] 0.26
     HNa_NCX = ScalarParam(3.25),
     Q10NCX = ScalarParam(1.57),
     uniC_NCX = ScalarParam(1e-2, unit="F*m**-2"),         # [F/m**2] unit conductance
@@ -150,18 +157,20 @@ parameters("SERCA_ER",
 
 parameters("p-p38",
     kb_pp38 = ScalarParam(0.0018518519e-3, unit="ms**-1"),
-    kf_pp38 = ScalarParam(5e-6, unit="(uM*ms)**-1"),
+    kf_pp38 = ScalarParam(0.96114456e-7, unit="(uM*ms)**-1"),
+    kdcapp38 = ScalarParam(0.08066, unit="uM"),
+    ncapp38 = ScalarParam(5.5),
     pp38t = ScalarParam(100, unit="molecule"),
     SApp38 = ScalarParam(1)
     )
 
 parameters("NFAT",
-    kf1_NFAT = ScalarParam(8.0e-7, unit="(nM*ms)**-1"),    # [1/(nMs)]  7.69e-6 5.2e-10
-    kr1_NFAT = ScalarParam(1.93e-3, unit="ms**-1"),   # [1/s] 1.93e-2
+    kf1_NFAT = ScalarParam(9.0e-10, unit="(nM*ms)**-1"),    # [1/(nMs)]  7.69e-6 5.2e-10
+    kr1_NFAT = ScalarParam(1.93e-2, unit="ms**-1"),   # [1/s] 1.93e-2
     kf2_NFAT = ScalarParam(1.44e-3, unit="ms**-1"),   # [1/s] 1.44e-3
-    kf3_NFAT = ScalarParam(3.62e-3, unit="ms**-1"),   # [1/s] 3.62e-4
-    kr3_NFAT = ScalarParam(8.71e-7, unit="(nM*ms)**-1"),   # [1/(nMs)] 4.71e-3
-    kf4_NFAT = ScalarParam(4.45e-3, unit="ms**-1"),   # [1/s] 4.45e-4
+    kf3_NFAT = ScalarParam(3.62e-4, unit="ms**-1"),   # [1/s] 3.62e-4
+    kr3_NFAT = ScalarParam(9.71e-5, unit="(nM*ms)**-1"),   # [1/(nMs)] 4.71e-3
+    kf4_NFAT = ScalarParam(4.45e-4, unit="ms**-1"),   # [1/s] 4.45e-4
     KmN_NFAT = ScalarParam(535, unit="nM"),        # [nM]
     n_NFAT = ScalarParam(2.92),
     Ccn_NFAT = ScalarParam(1),          # Volume ratio of Cytosol to Nucleus
@@ -178,14 +187,17 @@ parameters("TNFa",
     kgeneexpf_TNF = ScalarParam(111.11e-9, unit="(molecule*ms)**-1"),   # 1/(3600*2.5)      # [1/(molecule-s)]: Gene expression
     kgeneexpr_TNF = ScalarParam(277.78e-9, unit="ms**-1"),   # 1/3600            # [1/s]:
     ### Hill equation related constants for activation of DNA dynamics/TNFa release
-    kmaxexo_TNF = ScalarParam(2.777778e-5, unit="(uM*ms)**-1"),    # 5/1800             # [1/(M-s)]: R max of exocytosis of TNFa 150 15 15 10 1
     IC50pp38_TNF = ScalarParam(3, unit="molecule"),
-    npp38_TNF = ScalarParam(1.5) # 3
+    npp38_TNF = ScalarParam(1.5),
+    ### Exocytosis related ##########
+    kmaxexo_TNF = ScalarParam(1e-7, unit="(uM*ms)**-1"), # 5/1800        # [1/(M-s)]: R max of exocytosis of TNFa 150 15 15 10 1
+    IC50Caleak_TNF = ScalarParam(0.100, unit="uM"),         # [uM]: TNFa leaks related 4e-7 4e-7 1e-7 1e-7 1e-7 0.0968
+    nCaleak_TNF = ScalarParam(2) # 3
     )
 
 parameters("Leakage",
     CaExt = ScalarParam(2e3, unit="uM"),      # External Ca concentration in [M]
-    DExtoCy = ScalarParam(0.10e-4, unit="ms**-1"),    # Diffusion constant of Ca from External to Cytosol - Fitted
+    DExtoCy = ScalarParam(0.15e-4, unit="ms**-1"),    # Diffusion constant of Ca from External to Cytosol - Fitted
     DERtoCy = ScalarParam(0.45e-5, unit="ms**-1")     # Diffusion constant of Ca from ER to Cytosol
     )
 
@@ -221,25 +233,26 @@ states("MSMp2x7",
     )
 
 states("Ca_cyto",
-    Cai = ScalarParam(0.0961, unit="uM"),        # M
+    Cai = ScalarParam(0.0813, unit="uM"),        # M
     Captxs = ScalarParam(0, unit="uM"),
     Captxf = ScalarParam(0, unit="uM")
     )
 
 states("Buffer_cyto",
-    CaF = ScalarParam(9.63, unit="uM"),         # M
-    Ca2_CaM = ScalarParam(0.0224, unit="uM"),                   # M
-    Ca4_CaM = ScalarParam(0.00207, unit="uM"),                   # M
-    Ca4_CN = ScalarParam(0.0263, unit="uM"),                    # M
-    CaMCN = ScalarParam(0.5468, unit="uM")                       # M
+    CaF = ScalarParam(8.66, unit="uM"),         # M
+    Ca2_CaM = ScalarParam(0.0179, unit="uM"),                   # M
+    Ca4_CaM = ScalarParam(0.00118, unit="uM"),                   # M
+    Ca4_CN = ScalarParam(0.0226, unit="uM"),                    # M
+    CaMCN = ScalarParam(0.286, unit="uM"),
+    CaBex = ScalarParam(82432.1, unit="uM")                       # M  81990.4072933
     )
 
 states("Ca_ER",
-    CaER = ScalarParam(664.29, unit="uM")       # M
+    CaER = ScalarParam(560, unit="uM")       # M
     )
 
 states("Buffer_ER",
-    CaS = ScalarParam(808.70, unit="uM")        # M
+    CaS = ScalarParam(741, unit="uM")        # M
     )
 
 states("SERCA_ER",
@@ -247,10 +260,10 @@ states("SERCA_ER",
     )
 
 states("NFAT",
-    NFATpc = ScalarParam(1.09338, unit="nM"),        # nM 0.994682667758
-    NFATpn = ScalarParam(3.5397e-5, unit="nM"),       # nM 0.0463772043925
+    NFATpc = ScalarParam(1.096, unit="nM"),        # nM 0.994682667758
+    NFATpn = ScalarParam(4.72e-5, unit="nM"),       # nM 0.0463772043925
     #NFATNc = ScalarParam(0.000112322167638, unit="nM"),     # nM 0.000112322167638
-    NFATNn = ScalarParam(0.006469769691, unit="nM")        # nM 0.0581439005689
+    NFATNn = ScalarParam(0.004, unit="nM")        # nM 0.0581439005689
     )
 
 states("NCX",
@@ -258,7 +271,7 @@ states("NCX",
     )
 
 states("p-p38",
-    pp38 = ScalarParam(2.5297989, unit="molecule")                      # molecule
+    pp38 = ScalarParam(2.58, unit="molecule")                      # molecule
     #p38 = ScalarParam(49.47, unit="molecule")                        # molecule
     )
 
@@ -316,10 +329,10 @@ dN_ptxf_dt = H3_ptxf*D4_ptxf - H4_ptxf*N_ptxf
 
 expressions("MSMp2x7")
 
-L3_ptxs = Conditional(Ge(stim_amplitude,500),5.1e-4,5.1e-5)
-H1_ptxs = Conditional(Ge(stim_amplitude,500),2.437e-3,1e-6)
-H2_ptxs = Conditional(Ge(stim_amplitude,500),1e-8,8.1e-7)
-H4_ptxs = Conditional(Ge(stim_amplitude,500),3.0e-4,0)
+#L3_ptxs = Conditional(Ge(stim_amplitude,500),5.1e-4,5.1e-5)
+#H1_ptxs = Conditional(Ge(stim_amplitude,500),2.437e-3,1e-6)
+#H2_ptxs = Conditional(Ge(stim_amplitude,500),1e-8,8.1e-7)
+#H4_ptxs = Conditional(Ge(stim_amplitude,500),3.0e-4,0)
 
 dD1_ptxs_dt = k1_ptxs*D2_ptxs - (3*k2_ptxs*ATPptxs + H1_ptxs)*D1_ptxs #
 dD2_ptxs_dt = 3*k2_ptxs*ATPptxs*D1_ptxs + 2*k3_ptxs*D3_ptxs + H2_ptxs*C2_ptxs - (k1_ptxs + 2*k4_ptxs*ATPptxs + H4_ptxs)*D2_ptxs #
@@ -338,7 +351,7 @@ expressions("Ip2x4")
 I_ptxf = ((G12_ptxf*(Q1_ptxf + Q2_ptxf)*(V_ptxf - E12_ptxf) + G34_ptxf*(Q3_ptxf + Q4_ptxf)*(V_ptxf - E34_ptxf))*10**6)/4.5
 
 expressions("Ip2x7")
-I_ptxs = (G12_ptxs*(Q1_ptxs + Q2_ptxs)*(V_ptxs - E12_ptxs) + G34_ptxs*(Q3_ptxs + Q4_ptxs)*(V_ptxs - E34_ptxs))*10**6 # in [uC/ms]
+I_ptxs = ((G12_ptxs*(Q1_ptxs + Q2_ptxs)*(V_ptxs - E12_ptxs) + G34_ptxs*(Q3_ptxs + Q4_ptxs)*(V_ptxs - E34_ptxs))*10**6) # in [uC/ms]
 
 expressions("Jp2x")
 AHEK = 4*3.141592654*(rHEK)**2 # surface area of HEK293 cell in [sq. meter]
@@ -350,8 +363,10 @@ VcytMiG = VMiG*0.40 # [L] The volume of cytoplasm in microglia -> This fraction 
 VERMiG = VMiG*0.035 # [L] The volume of ER lumen in microglia -> This fraction was taken from Shannon-Bers paper
 #CHEK = 12*(10**9)*AHEK
 #J_ptxf = -(I_ptxf/VcytMiG)*(CmMG/CmHEK)/(2*F)*expF_ptxf*SAptxf # [umol/(L*ms) = uM/ms] 12 pF from Microglia and it wad divided by 12*10**9 pF/m^2 * A_HEK
-J_ptxf = -(I_ptxf/VcytMiG)/(2*F)*expF_ptxf*SAptxf
-J_ptxs = -(I_ptxs/VcytMiG)*(CmMG/CmHEK)/(2*F)*expF_ptxs*SAptxs # [umol/(L*ms) = uM/ms] 12 pF from Microglia and it wad divided by 12*10**9 pF/m^2 * A_HEK
+J_ptxf = -(I_ptxf*CaA_ptxf/VcytMiG)/(2*F)*expF_ptxf*SAptxf
+J_ptxfo = -(I_ptxf*CaA_ptxf/VcytMiG)/(2*F)
+J_ptxs = -(I_ptxs*CaA_ptxs/VcytMiG)*(CmMG/CmHEK)/(2*F)*expF_ptxs*SAptxs # [umol/(L*ms) = uM/ms] 12 pF from Microglia and it wad divided by 12*10**9 pF/m^2 * A_HEK
+J_ptxso = -(I_ptxs*CaA_ptxs/VcytMiG)*(CmMG/CmHEK)/(2*F)
 
 expressions("Buffer_cyto")
 CaM = CaMt*SAcm - (Ca2_CaM + Ca4_CaM + CaMCN)
@@ -367,6 +382,13 @@ dCaMCN = konA*Ca4_CaM*Ca4_CN - koffA*CaMCN
 dCaF = KonFura*Cai*(BmFura - CaF) - KoffFura*CaF
 dCaF_dt = dCaF
 dCaMCN_dt = dCaMCN
+## Extra Buffer
+CaiBex = Cai
+dCaBex = konBex*Cai*(Bmaxex-CaBex) - koffBex*CaBex
+#dCaBex = koffBex/(1+(kdBex/CaiBex)**nBex)*Cai
+dCaBex_dt = dCaBex
+Forward = konBex*Cai*(Bmaxex-CaBex)
+Reverse = koffBex*CaBex
 
 expressions("Buffer_ER")
 dCaS = KonCals*CaER*(BmCals/rV_ER - CaS) - KoffCals*CaS
@@ -399,8 +421,7 @@ dSERCA_dt = 0
 
 expressions("p-p38")
 p38 = pp38t*SApp38 - pp38
-dpp38_dt = -kb_pp38*pp38 + kf_pp38*p38*Cai
-
+dpp38_dt = -kb_pp38*pp38 + kf_pp38*p38/(1+(kdcapp38/Cai)**ncapp38)
 
 expressions("NFAT")
 CaMCN_NFAT = CaMCN*(1e3)                # in [nM]
@@ -424,14 +445,13 @@ RdegTNF_TNF = kdegTNF_TNF*TNFa
 RdegRNA_TNF = kdegRNA_TNF*mRNA_TNF*(1/(1+(pp38/IC50pp38_TNF)**npp38_TNF))
 
 Rgeneexp_TNF = kgeneexpf_TNF*DNA_TNF*TNFa - kgeneexpr_TNF*DNATNF # DNATNF is the complex of DNA and TNF
-# Rexo_TNF = (kmaxexo_TNF/(1+(IC50Caleak_TNF/Cai)**nCaleak_TNF))*TNFa #*Cai_TNF
+Rexo_TNF = (kmaxexo_TNF/(1+(IC50Caleak_TNF/Cai)**nCaleak_TNF))*TNFa #*Cai_TNF
 
 dDNA_TNF_dt = -Rgeneexp_TNF
 dmRNA_TNF_dt = Rtranscript_TNF - RdegRNA_TNF #- Rtranslate_TNF
 dDNATNF_dt = Rgeneexp_TNF
-dTNFa_dt = Rtranslate_TNF - RdegTNF_TNF - Rgeneexp_TNF #- Rexo_TNF
-# dTNFa_release_dt = Rexo_TNF
-
+dTNFa_dt = Rtranslate_TNF - RdegTNF_TNF - Rgeneexp_TNF - Rexo_TNF
+dTNFa_release_dt = Rexo_TNF
 
 expressions("Leakage")
 dCaExtoCy = DExtoCy*(CaExt - Cai)
@@ -443,6 +463,6 @@ expressions("Ca_ER")
 dCaER_dt = JERtoCyt - dCaS - dCaERtoCy
 
 expressions("Ca_cyto")
-dCai_dt = (J_ptxf + J_ptxs + dCaExtoCy)*SAca - JCyttoER + JNCX - dCa2_CaM - dCa4_CaM - dCa4_CN - dCaF + dCaERtoCy
+dCai_dt = (J_ptxf + J_ptxs + dCaExtoCy)*SAca - JCyttoER + JNCX - dCa2_CaM - dCa4_CaM - dCa4_CN - dCaF + dCaERtoCy - dCaBex
 dCaptxs_dt = J_ptxs
 dCaptxf_dt = J_ptxf
