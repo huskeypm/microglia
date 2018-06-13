@@ -13,7 +13,7 @@ cd /home/bch265/microglia/microglia/fitting
 
 ############## Control Panel #####################
 
-export ODEFILEshort=microgliav47.ode
+export ODEFILEshort=microgliav48.ode
 export ODEFILEfitted=microgliav20-fitted.ode
 
 ptxvalidfitted=0
@@ -21,7 +21,7 @@ ptxvalid=1  ### <---- 0 = OFF and 1 = ON
 
 caivalidfitted=0 ### 8 min ST validation (Hide data related)
 caivalid=0
-caitested=0
+caitested=1
 
 no=0        ### No stimulation
 
@@ -29,6 +29,7 @@ dura=0      ### Duration variation
 freq=0      ### Frequency variation
 sens1=0      ### Sensitivity Analysis
 sens2=0
+sens3=0
 
 leng=0      ### Lengthy Stimulation
 CaN=0       ### Special Edition for CaN Validation
@@ -267,6 +268,49 @@ array[19]=10
     do
 
     for SA in SAcn
+      do
+
+        for  (( i=0; i<=19; i++))
+          do
+
+          python2.7 daisychain.py -dt 1 -dSr 1000 -jit -odeName $ODEFILEshort -T 200000 -iters 1 -var stim_amplitude $ATP -var $SA ${array[$i]} -var stim_period 2e3 -var stim_gap1 1e3 -var stim_gap2 1e3 -var stim_low 1e3 -var stim_high 2e3 -name ~/Data_storage/SA-$SA-${array[$i]}-$ATP
+
+          done
+
+      done
+
+    done
+
+fi
+
+### SENSITIVITY ANALYSIS ###
+if [ $sens3 -eq 1 ]
+then
+array[0]=".01"
+array[1]=".1"
+array[2]=".2"
+array[3]=".3"
+array[4]=".4"
+array[5]=".5"
+array[6]=".6"
+array[7]=".7"
+array[8]=".8"
+array[9]=".9"
+array[10]=1
+array[11]=2
+array[12]=3
+array[13]=4
+array[14]=5
+array[15]=6
+array[16]=7
+array[17]=8
+array[18]=9
+array[19]=10
+
+  for ATP in 1000 100
+    do
+
+    for SA in SApp38
       do
 
         for  (( i=0; i<=19; i++))
