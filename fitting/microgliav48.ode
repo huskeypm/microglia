@@ -34,9 +34,7 @@ parameters("MSMp2x4",
     H3_ptxf = ScalarParam(1.56e-3, unit="ms**-1"),
     H4_ptxf = ScalarParam(0.02e-3, unit="ms**-1"),
     H5_ptxf = ScalarParam(1e-3, unit="ms**-1"), #8e-3
-    H6_ptxf = ScalarParam(1.4e-4, unit="ms**-1"),
-    F_ptxf = ScalarParam(1),
-    G_ptxf = ScalarParam(1)
+    H6_ptxf = ScalarParam(1.4e-4, unit="ms**-1")
     )
 
 parameters("MSMp2x7",
@@ -48,28 +46,25 @@ parameters("MSMp2x7",
     #k6_ptxs = ScalarParam(9.6997e-2, unit="(M*ms)**-1"),
     L1_ptxs = ScalarParam(4.91e-4, unit="ms**-1"),
     L2_ptxs = ScalarParam(1.70e-4, unit="ms**-1"),
-    H3_ptxs = ScalarParam(2.94e-5, unit="ms**-1"),
+    H5_ptxs = ScalarParam(2.94e-5, unit="ms**-1"),
     L3_ptxs = ScalarParam(0, unit="ms**-1"),
     H1_ptxs = ScalarParam(0.5e-5, unit="ms**-1"),
     H2_ptxs = ScalarParam(1e-4, unit="ms**-1"),
+    H6_ptxs = ScalarParam(1e-4, unit="ms**-1"),
     #H4_ptxs = ScalarParam(0, unit="ms**-1")
     )
 
 parameters("Ip2x4",
-    G12_ptxf = ScalarParam(3e-11, unit="C*(ms*V)**-1"),
-    G34_ptxf = ScalarParam(8e-11, unit="C*(ms*V)**-1"),
+    G12_ptxf = ScalarParam(2.22e-13, unit="C*(ms*V)**-1"),
     V_ptxf = ScalarParam(-0.023, unit="V"),  # 60 mV was used in MSM
     E12_ptxf = ScalarParam(0, unit="V"),
-    E34_ptxf = ScalarParam(0, unit="V"),
     CaA_ptxf = ScalarParam(0.0824) # fraction of current contributed by Calcium transport
     )
 
 parameters("Ip2x7",
-    G12_ptxs = ScalarParam(1.5e-11, unit="C*(ms*V)**-1"),
-    G34_ptxs = ScalarParam(4.5e-11, unit="C*(ms*V)**-1"),
+    G12_ptxs = ScalarParam(2.14e-12, unit="C*(ms*V)**-1"),
     V_ptxs = ScalarParam(-0.023, unit="V"),  # 60 mV was used in MSM
     E12_ptxs = ScalarParam(0, unit="V"),
-    E34_ptxs = ScalarParam(0, unit="V"),
     CaA_ptxs = ScalarParam(0.1) # fraction of current contributed by Calcium transport
     )
 
@@ -216,12 +211,8 @@ states("MSMp2x7",
     D4_ptxs = 0.0,
     C1_ptxs = 1.0,
     C2_ptxs = 0.0,
-    C3_ptxs = 0.0,
-    C4_ptxs = 0.0,
     Q1_ptxs = 0.0,
-    Q2_ptxs = 0.0,
-    Q3_ptxs = 0.0,
-    Q4_ptxs = 0.0,
+    Q2_ptxs = 0.0
     )
 
 states("Ca_cyto",
@@ -297,11 +288,9 @@ tail = 1/(1+(newtb/ICatp)**80)
 scale = Conditional(And(Ge(time-floor(time/stim_period)*stim_period,stim_low),Le(time-floor(time/stim_period)*stim_period,stim_high),),head,tail)
 ATPptxf_pulse = scale*stim_amplitude*10**-6
 ATPptxs_pulse = scale*stim_amplitude*10**-6
-#ATPptxs_pulse = scale*ATP71*10**-6
 
 ATPptxf_steady = stim_amplitude*10**-6
 ATPptxs_steady = stim_amplitude*10**-6
-#ATPptxs_steady = ATP71*10**-6
 
 ATPptxf = Conditional(Eq(pulse_switch,1),ATPptxf_pulse,ATPptxf_steady)
 ATPptxs = Conditional(Eq(pulse_switch,1),ATPptxs_pulse,ATPptxs_steady)
@@ -311,10 +300,10 @@ dD1_ptxf_dt = k1_ptxf*D2_ptxf - (3*k2_ptxf*ATPptxf + H1_ptxf)*D1_ptxf
 dD2_ptxf_dt = 3*k2_ptxf*ATPptxf*D1_ptxf + 2*k3_ptxf*D3_ptxf + H2_ptxf*C2_ptxf - (k1_ptxf + 2*k4_ptxf*ATPptxf)*D2_ptxf
 dD3_ptxf_dt = 2*k4_ptxf*ATPptxf*D2_ptxf + 3*k5_ptxf*D4_ptxf + H5_ptxf*Q1_ptxf - (2*k3_ptxf + k6_ptxf*ATPptxf)*D3_ptxf
 dD4_ptxf_dt = k6_ptxf*ATPptxf*D3_ptxf + H6_ptxf*Q2_ptxf - (3*k5_ptxf + H3_ptxf)*D4_ptxf
-dC1_ptxf_dt = H1_ptxf*D1_ptxf + k1_ptxf*G_ptxf*C2_ptxf + H4_ptxf*N_ptxf - 3*k2_ptxf*ATPptxf*F_ptxf*C1_ptxf
-dC2_ptxf_dt = 3*k2_ptxf*ATPptxf*F_ptxf*C1_ptxf + 2*k3_ptxf*G_ptxf*Q1_ptxf - (k1_ptxf*G_ptxf + 2*k4_ptxf*ATPptxf*F_ptxf + H2_ptxf)*C2_ptxf
-dQ1_ptxf_dt = 2*k4_ptxf*ATPptxf*F_ptxf*C2_ptxf + 3*k5_ptxf*G_ptxf*Q2_ptxf - (2*k3_ptxf*G_ptxf + k6_ptxf*ATPptxf*F_ptxf + H5_ptxf)*Q1_ptxf
-dQ2_ptxf_dt = k6_ptxf*ATPptxf*F_ptxf*Q1_ptxf - (3*k5_ptxf*G_ptxf + H6_ptxf)*Q2_ptxf
+dC1_ptxf_dt = H1_ptxf*D1_ptxf + k1_ptxf*C2_ptxf + H4_ptxf*N_ptxf - 3*k2_ptxf*ATPptxf*C1_ptxf
+dC2_ptxf_dt = 3*k2_ptxf*ATPptxf*C1_ptxf + 2*k3_ptxf*Q1_ptxf - (k1_ptxf + 2*k4_ptxf*ATPptxf + H2_ptxf)*C2_ptxf
+dQ1_ptxf_dt = 2*k4_ptxf*ATPptxf*C2_ptxf + 3*k5_ptxf*Q2_ptxf - (2*k3_ptxf + k6_ptxf*ATPptxf + H5_ptxf)*Q1_ptxf
+dQ2_ptxf_dt = k6_ptxf*ATPptxf*Q1_ptxf - (3*k5_ptxf + H6_ptxf)*Q2_ptxf
 dN_ptxf_dt = H3_ptxf*D4_ptxf - H4_ptxf*N_ptxf
 
 expressions("MSMp2x7")
@@ -322,28 +311,24 @@ expressions("MSMp2x7")
 k2_ptxs = Conditional(Ge(stim_amplitude,500),3.2,4)
 k4_ptxs = Conditional(Ge(stim_amplitude,500),1.155,2)
 k6_ptxs = Conditional(Ge(stim_amplitude,500),9.7e-2,0.01)
-H4_ptxs = Conditional(Ge(stim_amplitude,500),0.2e-4,1e-7) # control tail
+H7_ptxs = Conditional(Ge(stim_amplitude,500),0.2e-4,1e-7) # control tail
 
 dD1_ptxs_dt = k1_ptxs*D2_ptxs - (3*k2_ptxs*ATPptxs + H1_ptxs)*D1_ptxs #
-dD2_ptxs_dt = 3*k2_ptxs*ATPptxs*D1_ptxs + 2*k3_ptxs*D3_ptxs + H2_ptxs*C2_ptxs - (k1_ptxs + 2*k4_ptxs*ATPptxs + H4_ptxs)*D2_ptxs #
-dD3_ptxs_dt = 2*k4_ptxs*ATPptxs*D2_ptxs + 3*k5_ptxs*D4_ptxs + H3_ptxs*Q1_ptxs - (2*k3_ptxs + k6_ptxs*ATPptxs)*D3_ptxs #
-dD4_ptxs_dt = k6_ptxs*ATPptxs*D3_ptxs + H2_ptxs*Q2_ptxs - 3*k5_ptxs*D4_ptxs #
-dC1_ptxs_dt = H1_ptxs*D1_ptxs + k1_ptxs*C2_ptxs + L1_ptxs*C4_ptxs - 3*k2_ptxs*ATPptxs*C1_ptxs #
-dC2_ptxs_dt = H4_ptxs*D2_ptxs + 3*k2_ptxs*ATPptxs*C1_ptxs + 2*k3_ptxs*Q1_ptxs - (k1_ptxs + 2*k4_ptxs*ATPptxs + H2_ptxs)*C2_ptxs #
-dC3_ptxs_dt = 3*k2_ptxs*ATPptxs*C4_ptxs + 2*k1_ptxs*Q4_ptxs - (k1_ptxs + 2*k2_ptxs*ATPptxs)*C3_ptxs #
-dC4_ptxs_dt = k1_ptxs*C3_ptxs - (L1_ptxs + 3*k2_ptxs*ATPptxs)*C4_ptxs #
-dQ1_ptxs_dt = 2*k4_ptxs*ATPptxs*C2_ptxs + 3*k5_ptxs*Q2_ptxs - (2*k3_ptxs + k6_ptxs*ATPptxs + H3_ptxs)*Q1_ptxs #
-dQ2_ptxs_dt = k6_ptxs*ATPptxs*Q1_ptxs + L2_ptxs*Q3_ptxs - (3*k5_ptxs + L3_ptxs + H2_ptxs)*Q2_ptxs #
-dQ3_ptxs_dt = k2_ptxs*ATPptxs*Q4_ptxs + L3_ptxs*Q2_ptxs - (3*k1_ptxs + L2_ptxs)*Q3_ptxs #
-dQ4_ptxs_dt = 2*k2_ptxs*ATPptxs*C3_ptxs + 3*k1_ptxs*Q3_ptxs - (2*k1_ptxs + k2_ptxs*ATPptxs)*Q4_ptxs #
+dD2_ptxs_dt = 3*k2_ptxs*ATPptxs*D1_ptxs + 2*k3_ptxs*D3_ptxs + H2_ptxs*C2_ptxs - (k1_ptxs + 2*k4_ptxs*ATPptxs + H7_ptxs)*D2_ptxs #
+dD3_ptxs_dt = 2*k4_ptxs*ATPptxs*D2_ptxs + 3*k5_ptxs*D4_ptxs + H5_ptxs*Q1_ptxs - (2*k3_ptxs + k6_ptxs*ATPptxs)*D3_ptxs #
+dD4_ptxs_dt = k6_ptxs*ATPptxs*D3_ptxs + H6_ptxs*Q2_ptxs - 3*k5_ptxs*D4_ptxs #
+dC1_ptxs_dt = H1_ptxs*D1_ptxs + k1_ptxs*C2_ptxs - 3*k2_ptxs*ATPptxs*C1_ptxs #
+dC2_ptxs_dt = H7_ptxs*D2_ptxs + 3*k2_ptxs*ATPptxs*C1_ptxs + 2*k3_ptxs*Q1_ptxs - (k1_ptxs + 2*k4_ptxs*ATPptxs + H2_ptxs)*C2_ptxs #
+dQ1_ptxs_dt = 2*k4_ptxs*ATPptxs*C2_ptxs + 3*k5_ptxs*Q2_ptxs - (2*k3_ptxs + k6_ptxs*ATPptxs + H5_ptxs)*Q1_ptxs #
+dQ2_ptxs_dt = k6_ptxs*ATPptxs*Q1_ptxs - (3*k5_ptxs + H6_ptxs)*Q2_ptxs #
 
 expressions("Ip2x4")
-I_ptxf = ((G12_ptxf*(Q1_ptxf + Q2_ptxf)*(V_ptxf - E12_ptxf))*10**6)/(30*4.5)
-I_f = ((G12_ptxf*(Q1_ptxf + Q2_ptxf)*(-0.06 - E12_ptxf))*10**6)/(30*4.5)
+I_ptxf = ((G12_ptxf*(Q1_ptxf + Q2_ptxf)*(V_ptxf - E12_ptxf))*10**6)
+I_f = ((G12_ptxf*(Q1_ptxf + Q2_ptxf)*(-0.06 - E12_ptxf))*10**6)
 
 expressions("Ip2x7")
-I_ptxs = ((G12_ptxs*(Q1_ptxs + Q2_ptxs)*(V_ptxs - E12_ptxs) + G34_ptxs*(Q3_ptxs + Q4_ptxs)*(V_ptxs - E34_ptxs))*10**6)/(7) # in [uC/ms]
-I_s = ((G12_ptxs*(Q1_ptxs + Q2_ptxs)*(-0.04 - E12_ptxs) + G34_ptxs*(Q3_ptxs + Q4_ptxs)*(-0.04 - E34_ptxs))*10**6)/7 # in [uC/ms]
+I_ptxs = ((G12_ptxs*(Q1_ptxs + Q2_ptxs)*(V_ptxs - E12_ptxs))*10**6) # in [uC/ms]
+I_s = ((G12_ptxs*(Q1_ptxs + Q2_ptxs)*(-0.04 - E12_ptxs))*10**6) # in [uC/ms]
 
 expressions("Jp2x")
 AHEK = 4*3.141592654*(rHEK)**2 # surface area of HEK293 cell in [sq. meter]
