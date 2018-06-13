@@ -13,7 +13,7 @@ cd /home/bch265/microglia/microglia/fitting
 
 ############## Control Panel #####################
 
-export ODEFILEshort=microgliav34.ode
+export ODEFILEshort=microgliav47.ode
 export ODEFILEfitted=microgliav20-fitted.ode
 
 ptxvalidfitted=0
@@ -41,6 +41,10 @@ CaN=0       ### Special Edition for CaN Validation
 # microglia/gotran/Pulse-control-tester.ipynb in Bitbucket
 # P2X Validation ####################
 
+## Test Zone
+#python2.7 daisychain.py -dt 1 -dSr 1000 -jit -odeName $ODEFILEshort -T 10800000 -iters 1 -var pulse_switch 0 -var stim_amplitude 3000 -name ~/Data_storage/180min_MG_3mMATP_test
+###
+
 if [ $ptxvalidfitted -eq 1 ]
 then
   echo "Validation of P2X-fitted is ON" # This code needs to be fixed ( millisecond time unit )
@@ -51,11 +55,11 @@ fi
 if [ $ptxvalid -eq 1 ]
 then
   echo "Validation of P2X is ON" # This code needs to be fixed ( millisecond time unit )
-#  python2.7 daisychain.py -dt 0.1 -dSr 1000 -jit -odeName $ODEFILEshort -T 500e3 -iters 1 -var V_ptxs -0.06 -var stim_amplitude 100 -var stim_period 350e3 -var stim_gap1 230e3 -var stim_gap2 230e3 -var stim_low 1e3 -var stim_high 120e3 -name ~/Data_storage/p2x7_Yan120st_100uMATP_total
-#  python2.7 daisychain.py -dt 0.1 -dSr 1000 -jit -odeName $ODEFILEshort -T 500e3 -iters 1 -var V_ptxs -0.06 -var stim_amplitude 320 -var stim_period 350e3 -var stim_gap1 230e3 -var stim_gap2 230e3 -var stim_low 1e3 -var stim_high 120e3 -name ~/Data_storage/p2x7_Yan120st_320uMATP_total
-#  python2.7 daisychain.py -dt 0.1 -dSr 1000 -jit -odeName $ODEFILEshort -T 500e3 -iters 1 -var V_ptxs -0.06 -var stim_amplitude 1000 -var stim_period 350e3 -var stim_gap1 230e3 -var stim_gap2 230e3 -var stim_low 1e3 -var stim_high 120e3 -name ~/Data_storage/p2x7_Yan120st_1000uMATP_total
+  python2.7 daisychain.py -dt 0.1 -dSr 1000 -jit -odeName $ODEFILEshort -T 200e3 -iters 1 -var V_ptxs -0.06 -var stim_amplitude 100 -var stim_period 60e3 -var stim_gap1 50e3 -var stim_gap2 50e3 -var stim_low 1e3 -var stim_high 10e3 -name ~/Data_storage/p2x7_Duan15st_100uMATP_total &
+  python2.7 daisychain.py -dt 0.1 -dSr 1000 -jit -odeName $ODEFILEshort -T 200e3 -iters 1 -var V_ptxs -0.06 -var stim_amplitude 320 -var stim_period 60e3 -var stim_gap1 50e3 -var stim_gap2 50e3 -var stim_low 1e3 -var stim_high 10e3 -name ~/Data_storage/p2x7_Duan15st_320uMATP_total &
+  python2.7 daisychain.py -dt 0.1 -dSr 1000 -jit -odeName $ODEFILEshort -T 200e3 -iters 1 -var V_ptxs -0.06 -var stim_amplitude 1000 -var stim_period 60e3 -var stim_gap1 50e3 -var stim_gap2 50e3 -var stim_low 1e3 -var stim_high 10e3 -name ~/Data_storage/p2x7_Duan15st_1000uMATP_total &
 #  python2.7 daisychain.py -dt 0.1 -dSr 1000 -jit -odeName $ODEFILEshort -T 500e3 -iters 1 -var V_ptxf -0.06 -var stim_amplitude 100 -var stim_period 300e3 -var stim_gap1 250e3 -var stim_gap2 250e3 -var stim_low 1e3 -var stim_high 50e3 -name ~/Data_storage/p2x4_MacKay50st_100uMATP_total_new
-  python2.7 daisychain.py -dt 0.1 -dSr 1000 -jit -odeName $ODEFILEshort -T 500e3 -iters 1 -var V_ptxf -0.06 -var stim_amplitude 100 -var stim_period 300e3 -var stim_gap1 270e3 -var stim_gap2 270e3 -var stim_low 1e3 -var stim_high 30e3 -name ~/Data_storage/p2x4_Toulme30st_100uMATP_total_new
+  python2.7 daisychain.py -dt 0.1 -dSr 1000 -jit -odeName $ODEFILEshort -T 500e3 -iters 1 -var V_ptxf -0.06 -var stim_amplitude 100 -var stim_period 300e3 -var stim_gap1 270e3 -var stim_gap2 270e3 -var stim_low 1e3 -var stim_high 30e3 -name ~/Data_storage/p2x4_Toulme30st_100uMATP_total_new &
 # Lit Data
 # Toulme P2X4 MG ATP st 30s 100 uM
 #time = np.array([0,0.2040816327,1.734693878,4.693877551,8.571428571,13.7755102,24.08163265,34.69387755]) # in second
