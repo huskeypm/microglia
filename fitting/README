@@ -23,7 +23,12 @@ gotranrun simpleRyR.ode --plot_y O  --tstop=2000 --dt 0.1 --parameters Ca_jct 1e
 ## With output image
 python fittingAlgorithm.py -odeModel simpleRyR.ode -myVariedParam kiCa -variedParamTruthVal 3.0 -jobDuration 2e3 -fileName This_Is_A_Test.png -numRandomDraws 10 -numIters 9 -sigmaScaleRate 0.15 -outputParamName pO -outputParamSearcher O -outputParamMethod max -outputParamTruthVal 2.05e-5
 # in debug mode 
-python fittingAlgorithm.py -odeModel simpleRyR.ode -myVariedParam kiCa -variedParamTruthVal 3.0 -jobDuration 2e3 -numRandomDraws 2  -numIters 2 -sigmaScaleRate 0.15 -outputParamName pO -outputParamSearcher O -outputParamMethod max -outputParamTruthVal 2.05e-5 -debug
+python fittingAlgorithm.py -odeModel microgliav48.ode -myVariedParam k1_ptxf -variedParamTruthVal 1e-4 -jobDuration 20e3 -numRandomDraws 20  -numIters 5 -sigmaScaleRate 0.15 -outputParamName I -outputParamSearcher I_ptxf -outputParamMethod min -outputParamTruthVal -5e-9      -debug
+
+# need to define time range 
+
+
+
 
 # run with daisychain.py
 #python daisychain.py -t 0.1 -jit -odeName p2x4_MG.ode -T 10000 -iters 1 -outBase "name.pickle"
