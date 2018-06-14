@@ -9,7 +9,7 @@ from scipy.interpolate import spline
 import pickle as pk
 
 
-def test(lit_data,model_data): # indpnt = independent variable, dpnt = dependent variable
+def compareProfiles(lit_data,model_data): # indpnt = independent variable, dpnt = dependent variable
     lit_xset, lit_yset = lit_data    # literature data
     model_xset, model_yset = model_data  # modelled data
 
@@ -18,10 +18,11 @@ def test(lit_data,model_data): # indpnt = independent variable, dpnt = dependent
     N = np.shape(est_yset)[0]
     iters = np.arange(N)
 
-    err2 = 0
+    #err2 = 0
 
-    for i in iters:
-        err2 = err2 + (lit_yset[i] - est_yset[i])**2
+    #for i in iters:
+    #    err2 = err2 + (lit_yset[i] - est_yset[i])**2
+    err2 = np.sum( (lit_yset - est_yset)**2) 
 
     err2 = err2*100
     return err2
