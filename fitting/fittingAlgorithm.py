@@ -46,7 +46,11 @@ def workerParams(jobDict):
     odeName = jobDict['odeModel']
     jobNum = jobDict['jobNum']
     dtn = jobDict['jobDuration'] # [ms]
-    varDict = jobDict['varDict']
+    variedParamDict = jobDict['varDict']
+    fixedParamDict =jobDict['fixedParamDict']
+    #print varDict
+    #print fixedParamDict
+    #quit()
     print "Worker bee %d, Job %d "%(getpid(),jobNum)
 
     #print "varDict: ", varDict
@@ -58,8 +62,15 @@ def workerParams(jobDict):
         outputList = outputListDefault
         print "No outputList given, using outputListDefault."
 
+    # create new var Dict with all parameters
+    varDict = dict()
+    for key,val in variedParamDict.iteritems() :
+        varDict[key]=val
+    if isinstance(fixedParamDict, dict):
+      for key,val in fixedParamDict.iteritems() :
+        varDict[key]=val
     verbose = False
-    if verbose:
+    if verbose: 
       for key,val in varDict.iteritems() :
         print "  ",key,val
 
@@ -109,7 +120,7 @@ def ProcessWorkerOutputs(data,outputList,tag=99):
     print "key: ", key, "obj: ", obj
     #print "outputList: ", outputList
     #print "in the for loop"
-    #print "obj.timeRange: ", obj.timeRange
+    print "obj.timeRange: ", obj.timeRange
     dataSub = aG.GetData(data, obj.name)
 
     #print "dataSub: ", dataSub
@@ -122,7 +133,6 @@ def ProcessWorkerOutputs(data,outputList,tag=99):
     #outputResults.append( resultObj ) 
     outputResults[key]=resultObj
 
-  print "Left"
   return outputResults
 
 #
@@ -206,7 +216,8 @@ def StoreJobOLD(job1):
 # Genetic algorithm that randomizes the provided parameters (1 for now), selects the solution that minimizes the error, and repeats this process for a given number of iterations 
 def fittingAlgorithm(
   odeModel,
-  myVariedParam, # Supports a single param currently = "Bmax_SL", 
+  myVariedParamKey, # Supports a single param currently = "Bmax_SL", 
+  fixedParamDict=None, # optional, input set of fixed parameters/values 
   numCores=5,  # number of cores over which jobs are run
   numRandomDraws=3,  # number of random draws for each parameter
   jobDuration = 2000, # job run time, [ms]
@@ -285,7 +296,7 @@ def fittingAlgorithm(
               varDict = copy.copy(defaultVarDict)
               varDict[parameter] = val
 
-              jobDict =  {'odeModel':odeModel,'varDict':varDict,'jobNum':ctr,'jobDuration':jobDuration, 'outputList':outputList}
+              jobDict =  {'odeModel':odeModel,'varDict':varDict,'fixedParamDict':fixedParamDict,'jobNum':ctr,'jobDuration':jobDuration, 'outputList':outputList}
               jobList.append( jobDict )
               ctr+=1
               #print "JobList2: ", jobList
@@ -371,11 +382,11 @@ def fittingAlgorithm(
       	bestVarDict = bestJob[ 'varDict' ]
       	print "bestVarDict: " , bestVarDict
 
-      	variedParamVal = bestVarDict[ myVariedParam ]
+      	variedParamVal = bestVarDict[ myVariedParamKey ]
         #bestDrawAllIters.append(variedParamVal)
 
       	# update 'trialParamDict' with new values, [0] represents mean value of paramater
-      	trialParamVarDict[ myVariedParam ][0]  = variedParamVal 
+      	trialParamVarDict[ myVariedParamKey ][0]  = variedParamVal 
       	# [1] to represent updating stdDev value
       	# trialParamVarDict[ myVariedParam ][1]  = variedStdDevVal
      
@@ -466,6 +477,7 @@ def run(
 	odeModel="shannon_2004_rat.ode",
 	myVariedParam="I_NaK_max",
 	variedParamTruthVal=5.0,
+        timeStart= 0, # [ms] discard data before this time point
 	jobDuration= 30e3, # [ms] simulation length
 	fileName="This_Is_A_Test.png",
 	numRandomDraws=5,
@@ -476,8 +488,24 @@ def run(
 	outputParamMethod="mean",
 	outputParamTruthVal=12.0e-3,
         maxCores = 30,
+        yamlVarFile = None,
         debug = False
 	):
+
+  # open yaml file with variables needed for sim
+  fixedParamDict = None
+  if yamlVarFile is not None: 
+    import yaml 
+    with open(yamlVarFile ) as fp:
+      fixedParamDict = yaml.load(fp)
+      #varDict[key] = np.float( val ) 
+    # converting to float since yamml doesnt know science notation 
+    for key, val in fixedParamDict.iteritems():
+      fixedParamDict[key] = np.float(val)
+      #print key, type(val)
+      #print key, type(varDict[key]), varDict[key]
+     
+  # debug mode 
   if debug:
     print """
 WARNING: In debug mode. 
@@ -485,7 +513,9 @@ Fixing random seed
 """
     np.random.seed(10) 
 
-  timeRange = [((jobDuration*ms_to_s)-3),jobDuration*ms_to_s] # [s] range for data (It's because of the way GetData rescales the time series)
+  # Data analyzed over this range 
+  timeRange = [timeStart*ms_to_s,jobDuration*ms_to_s] # [s] range for data (It's because of the way GetData rescales the time series)
+  
   print "timeRange: ", timeRange
 
   ## Define parameter, its mean starting value and the starting std dev 
@@ -497,13 +527,14 @@ Fixing random seed
 
   # Run 
   numCores = np.min([numRandomDraws,maxCores])
-  trial(odeModel=odeModel,paramDict=paramDict,outputList=outputList,numCores=numCores,numRandomDraws=numRandomDraws,jobDuration=jobDuration,numIters=numIters,sigmaScaleRate=sigmaScaleRate,fileName=fileName)
+  trial(odeModel=odeModel,paramDict=paramDict,outputList=outputList,fixedParamDict=fixedParamDict,numCores=numCores,numRandomDraws=numRandomDraws,jobDuration=jobDuration,numIters=numIters,sigmaScaleRate=sigmaScaleRate,fileName=fileName)
 
 
 def trial(
   odeModel,
   paramDict,
   outputList,
+  fixedParamDict=None, # dictionary of ode file parameters/values (optional), which are not randomized
   numCores = 2, # maximum number of processors used at a time
   numRandomDraws = 2,# number of random draws for parameters list in 'parmDict' (parmDict should probably be passed in)
   jobDuration = 4e3, # [ms] simulation length 
@@ -514,13 +545,16 @@ def trial(
 
   # get varied parameter (should only be one for now) 
   keys = [key for key in paramDict.iterkeys()]
-  variedParam = keys[0]
+  variedParamKey = keys[0]
+  if len(keys)>1:
+    raise RuntimeError("can only support one key for now") 
 
 
   
   ## do fitting and get back debugging details 
   allDraws,bestDraws = fittingAlgorithm(
-    odeModel,variedParam,numCores, numRandomDraws, jobDuration, paramDict, outputList,numIters=numIters, sigmaScaleRate=sigmaScaleRate)
+    odeModel,variedParamKey,fixedParamDict=fixedParamDict,
+      numCores=numCores, numRandomDraws=numRandomDraws, jobDuration=jobDuration, paramVarDict=paramDict, outputList=outputList,numIters=numIters, sigmaScaleRate=sigmaScaleRate)
 
   if fileName is not None:
     PlotDebuggingData(allDraws,bestDraws,numIters,numRandomDraws,title="Varied param %s"%variedParam,fileName=fileName) 
@@ -601,6 +635,7 @@ if __name__ == "__main__":
   #    raise RuntimeError(msg)
 
   odeModel="shannon_2004_rat.ode"
+  yamlVarFile = None         
   myVariedParam="I_NaK_max"
   variedParamTruthVal=5.0
   jobDuration= 30e3 # [ms] simulation length
@@ -612,6 +647,7 @@ if __name__ == "__main__":
   outputParamSearcher="Nai"
   outputParamMethod="mean"
   outputParamTruthVal=12.0e-3
+  timeStart = 0
   debug = False
 
   #fileIn= sys.argv[1]
@@ -635,41 +671,47 @@ if __name__ == "__main__":
     if(arg=="-myVariedParam"):
 	myVariedParam = sys.argv[i+1]
 
-    if(arg=="-variedParamTruthVal"):
+    elif(arg=="-variedParamTruthVal"):
 	variedParamTruthVal = np.float(sys.argv[i+1])
 
-    if(arg=="-jobDuration"):
+    elif(arg=="-jobDuration"):
 	jobDuration = np.float(sys.argv[i+1])
        
-    if(arg=="-fileName"):
+    elif(arg=="-fileName"):
 	fileName = sys.argv[i+1]
 
-    if(arg=="-numRandomDraws"):
+    elif(arg=="-numRandomDraws"):
 	numRandomDraws = np.int(sys.argv[i+1])
    
-    if(arg=="-numIters"):
+    elif(arg=="-numIters"):
 	numIters = np.int(sys.argv[i+1])
 
-    if(arg=="-sigmaScaleRate"):
+    elif(arg=="-sigmaScaleRate"):
 	sigmaScaleRate = np.float(sys.argv[i+1])
     
-    if(arg=="-outputParamName"):
+    elif(arg=="-outputParamName"):
 	outputParamName = sys.argv[i+1]
 
-    if(arg=="-outputParamSearcher"):
+    elif(arg=="-outputParamSearcher"):
         outputParamSearcher = sys.argv[i+1]
 
-    if(arg=="-outputParamMethod"):
+    elif(arg=="-outputParamMethod"):
         outputParamMethod = sys.argv[i+1]
 
-    if(arg=="-outputParamTruthVal"):
+    elif(arg=="-outputParamTruthVal"):
         outputParamTruthVal = np.float(sys.argv[i+1])
-    if(arg=="-debug"):
+    elif(arg=="-timeStart"):
+        timeStart=np.float(sys.argv[i+1])
+    elif(arg=="-fixedvars"):
+      yamlVarFile = sys.argv[i+1]
+    elif(arg=="-debug"):
       debug = True
 
   run(odeModel=odeModel,
+      yamlVarFile = yamlVarFile,
       myVariedParam=myVariedParam,
       variedParamTruthVal=variedParamTruthVal,
+      timeStart = timeStart,
       jobDuration=jobDuration,
       fileName=fileName,
       numRandomDraws=numRandomDraws,
