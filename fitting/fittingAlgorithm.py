@@ -10,7 +10,7 @@ import copy
 import pandas as pd
 import taufitting as tf
 import matplotlib.pylab as plt
-import fitter
+#import fitter
 import daisychain as dc
 import analyzeGotran as aG
 
@@ -114,7 +114,7 @@ def ProcessWorkerOutputs(data,outputList,tag=99):
 
     #print "dataSub: ", dataSub
     #print "dataSub.valsIdx: ", dataSub.valsIdx
-    result = ao.ProcessDataArray(dataSub,obj.mode,obj.timeRange,key=key)
+    result = aG.ProcessDataArray(dataSub,obj.mode,obj.timeRange,key=key)
 
     #output.result = result    
     resultObj = copy.copy(obj)
@@ -475,8 +475,15 @@ def run(
 	outputParamSearcher="Nai",
 	outputParamMethod="mean",
 	outputParamTruthVal=12.0e-3,
-        maxCores = 30
+        maxCores = 30,
+        debug = False
 	):
+  if debug:
+    print """
+WARNING: In debug mode. 
+Fixing random seed
+"""
+    np.random.seed(10) 
 
   timeRange = [((jobDuration*ms_to_s)-3),jobDuration*ms_to_s] # [s] range for data (It's because of the way GetData rescales the time series)
   print "timeRange: ", timeRange
@@ -515,7 +522,10 @@ def trial(
   allDraws,bestDraws = fittingAlgorithm(
     odeModel,variedParam,numCores, numRandomDraws, jobDuration, paramDict, outputList,numIters=numIters, sigmaScaleRate=sigmaScaleRate)
 
-  PlotDebuggingData(allDraws,bestDraws,numIters,numRandomDraws,title="Varied param %s"%variedParam,fileName=fileName) 
+  if fileName is not None:
+    PlotDebuggingData(allDraws,bestDraws,numIters,numRandomDraws,title="Varied param %s"%variedParam,fileName=fileName) 
+  else:
+   print "Leaving!!"
   
 def PlotDebuggingData(allDraws,bestDraws,numIters,numRandomDraws,title=None,fileName=None):
   # put into array form 
@@ -594,7 +604,7 @@ if __name__ == "__main__":
   myVariedParam="I_NaK_max"
   variedParamTruthVal=5.0
   jobDuration= 30e3 # [ms] simulation length
-  fileName="This_Is_A_Test.png"
+  fileName=None 
   numRandomDraws=3
   numIters=3
   sigmaScaleRate=0.15
@@ -602,6 +612,7 @@ if __name__ == "__main__":
   outputParamSearcher="Nai"
   outputParamMethod="mean"
   outputParamTruthVal=12.0e-3
+  debug = False
 
   #fileIn= sys.argv[1]
   #if(len(sys.argv)==3):
@@ -653,6 +664,8 @@ if __name__ == "__main__":
 
     if(arg=="-outputParamTruthVal"):
         outputParamTruthVal = np.float(sys.argv[i+1])
+    if(arg=="-debug"):
+      debug = True
 
   run(odeModel=odeModel,
       myVariedParam=myVariedParam,
@@ -665,7 +678,8 @@ if __name__ == "__main__":
       outputParamName=outputParamName,
       outputParamSearcher=outputParamSearcher,
       outputParamMethod=outputParamMethod,
-      outputParamTruthVal=outputParamTruthVal)
+      outputParamTruthVal=outputParamTruthVal,
+      debug = debug )
 
 
 

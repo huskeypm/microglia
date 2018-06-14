@@ -89,3 +89,40 @@ def GetData(data,idxName):
 
     return datac
 
+### taken from fitter.py/analyzeODE.py, used to process data made to put into panda format at the end.
+# Most of the original implementation has been scrapped
+def ProcessDataArray(dataSub,mode,timeRange=[0,1e3],key=None):
+
+      # PRINT NO, NEED TO PASS IN TIME TOO 
+      timeSeries = dataSub.t
+      idxMin = (np.abs(timeSeries-timeRange[0])).argmin()  # looks for entry closest to timeRange[i]
+      idxMax = (np.abs(timeSeries-timeRange[1])).argmin()
+      valueTimeSeries = dataSub.valsIdx#[idxMin:idxMax]
+      #print "obj.timeRange[0]: ", obj.timeRange[0]
+      #print "valueTimeSeries: ", valueTimeSeries
+   
+      tRange = timeSeries[idxMin:idxMax] - timeSeries[idxMin]
+      waveMax = np.argmax(valueTimeSeries)
+      tRangeSub = tRange[waveMax:]
+      caiSub = valueTimeSeries[waveMax:]
+      if key=="Cai": # for debug
+        np.savetxt("test%d"%tag,valueTimeSeries)
+      #print "dataSub.valsIdx: ", dataSub.valsIdx 
+      if mode == "max":
+          result = np.max(valueTimeSeries)
+      elif mode == "min":
+          result = np.min(valueTimeSeries)
+      elif mode == "mean":
+          result = np.mean(valueTimeSeries)
+      elif mode == "amp":
+          result = (np.max(valueTimeSeries) - np.min(valueTimeSeries))
+      elif mode == "ptxsth":
+ 	  tpx = np.array([0,0,7.328244275,25.64885496,32.97709924,53.58778626,79.23664122,94.80916031,107.1755725,118.6259542,120.9160305,122.2900763])*10**-3
+          Ipx = np.array([0,-0.0505952381,-0.06845238095,-0.08035714286,-0.09523809524,-0.2083333333,-0.5863095238,-0.8392857143,-0.8988095238,-0.9077380952,0.03273809524,0.002976190476])
+          modeldata = [timeSeries, valueTimeSeries]
+          litdata = [tpx, Ipx]
+          result = fp.test(litdata,modeldata)*100
+      else:
+          raise RuntimeError("%s is not yet implemented"%output.mode)
+
+      return result
