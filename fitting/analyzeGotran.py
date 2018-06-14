@@ -98,8 +98,8 @@ def ProcessDataArray(dataSub,mode,timeRange=[0,1e3],key=None):
       idxMin = (np.abs(timeSeries-timeRange[0])).argmin()  # looks for entry closest to timeRange[i]
       idxMax = (np.abs(timeSeries-timeRange[1])).argmin()
       valueTimeSeries = dataSub.valsIdx[idxMin:idxMax]
-      print "obj.timeRange[0]: ", timeRange[0]
-      print "valueTimeSeries: ", valueTimeSeries
+      #print "obj.timeRange[0]: ", timeRange[0]
+      #print "valueTimeSeries: ", valueTimeSeries
    
       tRange = timeSeries[idxMin:idxMax] - timeSeries[idxMin]
       waveMax = np.argmax(valueTimeSeries)
