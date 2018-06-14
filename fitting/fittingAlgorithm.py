@@ -1,5 +1,5 @@
 import sys
-sys.path.append("./fitting_sensitivity/") 
+#sys.path.append("./fitting_sensitivity/") 
 
 import multiprocessing
 from os import getpid
@@ -27,12 +27,19 @@ class outputObj:
 #outputs = ["Cai","Nai"]
 #outputListDefault = { "Nai":outputObj("Nai","mean"),
 #                      "Cai":outputObj("Cai","max")} 
+
+## Format: 
+# Key: state name, metric of comparison, time range over which to compute metric, truth value
 outputListDefault = { "Nai":outputObj("Nai","mean",[5e4,10e4],12.0e-3),
                       "Cai":outputObj("Cai","amp",[5e4,10e4],10000) }
              # decayRate:outputObj("decayRate","tau") 
 
 class empty:pass
 
+""" 
+Executes an input .ode file on each worker process. 
+Returns result that is used for comparison against expt
+"""
 def workerParams(jobDict):
     #print "poop"
     #odeName = "shannon_2004_mouse.ode"
@@ -89,12 +96,17 @@ def workerParams(jobDict):
 
     return jobNum,results
 
+"""
+Given data dictionary, pulls out subsection of data
+Data subset is evaluate based on 'obj.mode', which defines the type of analysis done. 
+See outputObj class definition and ProcessDataArray function  
+"""
 def ProcessWorkerOutputs(data,outputList,tag=99):
   outputResults = {}
-  #print "made it to ProcessWorkerOutputs"
+  print "made it to ProcessWorkerOutputs"
   #print "outputList: ", outputList
   for key,obj in outputList.iteritems():
-    #print "key: ", key, "obj: ", obj
+    print "key: ", key, "obj: ", obj
     #print "outputList: ", outputList
     #print "in the for loop"
     #print "obj.timeRange: ", obj.timeRange
@@ -110,9 +122,31 @@ def ProcessWorkerOutputs(data,outputList,tag=99):
     #outputResults.append( resultObj ) 
     outputResults[key]=resultObj
 
+  print "Left"
   return outputResults
 
+#
+# stores all data into a pandas object, which simplifies analyses later 
+#
 def PandaData(jobOutputs,csvFile="example.csv"):
+  masterDict = dict()
+ 
+  # get dictionary for each job and append it to a 'master' dictionary
+  for workerNum, jobObj in jobOutputs.iteritems():
+    jobDict = StoreJob(job1= jobObj)
+    jobID = jobDict['jobID']
+    masterDict[jobID]=jobDict
+
+    
+  # store data in pandas dataframe 
+  df = pd.DataFrame(masterDict)    
+  df = df.T
+  if csvFile!=None: 
+    df.to_csv(csvFile)
+  return df 
+
+
+def PandaDataOLD(jobOutputs,csvFile="example.csv"):
   raise RuntimeError("Not using") 
   masterDict = dict()
 
@@ -129,7 +163,28 @@ def PandaData(jobOutputs,csvFile="example.csv"):
   df.to_csv(csvFile)
   return df
 
+# Stores job information into a dict that can be used with pandas 
 def StoreJob(job1):
+    pandasDict = dict()
+    tag = "%d_%d"%(job1.jobNum,job1.pid)
+    pandasDict['jobID']=tag
+    pandasDict['jobNum']=job1.jobNum
+
+    # pull out inputs
+    varDict = job1.jobDict['varDict']
+    for param,value in varDict.iteritems():
+        #print param, value
+        pandasDict[param] = value
+
+    # pull out its results vector
+    outputResults = job1.outputResults
+    for output,result in outputResults.iteritems():
+        #print output, result.result
+        pandasDict[output] = result.result
+
+    return pandasDict
+
+def StoreJobOLD(job1):
     pandasDict = dict()
     tag = "%d_%d"%(job1.jobNum,job1.pid)
     pandasDict['jobID']=tag
@@ -248,7 +303,8 @@ def fittingAlgorithm(
           raise RuntimeError("PKH Needs to fig - give dataframe save" )
       
       # Shouldn't have to write csv for these 
-      myDataFrame = fitter.PandaData(jobOutputs,csvFile=None) # "example.csv")
+      #myDataFrame = fitter.PandaData(jobOutputs,csvFile=None) # "example.csv")
+      myDataFrame = PandaData(jobOutputs,csvFile=None) # "example.csv")
       
       #allErrors.append([])
       #errorsGood_array.append([])
