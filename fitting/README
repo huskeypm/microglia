@@ -27,7 +27,7 @@ python fittingAlgorithm.py -odeModel simpleRyR.ode -myVariedParam kiCa -variedPa
 
 # run with daisychain.py
 #python daisychain.py -t 0.1 -jit -odeName p2x4_MG.ode -T 10000 -iters 1 -outBase "name.pickle"
-export ODEFILEfitted=microgliav27.ode 
+export ODEFILEfitted=microgliav48.ode 
 python2.7 daisychain.py -dt 0.1 -dSr 1000 -jit -odeName $ODEFILEfitted -T 50e3 -iters 1 -var V_ptxf -0.06 -var stim_amplitude 100 -var stim_period 300e3 -var stim_gap1 250e3 -var stim_gap2 250e3 -var stim_low 1e3 -var stim_high 50e3 -name test
 
 

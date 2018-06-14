@@ -13,7 +13,7 @@ cd /home/bch265/microglia/microglia/fitting
 
 ############## Control Panel #####################
 
-export ODEFILEshort=microgliav34.ode
+export ODEFILEshort=microgliav48.ode
 export ODEFILEfitted=microgliav20-fitted.ode
 
 ptxvalidfitted=0
@@ -21,7 +21,7 @@ ptxvalid=1  ### <---- 0 = OFF and 1 = ON
 
 caivalidfitted=0 ### 8 min ST validation (Hide data related)
 caivalid=0
-caitested=0
+caitested=1
 
 no=0        ### No stimulation
 
@@ -29,6 +29,7 @@ dura=0      ### Duration variation
 freq=0      ### Frequency variation
 sens1=0      ### Sensitivity Analysis
 sens2=0
+sens3=0
 
 leng=0      ### Lengthy Stimulation
 CaN=0       ### Special Edition for CaN Validation
@@ -41,6 +42,10 @@ CaN=0       ### Special Edition for CaN Validation
 # microglia/gotran/Pulse-control-tester.ipynb in Bitbucket
 # P2X Validation ####################
 
+## Test Zone
+#python2.7 daisychain.py -dt 1 -dSr 1000 -jit -odeName $ODEFILEshort -T 10800000 -iters 1 -var pulse_switch 0 -var stim_amplitude 3000 -name ~/Data_storage/180min_MG_3mMATP_test
+###
+
 if [ $ptxvalidfitted -eq 1 ]
 then
   echo "Validation of P2X-fitted is ON" # This code needs to be fixed ( millisecond time unit )
@@ -51,11 +56,11 @@ fi
 if [ $ptxvalid -eq 1 ]
 then
   echo "Validation of P2X is ON" # This code needs to be fixed ( millisecond time unit )
-#  python2.7 daisychain.py -dt 0.1 -dSr 1000 -jit -odeName $ODEFILEshort -T 500e3 -iters 1 -var V_ptxs -0.06 -var stim_amplitude 100 -var stim_period 350e3 -var stim_gap1 230e3 -var stim_gap2 230e3 -var stim_low 1e3 -var stim_high 120e3 -name ~/Data_storage/p2x7_Yan120st_100uMATP_total
-#  python2.7 daisychain.py -dt 0.1 -dSr 1000 -jit -odeName $ODEFILEshort -T 500e3 -iters 1 -var V_ptxs -0.06 -var stim_amplitude 320 -var stim_period 350e3 -var stim_gap1 230e3 -var stim_gap2 230e3 -var stim_low 1e3 -var stim_high 120e3 -name ~/Data_storage/p2x7_Yan120st_320uMATP_total
-#  python2.7 daisychain.py -dt 0.1 -dSr 1000 -jit -odeName $ODEFILEshort -T 500e3 -iters 1 -var V_ptxs -0.06 -var stim_amplitude 1000 -var stim_period 350e3 -var stim_gap1 230e3 -var stim_gap2 230e3 -var stim_low 1e3 -var stim_high 120e3 -name ~/Data_storage/p2x7_Yan120st_1000uMATP_total
+  python2.7 daisychain.py -dt 0.1 -dSr 1000 -jit -odeName $ODEFILEshort -T 200e3 -iters 1 -var V_ptxs -0.06 -var stim_amplitude 100 -var stim_period 60e3 -var stim_gap1 50e3 -var stim_gap2 50e3 -var stim_low 1e3 -var stim_high 10e3 -name ~/Data_storage/p2x7_Duan15st_100uMATP_total &
+  python2.7 daisychain.py -dt 0.1 -dSr 1000 -jit -odeName $ODEFILEshort -T 200e3 -iters 1 -var V_ptxs -0.06 -var stim_amplitude 320 -var stim_period 60e3 -var stim_gap1 50e3 -var stim_gap2 50e3 -var stim_low 1e3 -var stim_high 10e3 -name ~/Data_storage/p2x7_Duan15st_320uMATP_total &
+  python2.7 daisychain.py -dt 0.1 -dSr 1000 -jit -odeName $ODEFILEshort -T 200e3 -iters 1 -var V_ptxs -0.06 -var stim_amplitude 1000 -var stim_period 60e3 -var stim_gap1 50e3 -var stim_gap2 50e3 -var stim_low 1e3 -var stim_high 10e3 -name ~/Data_storage/p2x7_Duan15st_1000uMATP_total &
 #  python2.7 daisychain.py -dt 0.1 -dSr 1000 -jit -odeName $ODEFILEshort -T 500e3 -iters 1 -var V_ptxf -0.06 -var stim_amplitude 100 -var stim_period 300e3 -var stim_gap1 250e3 -var stim_gap2 250e3 -var stim_low 1e3 -var stim_high 50e3 -name ~/Data_storage/p2x4_MacKay50st_100uMATP_total_new
-  python2.7 daisychain.py -dt 0.1 -dSr 1000 -jit -odeName $ODEFILEshort -T 500e3 -iters 1 -var V_ptxf -0.06 -var stim_amplitude 100 -var stim_period 300e3 -var stim_gap1 270e3 -var stim_gap2 270e3 -var stim_low 1e3 -var stim_high 30e3 -name ~/Data_storage/p2x4_Toulme30st_100uMATP_total_new
+  python2.7 daisychain.py -dt 0.1 -dSr 1000 -jit -odeName $ODEFILEshort -T 500e3 -iters 1 -var V_ptxf -0.06 -var stim_amplitude 100 -var stim_period 300e3 -var stim_gap1 270e3 -var stim_gap2 270e3 -var stim_low 1e3 -var stim_high 30e3 -name ~/Data_storage/p2x4_Toulme30st_100uMATP_total_new &
 # Lit Data
 # Toulme P2X4 MG ATP st 30s 100 uM
 #time = np.array([0,0.2040816327,1.734693878,4.693877551,8.571428571,13.7755102,24.08163265,34.69387755]) # in second
@@ -263,6 +268,49 @@ array[19]=10
     do
 
     for SA in SAcn
+      do
+
+        for  (( i=0; i<=19; i++))
+          do
+
+          python2.7 daisychain.py -dt 1 -dSr 1000 -jit -odeName $ODEFILEshort -T 200000 -iters 1 -var stim_amplitude $ATP -var $SA ${array[$i]} -var stim_period 2e3 -var stim_gap1 1e3 -var stim_gap2 1e3 -var stim_low 1e3 -var stim_high 2e3 -name ~/Data_storage/SA-$SA-${array[$i]}-$ATP
+
+          done
+
+      done
+
+    done
+
+fi
+
+### SENSITIVITY ANALYSIS ###
+if [ $sens3 -eq 1 ]
+then
+array[0]=".01"
+array[1]=".1"
+array[2]=".2"
+array[3]=".3"
+array[4]=".4"
+array[5]=".5"
+array[6]=".6"
+array[7]=".7"
+array[8]=".8"
+array[9]=".9"
+array[10]=1
+array[11]=2
+array[12]=3
+array[13]=4
+array[14]=5
+array[15]=6
+array[16]=7
+array[17]=8
+array[18]=9
+array[19]=10
+
+  for ATP in 1000 100
+    do
+
+    for SA in SApp38
       do
 
         for  (( i=0; i<=19; i++))
