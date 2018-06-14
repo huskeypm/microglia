@@ -22,9 +22,9 @@ class outputObj:
       self.name = name
       self.mode = mode
       self.timeRange = timeRange #[5e4,10e4]  # NEED TO ADD 
-      self.timeInterpolations= timeInterpolations# if ndarray, will interpolate the values of valueTimeSeries at the provided times
+      self.timeInterpolations= np.copy(timeInterpolations)# if ndarray, will interpolate the values of valueTimeSeries at the provided times
       if isinstance(timeInterpolations,np.ndarray):
-        self.timeInterpolations*=ms_to_s 
+        self.timeInterpolations=ms_to_s 
       self.truthValue = truthValue
       self.result = None
 
@@ -627,12 +627,15 @@ def Demo(odeModel, jobDuration,variedParamKey,fixedParamDict,results):
   dataSub = ao.GetData(data,testStateName)   
 
   plt.figure()
-  plt.plot(dataSub.t,dataSub.valsIdx,label="pred")
+  ts = dataSub.t
+  plt.plot(ts,dataSub.valsIdx,label="pred")
   if isinstance( obj.timeInterpolations,np.ndarray):
     plt.scatter(obj.timeInterpolations,obj.truthValue,label="truth") 
+  else: 
+    plt.plot([np.min(ts),np.max(ts)],[obj.truthValue,obj.truthValue],'r--',label="truth") 
 
   plt.title(testStateName) 
-  plt.legend(loc=0)
+  plt.legend(loc=4)
   plt.gcf().savefig(testStateName + ".png") 
   
 
