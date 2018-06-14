@@ -13,14 +13,18 @@ import matplotlib.pylab as plt
 #import fitter
 import daisychain as dc
 import analyzeGotran as aG
+ms_to_s = 1e-3
 
 
 class outputObj:
     #def __init__(self,name,mode):
-    def __init__(self,name,mode,timeRange,truthValue):
+    def __init__(self,name,mode,timeRange,truthValue,timeInterpolations= None ):
       self.name = name
       self.mode = mode
       self.timeRange = timeRange #[5e4,10e4]  # NEED TO ADD 
+      self.timeInterpolations= timeInterpolations# if ndarray, will interpolate the values of valueTimeSeries at the provided times
+      if isinstance(timeInterpolations,np.ndarray):
+        self.timeInterpolations*=ms_to_s 
       self.truthValue = truthValue
       self.result = None
 
@@ -31,7 +35,7 @@ class outputObj:
 ## Format: 
 # Key: state name, metric of comparison, time range over which to compute metric, truth value
 outputListDefault = { "Nai":outputObj("Nai","mean",[5e4,10e4],12.0e-3),
-                      "Cai":outputObj("Cai","amp",[5e4,10e4],10000) }
+                      "Cai":outputObj("Cai","val_vs_time",[5e3,10e4],[1,2,10],timeInterpolations=[7e3,8e3,9e3]) }
              # decayRate:outputObj("decayRate","tau") 
 
 class empty:pass
@@ -127,7 +131,7 @@ def ProcessWorkerOutputs(data,outputList,tag=99):
 
     #print "dataSub: ", dataSub
     #print "dataSub.valsIdx: ", dataSub.valsIdx
-    result = aG.ProcessDataArray(dataSub,obj.mode,obj.timeRange,key=key)
+    result = aG.ProcessDataArray(dataSub,obj.mode,obj.timeRange,obj.timeInterpolations,key=key)
 
     #output.result = result    
     resultObj = copy.copy(obj)
@@ -337,7 +341,15 @@ def fittingAlgorithm(
           for key,obj in outputList.iteritems():
               #print "outputList: ", key
               result = myDataFrame.loc[myDataFrame.index[i],key] 
-              error = (result - obj.truthValue) ** 2
+
+              # Decide on scalar vs vector comparisons 
+              if not isinstance(result,np.ndarray): 
+              #  print "already an array"
+              #else: 
+                result = np.array( result ) 
+
+              # sum over squares 
+              error = np.sum((result - obj.truthValue) ** 2)
               print "result: ", result, "truthValue: ", obj.truthValue
               #allErrors[iters-1].append(error)
               
@@ -426,9 +438,6 @@ def fittingAlgorithm(
   return randomDrawAllIters, bestDrawAllIters    
 
 # Here we try to optimize the sodium buffer to get the correct free Na concentration 
-ms_to_s = 1e-3
-
-
 def validation():
   # define job length and period during which data will be analyzed (assume sys. reaches steady state) 
   jobDuration = 4e3 # [ms] simulation length 
@@ -506,7 +515,8 @@ def run(
 	outputParamName="Nai",
 	outputParamSearcher="Nai",
 	outputParamMethod="mean",
-	outputParamTruthVal=12.0e-3,
+	outputParamTruthTimes=None, # time points ([ms]) at which to interpolate predicted values. Used where TruthVal is an array 
+	outputParamTruthVal=12.0e-3, # can be an array
         maxCores = 30,
         yamlVarFile = None,
         debug = False
@@ -533,7 +543,14 @@ Fixing random seed
   paramDict[myVariedParam] = [variedParamTruthVal, 0.2] # for log normal
 
   ## Define the observables and the truth value
-  outputList = {outputParamName:outputObj(outputParamSearcher,outputParamMethod,timeRange,outputParamTruthVal)}
+  outputList = {
+    outputParamName:outputObj(
+      outputParamSearcher,
+      outputParamMethod,
+      timeRange,
+      outputParamTruthVal,
+      timeInterpolations= outputParamTruthTimes)
+  }
 
   # Run 
   numCores = np.min([numRandomDraws,maxCores])
@@ -604,13 +621,18 @@ def Demo(odeModel, jobDuration,variedParamKey,fixedParamDict,results):
 
   # cludgy way of plotting result 
   key = outputList.keys()[0]
-  print outputList[key].name
-  testStateName = outputList[key].name
+  obj= outputList[key]
+  testStateName = obj.name
   data = workerResults.outputResults
   dataSub = ao.GetData(data,testStateName)   
+
   plt.figure()
-  plt.plot(dataSub.t,dataSub.valsIdx)
+  plt.plot(dataSub.t,dataSub.valsIdx,label="pred")
+  if isinstance( obj.timeInterpolations,np.ndarray):
+    plt.scatter(obj.timeInterpolations,obj.truthValue,label="truth") 
+
   plt.title(testStateName) 
+  plt.legend(loc=0)
   plt.gcf().savefig(testStateName + ".png") 
   
 
