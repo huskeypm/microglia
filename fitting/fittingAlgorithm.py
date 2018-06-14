@@ -24,7 +24,7 @@ class outputObj:
       self.timeRange = timeRange #[5e4,10e4]  # NEED TO ADD 
       self.timeInterpolations= np.copy(timeInterpolations)# if ndarray, will interpolate the values of valueTimeSeries at the provided times
       if isinstance(timeInterpolations,np.ndarray):
-        self.timeInterpolations=ms_to_s 
+        self.timeInterpolations*=ms_to_s 
       self.truthValue = truthValue
       self.result = None
 
@@ -625,6 +625,9 @@ def Demo(odeModel, jobDuration,variedParamKey,fixedParamDict,results):
   testStateName = obj.name
   data = workerResults.outputResults
   dataSub = ao.GetData(data,testStateName)   
+
+  print "tru",obj.truthValue
+  print "int",obj.timeInterpolations
 
   plt.figure()
   ts = dataSub.t
