@@ -40,7 +40,7 @@ class empty:pass
 Executes an input .ode file on each worker process. 
 Returns result that is used for comparison against expt
 """
-def workerParams(jobDict):
+def workerParams(jobDict,skipProcess=False):
     #print "poop"
     #odeName = "shannon_2004_mouse.ode"
     odeName = jobDict['odeModel']
@@ -92,7 +92,10 @@ def workerParams(jobDict):
     ## do output processing 
     data = returnDict['data']
     #print "DATA: ", data
-    outputResults = ProcessWorkerOutputs(data,outputList,tag=jobNum)
+    if skipProcess:
+      outputResults = data 
+    else: 
+      outputResults = ProcessWorkerOutputs(data,outputList,tag=jobNum)
     if verbose:
       for key,val in outputResults.iteritems() :
         print "  ",key,val.result
@@ -114,13 +117,12 @@ See outputObj class definition and ProcessDataArray function
 """
 def ProcessWorkerOutputs(data,outputList,tag=99):
   outputResults = {}
-  print "made it to ProcessWorkerOutputs"
   #print "outputList: ", outputList
   for key,obj in outputList.iteritems():
-    print "key: ", key, "obj: ", obj
+    #print "key: ", key, "obj: ", obj
     #print "outputList: ", outputList
     #print "in the for loop"
-    print "obj.timeRange: ", obj.timeRange
+    #print "obj.timeRange: ", obj.timeRange
     dataSub = aG.GetData(data, obj.name)
 
     #print "dataSub: ", dataSub
@@ -273,7 +275,7 @@ def fittingAlgorithm(
           print "Should probably rescale sigma by the tolerated error vs current error" 
           #rescaledSigma = sigma/(sigmaScaleRate * iters)
           rescaledSigma = sigma*np.exp(-sigmaScaleRate * (iters-1)) 
-          print "rescaledSigma: ", rescaledSigma, " rate ", sigmaScaleRate
+          #print "rescaledSigma: ", rescaledSigma, " rate ", sigmaScaleRate
           #rescaledSigma = sigma
           distro = "lognormal"
           if distro=="normal":
@@ -286,8 +288,8 @@ def fittingAlgorithm(
           randomDraws = np.sort(randomDraws)
 
           # create a list of jobs 
-          print parameter, " random draws:"
-          print randomDraws
+          #print parameter, " random draws:"
+          #print randomDraws
           randomDrawAllIters.append(randomDraws)
           #listN = [{parameter:val,'jobNum':i} for i,val in enumerate(randomDraws)]
           #jobList+=listN
@@ -472,6 +474,24 @@ def test1():
   numCores = np.min([numRandomDraws,30]) 
   numIters = 20 
   trial(paramDict=paramDict,outputList=outputList,numCores=numCores,numRandomDraws=numRandomDraws,jobDuration=jobDuration,numIters=numIters,sigmaScaleRate=sigmaScaleRate,fileName=fileName)
+"""
+The genetic algorithm wrapper 
+"""
+
+def YamlToParamDict(yamlVarFile):
+  fixedParamDict = None
+  if yamlVarFile is not None: 
+    import yaml 
+    with open(yamlVarFile ) as fp:
+      fixedParamDict = yaml.load(fp)
+      #varDict[key] = np.float( val ) 
+    # converting to float since yamml doesnt know science notation 
+    for key, val in fixedParamDict.iteritems():
+      fixedParamDict[key] = np.float(val)
+      #print key, type(val)
+      #print key, type(varDict[key]), varDict[key]
+  return fixedParamDict
+     
 
 def run(
 	odeModel="shannon_2004_rat.ode",
@@ -479,7 +499,7 @@ def run(
 	variedParamTruthVal=5.0,
         timeStart= 0, # [ms] discard data before this time point
 	jobDuration= 30e3, # [ms] simulation length
-	fileName="This_Is_A_Test.png",
+	fileName=None,
 	numRandomDraws=5,
 	numIters=3,
 	sigmaScaleRate=0.15,
@@ -493,18 +513,8 @@ def run(
 	):
 
   # open yaml file with variables needed for sim
-  fixedParamDict = None
-  if yamlVarFile is not None: 
-    import yaml 
-    with open(yamlVarFile ) as fp:
-      fixedParamDict = yaml.load(fp)
-      #varDict[key] = np.float( val ) 
-    # converting to float since yamml doesnt know science notation 
-    for key, val in fixedParamDict.iteritems():
-      fixedParamDict[key] = np.float(val)
-      #print key, type(val)
-      #print key, type(varDict[key]), varDict[key]
-     
+  fixedParamDict = YamlToParamDict(yamlVarFile)
+
   # debug mode 
   if debug:
     print """
@@ -527,8 +537,13 @@ Fixing random seed
 
   # Run 
   numCores = np.min([numRandomDraws,maxCores])
-  trial(odeModel=odeModel,paramDict=paramDict,outputList=outputList,fixedParamDict=fixedParamDict,numCores=numCores,numRandomDraws=numRandomDraws,jobDuration=jobDuration,numIters=numIters,sigmaScaleRate=sigmaScaleRate,fileName=fileName)
+  results = trial(odeModel=odeModel,paramDict=paramDict,outputList=outputList,fixedParamDict=fixedParamDict,numCores=numCores,numRandomDraws=numRandomDraws,jobDuration=jobDuration,numIters=numIters,sigmaScaleRate=sigmaScaleRate,fileName=fileName)
 
+  return results
+
+"""
+The genetic algorithm 
+"""
 
 def trial(
   odeModel,
@@ -555,11 +570,58 @@ def trial(
   allDraws,bestDraws = fittingAlgorithm(
     odeModel,variedParamKey,fixedParamDict=fixedParamDict,
       numCores=numCores, numRandomDraws=numRandomDraws, jobDuration=jobDuration, paramVarDict=paramDict, outputList=outputList,numIters=numIters, sigmaScaleRate=sigmaScaleRate)
+  bestFitParam = bestDraws[-1]
+  print "Best fit parameter", bestFitParam 
 
+
+  
+
+  ## plot performance 
   if fileName is not None:
-    PlotDebuggingData(allDraws,bestDraws,numIters,numRandomDraws,title="Varied param %s"%variedParam,fileName=fileName) 
+    PlotDebuggingData(allDraws,bestDraws,numIters,numRandomDraws,title="Varied param %s"%variedParamKey,fileName=fileName) 
   else:
-   print "Leaving!!"
+    print "Leaving!!"
+  
+  results ={
+    'outputList': outputList,
+    'allDraws': allDraws,
+    'bestDraws': bestDraws,
+    'bestFitParam': bestFitParam
+  } 
+
+  ## do a demorun with single worker to demonstrate new fit 
+  results['data']  = Demo(odeModel, jobDuration,variedParamKey,fixedParamDict,results)
+
+  return results  
+
+def Demo(odeModel, jobDuration,variedParamKey,fixedParamDict,results): 
+
+  # run job with best parameters
+  outputList = results['outputList']
+  varDict = {variedParamKey: results['bestFitParam']}
+  jobDict =  {'odeModel':odeModel,'varDict':varDict,'fixedParamDict':fixedParamDict,'jobNum':0,'jobDuration':jobDuration, 'outputList':results['outputList']}
+  dummy, workerResults = workerParams(jobDict,skipProcess=True)
+
+  # cludgy way of plotting result 
+  key = outputList.keys()[0]
+  print outputList[key].name
+  testStateName = outputList[key].name
+  data = workerResults.outputResults
+  dataSub = ao.GetData(data,testStateName)   
+  plt.figure()
+  plt.plot(dataSub.t,dataSub.valsIdx)
+  plt.title(testStateName) 
+  plt.gcf().savefig(testStateName + ".png") 
+  
+
+  return data
+
+  
+  
+  
+
+  
+  return 1
   
 def PlotDebuggingData(allDraws,bestDraws,numIters,numRandomDraws,title=None,fileName=None):
   # put into array form 
@@ -570,9 +632,14 @@ def PlotDebuggingData(allDraws,bestDraws,numIters,numRandomDraws,title=None,file
   vals= np.ndarray.flatten(allDraws)
   iters = np.repeat([np.arange(numIters)],numRandomDraws)
   scatteredData= np.asarray(zip(iters,vals))
+
+  veryBest = bestDraws[-1]
+  #print bestDraws
+  #print veryBest
+  norm_by = 1/veryBest
   
-  plt.scatter(scatteredData[:,0], scatteredData[:,1],label="draws")
-  plt.plot(np.arange(numIters), bestDraws, label="best")
+  plt.scatter(scatteredData[:,0], norm_by*scatteredData[:,1],label="draws")
+  plt.plot(np.arange(numIters), norm_by*bestDraws, label="best")
   plt.legend()
   if title!= None:
     plt.title(title)
@@ -580,7 +647,7 @@ def PlotDebuggingData(allDraws,bestDraws,numIters,numRandomDraws,title=None,file
   plt.xlabel("number of iterations")
   plt.xlim([-1,numIters])
   
-  plt.ylabel("I_NaK_max")
+  plt.ylabel("value (relative to best %e)"%veryBest)
  
   if fileName == None:
   	plt.gcf().savefig("mytest.png")
