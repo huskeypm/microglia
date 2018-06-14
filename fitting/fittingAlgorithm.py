@@ -626,9 +626,6 @@ def Demo(odeModel, jobDuration,variedParamKey,fixedParamDict,results):
   data = workerResults.outputResults
   dataSub = ao.GetData(data,testStateName)   
 
-  print "tru",obj.truthValue
-  print "int",obj.timeInterpolations
-
   plt.figure()
   ts = dataSub.t
   plt.plot(ts,dataSub.valsIdx,label="pred")
