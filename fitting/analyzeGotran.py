@@ -97,15 +97,16 @@ def ProcessDataArray(dataSub,mode,timeRange=[0,1e3],key=None):
       timeSeries = dataSub.t
       idxMin = (np.abs(timeSeries-timeRange[0])).argmin()  # looks for entry closest to timeRange[i]
       idxMax = (np.abs(timeSeries-timeRange[1])).argmin()
-      valueTimeSeries = dataSub.valsIdx#[idxMin:idxMax]
-      #print "obj.timeRange[0]: ", obj.timeRange[0]
-      #print "valueTimeSeries: ", valueTimeSeries
+      valueTimeSeries = dataSub.valsIdx[idxMin:idxMax]
+      print "obj.timeRange[0]: ", timeRange[0]
+      print "valueTimeSeries: ", valueTimeSeries
    
       tRange = timeSeries[idxMin:idxMax] - timeSeries[idxMin]
       waveMax = np.argmax(valueTimeSeries)
       tRangeSub = tRange[waveMax:]
       caiSub = valueTimeSeries[waveMax:]
-      if key=="Cai": # for debug
+      if 1: # key=="Cai": # for debug
+        tag = 12
         np.savetxt("test%d"%tag,valueTimeSeries)
       #print "dataSub.valsIdx: ", dataSub.valsIdx 
       if mode == "max":
