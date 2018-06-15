@@ -1,9 +1,9 @@
 # yaml file that contains specific variables (fixed) needed for fitting the P2X4 currents
 # my reader assumes all entries are floats (since yaml doesnt know 1e3)
 V_ptxs: -0.06
-stim_amplitude: 100.
+stim_amplitude: 300.
 stim_period: 60.0e3
-stim_gap1: 30.e3
-stim_gap2: 30.e3
+stim_gap1: 50.e3
+stim_gap2: 50.e3
 stim_low: 1.e3
-stim_high: 30.e3
+stim_high: 10.e3

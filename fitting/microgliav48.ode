@@ -24,17 +24,17 @@ parameters("stimulation",
 
 parameters("MSMp2x4",
     k1_ptxf = ScalarParam(1.0e-4, unit="ms**-1"),
-    k2_ptxf = ScalarParam(2000, unit="(M*ms)**-1"),
-    k3_ptxf = ScalarParam(3, unit="ms**-1"),
-    k4_ptxf = ScalarParam(10000, unit="(M*ms)**-1"),
-    k5_ptxf = ScalarParam(0.0005, unit="ms**-1"), #3.0e1
-    k6_ptxf = ScalarParam(3000, unit="(M*ms)**-1"),
-    H1_ptxf = ScalarParam(1.3e-5, unit="ms**-1"),
-    H2_ptxf = ScalarParam(2e-4, unit="ms**-1"),
+    k2_ptxf = ScalarParam(2610, unit="(M*ms)**-1"),
+    k3_ptxf = ScalarParam(3.915, unit="ms**-1"),
+    k4_ptxf = ScalarParam(11537.9, unit="(M*ms)**-1"),
+    k5_ptxf = ScalarParam(0.000652, unit="ms**-1"), #3.0e1
+    k6_ptxf = ScalarParam(3461.38, unit="(M*ms)**-1"),
+    H1_ptxf = ScalarParam(1.67e-5, unit="ms**-1"),
+    H2_ptxf = ScalarParam(0.00026, unit="ms**-1"),
     H3_ptxf = ScalarParam(1.56e-3, unit="ms**-1"),
-    H4_ptxf = ScalarParam(0.02e-3, unit="ms**-1"),
-    H5_ptxf = ScalarParam(1e-3, unit="ms**-1"), #8e-3
-    H6_ptxf = ScalarParam(1.4e-4, unit="ms**-1")
+    H4_ptxf = ScalarParam(0.0237e-3, unit="ms**-1"),
+    H5_ptxf = ScalarParam(0.0013, unit="ms**-1"), #8e-3
+    H6_ptxf = ScalarParam(0.00018, unit="ms**-1")
     )
 
 parameters("MSMp2x7",
@@ -55,7 +55,7 @@ parameters("MSMp2x7",
     )
 
 parameters("Ip2x4",
-    G12_ptxf = ScalarParam(2.22e-13, unit="C*(ms*V)**-1"),
+    G12_ptxf = ScalarParam(2.124e-13, unit="C*(ms*V)**-1"),
     V_ptxf = ScalarParam(-0.023, unit="V"),  # 60 mV was used in MSM
     E12_ptxf = ScalarParam(0, unit="V"),
     CaA_ptxf = ScalarParam(0.0824) # fraction of current contributed by Calcium transport
@@ -174,11 +174,11 @@ parameters("TNFa",
     ktrnscrpt_TNF = ScalarParam(277.78e-9, unit="ms**-1"),   # 1/3600            # [1/s]: k for transcription of mRNA from DNA per molecule
     ktrnsl_TNF = ScalarParam(27.7778e-6, unit="ms**-1"),     # 100/3600          # [1/s]: k for translation of TNFa from mRNA per molecule
     kdegTNF_TNF = ScalarParam(13.8889e-6, unit="ms**-1"),    # 50/3600           # [1/s]: the rate of degradation of TNFa per molecule
-    kdegRNA_TNF = ScalarParam(13.89e-7, unit="ms**-1"),   # 0.5/3600          # [1/s]: the rate of degradation of mRNA per molecule
+    kdegRNA_TNF = ScalarParam(13.5e-6, unit="ms**-1"),   # 0.5/3600          # [1/s]: the rate of degradation of mRNA per molecule
     kgeneexpf_TNF = ScalarParam(111.11e-9, unit="(molecule*ms)**-1"),   # 1/(3600*2.5)      # [1/(molecule-s)]: Gene expression
     kgeneexpr_TNF = ScalarParam(277.78e-9, unit="ms**-1"),   # 1/3600            # [1/s]:
     ### Hill equation related constants for activation of DNA dynamics/TNFa release
-    IC50pp38_TNF = ScalarParam(2.7, unit="molecule"),
+    IC50pp38_TNF = ScalarParam(2.6, unit="molecule"),
     npp38_TNF = ScalarParam(1.5),
     ### Exocytosis related ##########
     kmaxexo_TNF = ScalarParam(1e-7, unit="(uM*ms)**-1"), # 5/1800        # [1/(M-s)]: R max of exocytosis of TNFa 150 15 15 10 1
@@ -218,7 +218,8 @@ states("MSMp2x7",
 states("Ca_cyto",
     Cai = ScalarParam(0.0813, unit="uM"),
     Captxs = ScalarParam(0, unit="uM"),
-    Captxf = ScalarParam(0, unit="uM")
+    Captxf = ScalarParam(0, unit="uM"),
+    Catot = ScalarParam(0, unit="uM")
     )
 
 states("Buffer_cyto",
@@ -438,5 +439,6 @@ dCaER_dt = JERtoCyt - dCaS - dCaERtoCy
 
 expressions("Ca_cyto")
 dCai_dt = (J_ptxf + J_ptxs + dCaExtoCy)*SAca - JCyttoER + JNCX - dCa2_CaM - dCa4_CaM - dCa4_CN - dCaF + dCaERtoCy  - dCaBex
+dCatot_dt = J_ptxf + J_ptxs + dCaExtoCy + dCaERtoCy
 dCaptxs_dt = J_ptxs
 dCaptxf_dt = J_ptxf

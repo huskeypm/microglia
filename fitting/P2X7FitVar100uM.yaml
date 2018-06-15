@@ -3,7 +3,7 @@
 V_ptxs: -0.06
 stim_amplitude: 100.
 stim_period: 60.0e3
-stim_gap1: 30.e3
-stim_gap2: 30.e3
+stim_gap1: 50.e3
+stim_gap2: 50.e3
 stim_low: 1.e3
-stim_high: 30.e3
+stim_high: 10.e3
