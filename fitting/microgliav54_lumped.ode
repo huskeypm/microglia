@@ -325,7 +325,7 @@ expressions("MSMp2x7")
 k2_ptxs = Conditional(Ge(stim_amplitude,500),3.2,4)
 k4_ptxs = Conditional(Ge(stim_amplitude,500),1.155,2)
 k6_ptxs = Conditional(Ge(stim_amplitude,500),9.7e-2,0.01)
-H7_ptxs = Conditional(Ge(stim_amplitude,500),0.2e-4,1e-7) # control tail
+H7_ptxs = Conditional(Ge(stim_amplitude,500),1.2e-5,1e-7) # control tail
 
 l01 = 2*k4_ptxs*ATPptxs
 l10 = 2*k3_ptxs
