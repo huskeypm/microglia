@@ -13,7 +13,7 @@ cd /home/bch265/microglia/microglia/fitting
 
 ############## Control Panel #####################
 
-export ODEFILEshort=microgliav54_lumped.ode
+export ODEFILEshort=microgliav55.ode
 export ODEFILEfitted=microgliav20-fitted.ode
 
 ptxvalidfitted=0
@@ -49,19 +49,19 @@ CaN=0      ### Special Edition for CaN Validation
 if [ $ptxvalidfitted -eq 1 ]
 then
   echo "Validation of P2X-fitted is ON" # This code needs to be fixed ( millisecond time unit )
-  python2.7 daisychain.py -dt 0.1 -dSr 1000 -jit -odeName $ODEFILEfitted -T 500e3 -iters 1 -var V_ptxf -0.06 -var stim_amplitude 100 -var stim_period 300e3 -var stim_gap1 250e3 -var stim_gap2 250e3 -var stim_low 1e3 -var stim_high 50e3 -name ~/Data_storage/p2x4_MacKay50st_100uMATP_new
-  python2.7 daisychain.py -dt 0.1 -dSr 1000 -jit -odeName $ODEFILEfitted -T 500e3 -iters 1 -var V_ptxf -0.06 -var stim_amplitude 100 -var stim_period 300e3 -var stim_gap1 270e3 -var stim_gap2 270e3 -var stim_low 1e3 -var stim_high 30e3 -name ~/Data_storage/p2x4_Toulme30st_100uMATP_new
+#  python2.7 daisychain.py -dt 0.1 -dSr 1000 -jit -odeName $ODEFILEfitted -T 500e3 -iters 1 -var V_ptxf -0.06 -var stim_amplitude 100 -var stim_period 300e3 -var stim_gap1 250e3 -var stim_gap2 250e3 -var stim_low 1e3 -var stim_high 50e3 -name ~/Data_storage/p2x4_MacKay50st_100uMATP_new
+#  python2.7 daisychain.py -dt 0.1 -dSr 1000 -jit -odeName $ODEFILEfitted -T 500e3 -iters 1 -var V_ptxf -0.06 -var stim_amplitude 100 -var stim_period 300e3 -var stim_gap1 270e3 -var stim_gap2 270e3 -var stim_low 1e3 -var stim_high 30e3 -name ~/Data_storage/p2x4_Toulme30st_100uMATP_new
 fi
 
 if [ $ptxvalid -eq 1 ]
 then
   echo "Validation of P2X is ON" # This code needs to be fixed ( millisecond time unit )
   python2.7 daisychain.py -dt 0.1 -dSr 1000 -jit -odeName $ODEFILEshort -T 200e3 -iters 1 -var V_ptxs -0.04 -var stim_amplitude 100 -var stim_period 60e3 -var stim_gap1 50e3 -var stim_gap2 50e3 -var stim_low 1e3 -var stim_high 10e3 -name ~/Data_storage/p2x7_Duan15st_100uMATP_lumped &
-  python2.7 daisychain.py -dt 0.1 -dSr 1000 -jit -odeName $ODEFILEshort -T 200e3 -iters 1 -var V_ptxs -0.04 -var stim_amplitude 320 -var stim_period 60e3 -var stim_gap1 50e3 -var stim_gap2 50e3 -var stim_low 1e3 -var stim_high 10e3 -name ~/Data_storage/p2x7_Duan15st_320uMATP_lumped &
-  python2.7 daisychain.py -dt 0.1 -dSr 1000 -jit -odeName $ODEFILEshort -T 200e3 -iters 1 -var V_ptxs -0.04 -var stim_amplitude 1000 -var stim_period 60e3 -var stim_gap1 50e3 -var stim_gap2 50e3 -var stim_low 1e3 -var stim_high 10e3 -name ~/Data_storage/p2x7_Duan15st_1000uMATP_lumped &
-  python2.7 daisychain.py -dt 0.1 -dSr 1000 -jit -odeName $ODEFILEshort -T 500e3 -iters 1 -var V_ptxf -0.06 -var stim_amplitude 10 -var stim_period 300e3 -var stim_gap1 270e3 -var stim_gap2 270e3 -var stim_low 1e3 -var stim_high 30e3 -name ~/Data_storage/p2x4_Toulme30st_10uMATP_total_lumped &
-  python2.7 daisychain.py -dt 0.1 -dSr 1000 -jit -odeName $ODEFILEshort -T 500e3 -iters 1 -var V_ptxf -0.06 -var stim_amplitude 100 -var stim_period 300e3 -var stim_gap1 270e3 -var stim_gap2 270e3 -var stim_low 1e3 -var stim_high 30e3 -name ~/Data_storage/p2x4_Toulme30st_100uMATP_total_lumped &
-  python2.7 daisychain.py -dt 0.1 -dSr 1000 -jit -odeName $ODEFILEshort -T 500e3 -iters 1 -var V_ptxf -0.06 -var stim_amplitude 1000 -var stim_period 300e3 -var stim_gap1 270e3 -var stim_gap2 270e3 -var stim_low 1e3 -var stim_high 30e3 -name ~/Data_storage/p2x4_Toulme30st_1000uMATP_total_lumped 
+  python2.7 daisychain.py -dt 0.1 -dSr 1000 -jit -odeName $ODEFILEshort -T 200e3 -iters 1 -var V_ptxs -0.04 -var stim_amplitude 320 -var stim_period 60e3 -var stim_gap1 50e3 -var stim_gap2 50e3 -var stim_low 1e3 -var stim_high 10e3 -name ~/Data_storage/p2x7_Duan15st_320uMATP_lumped & 
+#  python2.7 daisychain.py -dt 0.1 -dSr 1000 -jit -odeName $ODEFILEshort -T 200e3 -iters 1 -var V_ptxs -0.04 -var stim_amplitude 1000 -var stim_period 60e3 -var stim_gap1 50e3 -var stim_gap2 50e3 -var stim_low 1e3 -var stim_high 10e3 -name ~/Data_storage/p2x7_Duan15st_1000uMATP_lumped 
+#  python2.7 daisychain.py -dt 0.1 -dSr 1000 -jit -odeName $ODEFILEshort -T 500e3 -iters 1 -var V_ptxf -0.06 -var stim_amplitude 10 -var stim_period 300e3 -var stim_gap1 270e3 -var stim_gap2 270e3 -var stim_low 1e3 -var stim_high 30e3 -name ~/Data_storage/p2x4_Toulme30st_10uMATP_total_lumped &
+#  python2.7 daisychain.py -dt 0.1 -dSr 1000 -jit -odeName $ODEFILEshort -T 500e3 -iters 1 -var V_ptxf -0.06 -var stim_amplitude 100 -var stim_period 300e3 -var stim_gap1 270e3 -var stim_gap2 270e3 -var stim_low 1e3 -var stim_high 30e3 -name ~/Data_storage/p2x4_Toulme30st_100uMATP_total_lumped &
+#  python2.7 daisychain.py -dt 0.1 -dSr 1000 -jit -odeName $ODEFILEshort -T 500e3 -iters 1 -var V_ptxf -0.06 -var stim_amplitude 1000 -var stim_period 300e3 -var stim_gap1 270e3 -var stim_gap2 270e3 -var stim_low 1e3 -var stim_high 30e3 -name ~/Data_storage/p2x4_Toulme30st_1000uMATP_total_lumped 
 # Lit Data
 # Toulme P2X4 MG ATP st 30s 100 uM
 #time = np.array([0,0.2040816327,1.734693878,4.693877551,8.571428571,13.7755102,24.08163265,34.69387755]) # in second
@@ -86,19 +86,19 @@ fi
 if [ $caivalid -eq 1 ]
 then
   echo "Validation of Cai is ON"
-  python2.7 daisychain.py -dt 1 -dSr 1000 -jit -odeName $ODEFILEshort -T 2000000 -iters 1 -var stim_period 800e3 -var stim_gap1 400e3 -var stim_gap2 750e3 -var stim_low 1e3 -var stim_high 400e3 -var stim_amplitude 1000 -name ~/Data_storage/8min_MG_1mMATP &
-  python2.7 daisychain.py -dt 1 -dSr 1000 -jit -odeName $ODEFILEshort -T 2000000 -iters 1 -var stim_period 800e3 -var stim_gap1 400e3 -var stim_gap2 750e3 -var stim_low 1e3 -var stim_high 400e3 -var stim_amplitude 100 -name ~/Data_storage/8min_MG_0.1mMATP &
-  python2.7 daisychain.py -dt 1 -dSr 1000 -jit -odeName $ODEFILEshort -T 2000000 -iters 1 -var stim_period 800e3 -var stim_gap1 400e3 -var stim_gap2 750e3 -var stim_low 1e3 -var stim_high 400e3 -var stim_amplitude 10 -name ~/Data_storage/8min_MG_0.01mMATP &
-  python2.7 daisychain.py -dt 1 -dSr 1000 -jit -odeName $ODEFILEshort -T 2000000 -iters 1 -var stim_period 800e3 -var stim_gap1 400e3 -var stim_gap2 750e3 -var stim_low 1e3 -var stim_high 400e3 -var stim_amplitude 0 -name ~/Data_storage/8min_MG_0mMATP
+  python2.7 daisychain.py -dt 1 -dSr 1000 -jit -odeName $ODEFILEshort -T 2000000 -iters 1 -var stim_period 800e3 -var stim_gap1 400e3 -var stim_gap2 750e3 -var stim_low 1e3 -var stim_high 400e3 -var stim_amplitude 1000 -name ~/Data_storage/8min_MG_1mMATP 
+#  python2.7 daisychain.py -dt 1 -dSr 1000 -jit -odeName $ODEFILEshort -T 2000000 -iters 1 -var stim_period 800e3 -var stim_gap1 400e3 -var stim_gap2 750e3 -var stim_low 1e3 -var stim_high 400e3 -var stim_amplitude 100 -name ~/Data_storage/8min_MG_0.1mMATP &
+#  python2.7 daisychain.py -dt 1 -dSr 1000 -jit -odeName $ODEFILEshort -T 2000000 -iters 1 -var stim_period 800e3 -var stim_gap1 400e3 -var stim_gap2 750e3 -var stim_low 1e3 -var stim_high 400e3 -var stim_amplitude 10 -name ~/Data_storage/8min_MG_0.01mMATP &
+#  python2.7 daisychain.py -dt 1 -dSr 1000 -jit -odeName $ODEFILEshort -T 2000000 -iters 1 -var stim_period 800e3 -var stim_gap1 400e3 -var stim_gap2 750e3 -var stim_low 1e3 -var stim_high 400e3 -var stim_amplitude 0 -name ~/Data_storage/8min_MG_0mMATP
 fi
 
 if [ $caitested -eq 1 ]
 then
   echo "Validation of Cai is ON"
-  python2.7 daisychain.py -dt 1 -dSr 1000 -jit -odeName $ODEFILEshort -T 2000000 -iters 1 -var stim_period 800e3 -var stim_gap1 400e3 -var stim_gap2 750e3 -var stim_low 1e3 -var stim_high 400e3 -var stim_amplitude 1000 -name ~/Data_storage/8min_MG_1mMATPlumped &
+#  python2.7 daisychain.py -dt 1 -dSr 1000 -jit -odeName $ODEFILEshort -T 2000000 -iters 1 -var stim_period 800e3 -var stim_gap1 400e3 -var stim_gap2 750e3 -var stim_low 1e3 -var stim_high 400e3 -var stim_amplitude 1000 -name ~/Data_storage/8min_MG_1mMATPlumped 
   python2.7 daisychain.py -dt 1 -dSr 1000 -jit -odeName $ODEFILEshort -T 2000000 -iters 1 -var stim_period 800e3 -var stim_gap1 400e3 -var stim_gap2 750e3 -var stim_low 1e3 -var stim_high 400e3 -var stim_amplitude 100 -name ~/Data_storage/8min_MG_0.1mMATPlumped &
-  python2.7 daisychain.py -dt 1 -dSr 1000 -jit -odeName $ODEFILEshort -T 2000000 -iters 1 -var stim_period 800e3 -var stim_gap1 400e3 -var stim_gap2 750e3 -var stim_low 1e3 -var stim_high 400e3 -var stim_amplitude 10 -name ~/Data_storage/8min_MG_0.01mMATPlumped &
-  python2.7 daisychain.py -dt 1 -dSr 1000 -jit -odeName $ODEFILEshort -T 2000000 -iters 1 -var stim_period 800e3 -var stim_gap1 400e3 -var stim_gap2 750e3 -var stim_low 1e3 -var stim_high 400e3 -var stim_amplitude 0 -name ~/Data_storage/8min_MG_0mMATPlumped
+  python2.7 daisychain.py -dt 1 -dSr 1000 -jit -odeName $ODEFILEshort -T 2000000 -iters 1 -var stim_period 800e3 -var stim_gap1 400e3 -var stim_gap2 750e3 -var stim_low 1e3 -var stim_high 400e3 -var stim_amplitude 10 -name ~/Data_storage/8min_MG_0.01mMATPlumped 
+#  python2.7 daisychain.py -dt 1 -dSr 1000 -jit -odeName $ODEFILEshort -T 2000000 -iters 1 -var stim_period 800e3 -var stim_gap1 400e3 -var stim_gap2 750e3 -var stim_low 1e3 -var stim_high 400e3 -var stim_amplitude 0 -name ~/Data_storage/8min_MG_0mMATPlumped
 fi
 
 
