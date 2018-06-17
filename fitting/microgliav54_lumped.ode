@@ -39,16 +39,16 @@ parameters("MSMp2x4",
 
 parameters("MSMp2x7",
     k1_ptxs = ScalarParam(3.94e-5, unit="ms**-1"),
-    #k2_ptxs = ScalarParam(3.19852, unit="(M*ms)**-1"),
+#    k2_ptxs = ScalarParam(3.19852, unit="(M*ms)**-1"),
     k3_ptxs = ScalarParam(4.95e-4, unit="ms**-1"),
-    #k4_ptxs = ScalarParam(1.155, unit="(M*ms)**-1"),
+#    k4_ptxs = ScalarParam(1.155, unit="(M*ms)**-1"),
     k5_ptxs = ScalarParam(5.7e-4, unit="ms**-1"),
-    #k6_ptxs = ScalarParam(9.6997e-2, unit="(M*ms)**-1"),
+#    k6_ptxs = ScalarParam(9.6997e-2, unit="(M*ms)**-1"),
     H5_ptxs = ScalarParam(2.94e-5, unit="ms**-1"),
     H1_ptxs = ScalarParam(0.5e-5, unit="ms**-1"),
     H2_ptxs = ScalarParam(1e-4, unit="ms**-1"),
     H6_ptxs = ScalarParam(1e-4, unit="ms**-1"),
-    #H4_ptxs = ScalarParam(0, unit="ms**-1")
+#    H7_ptxs = ScalarParam(0, unit="ms**-1")
     )
 
 parameters("Ip2x4",
@@ -59,7 +59,7 @@ parameters("Ip2x4",
     )
 
 parameters("Ip2x7",
-    G12_ptxs = ScalarParam(2.15e-12, unit="C*(ms*V)**-1"),
+    G12_ptxs = ScalarParam(2.00e-12, unit="C*(ms*V)**-1"),
     V_ptxs = ScalarParam(-0.023, unit="V"),  # 60 mV was used in MSM
     E12_ptxs = ScalarParam(0, unit="V"),
     CaA_ptxs = ScalarParam(0.1) # fraction of current contributed by Calcium transport
@@ -196,8 +196,8 @@ states("MSMp2x4",
     D4_ptxf = 0.0,
     C1_ptxf = 1.0,
     C2_ptxf = 0.0,
-#    Q1_ptxf = 0.0,
-#    Q2_ptxf = 0.0,
+    Q1_ptxf = 0.0,
+    Q2_ptxf = 0.0,
     Q12_ptxf = 0.0, # PKH 
     N_ptxf = 0.0
     )
@@ -209,8 +209,8 @@ states("MSMp2x7",
     D4_ptxs = 0.0,
     C1_ptxs = 1.0,
     C2_ptxs = 0.0,
-#    Q1_ptxs = 0.0,
-#    Q2_ptxs = 0.0
+    Q1_ptxs = 0.0,
+    Q2_ptxs = 0.0,
     Q12_ptxs = 0.0
     )
 
@@ -307,36 +307,18 @@ K12 = k12/k21
 a1p = k01
 a1m = k10/(1+K12)
 a2p = k24/(1+1/K12)
-a2m = k42                        
+a2m = k42                       
+
 dD1_ptxf_dt = k1_ptxf*D2_ptxf - (3*k2_ptxf*ATPptxf + H1_ptxf)*D1_ptxf
 dD2_ptxf_dt = 3*k2_ptxf*ATPptxf*D1_ptxf + 2*k3_ptxf*D3_ptxf + H2_ptxf*C2_ptxf - (k1_ptxf + 2*k4_ptxf*ATPptxf)*D2_ptxf
 dD3_ptxf_dt = 2*k4_ptxf*ATPptxf*D2_ptxf + 3*k5_ptxf*D4_ptxf + H5_ptxf*Q1_ptxf - (2*k3_ptxf + k6_ptxf*ATPptxf)*D3_ptxf
-#dD4_ptxf_dt = k6_ptxf*ATPptxf*D3_ptxf + H6_ptxf*Q2_ptxf - (3*k5_ptxf + H3_ptxf)*D4_ptxf
-
-
 dD4_ptxf_dt = k6_ptxf*ATPptxf*D3_ptxf +      a2p*Q12_ptxf - (3*k5_ptxf + H3_ptxf + a2m)*D4_ptxf
 dC1_ptxf_dt = H1_ptxf*D1_ptxf + k1_ptxf*C2_ptxf + H4_ptxf*N_ptxf - 3*k2_ptxf*ATPptxf*C1_ptxf
-
-#dC2_ptxf_dt = 3*k2_ptxf*ATPptxf*C1_ptxf + 2*k3_ptxf*Q1_ptxf - (k1_ptxf + 2*k4_ptxf*ATPptxf + H2_ptxf)*C2_ptxf
-
-
-dC2_ptxf_dt = 3*k2_ptxf*ATPptxf*C1_ptxf +       a1m*Q12_ptxf - (k1_ptxf +               a1p + H2_ptxf)*C2_ptxf
-
-#dQ1_ptxf_dt = 2*k4_ptxf*ATPptxf*C2_ptxf + 3*k5_ptxf*Q2_ptxf - (2*k3_ptxf + k6_ptxf*ATPptxf + H5_ptxf)*Q1_ptxf
-
-
-dQ1_ptxf_dt =  0 #               k01*C2_ptxf +       k21*Q2_ptxf - (      k10 +             k12 + H5_ptxf)*Q1_ptxf
-
-#dQ2_ptxf_dt = k6_ptxf*ATPptxf*Q1_ptxf - (3*k5_ptxf + H6_ptxf)*Q2_ptxf
-
-
-dQ2_ptxf_dt =  0 # k42*D4_ptxf + k12*Q1_ptxf - (      k21 +     k24)*Q2_ptxf
-
-#dQ12_ptxf_dt = a2m*D4_ptxf +  a1p*C2_ptxf #- (      a1m +     a2p)*Q12_ptxf
-
-
-dQ12_ptxf_dt = a2m*D4_ptxf +  a1p*C2_ptxf  - (      a1m +     a2p)*Q12_ptxf
+dC2_ptxf_dt = 3*k2_ptxf*ATPptxf*C1_ptxf + a1m*Q12_ptxf - (k1_ptxf + a1p + H2_ptxf)*C2_ptxf
+dQ12_ptxf_dt = a2m*D4_ptxf +  a1p*C2_ptxf  - (a1m + a2p)*Q12_ptxf
 dN_ptxf_dt = H3_ptxf*D4_ptxf - H4_ptxf*N_ptxf
+dQ1_ptxf_dt = 0
+dQ2_ptxf_dt = 0
 
 expressions("MSMp2x7")
 
@@ -345,40 +327,38 @@ k4_ptxs = Conditional(Ge(stim_amplitude,500),1.155,2)
 k6_ptxs = Conditional(Ge(stim_amplitude,500),9.7e-2,0.01)
 H7_ptxs = Conditional(Ge(stim_amplitude,500),0.2e-4,1e-7) # control tail
 
-k01 = 2*k4_ptxs*ATPptxs
-k10 = 2*k3_ptxs
-k12 = k6_ptxs*ATPptxs
-k21 = 3*k5_ptxs
-k24 = H6_ptxs  # Q2->D4
-k42 = 0        # D4->Q2
-K12 = k12/k21
-a1p = k01
-a1m = k10/(1+K12)
-a2p = k24/(1+1/K12)
-a2m = k42
+l01 = 2*k4_ptxs*ATPptxs
+l10 = 2*k3_ptxs
+l12 = k6_ptxs*ATPptxs
+l21 = 3*k5_ptxs
+l24 = H6_ptxs  # Q2->D4
+l42 = 0        # D4->Q2
+L12 = l12/l21
+b1p = l01
+b1m = l10/(1+L12)
+b2p = l24/(1+1/L12)
+b2m = l42
 
 dD1_ptxs_dt = k1_ptxs*D2_ptxs - (3*k2_ptxs*ATPptxs + H1_ptxs)*D1_ptxs #
 dD2_ptxs_dt = 3*k2_ptxs*ATPptxs*D1_ptxs + 2*k3_ptxs*D3_ptxs + H2_ptxs*C2_ptxs - (k1_ptxs + 2*k4_ptxs*ATPptxs + H7_ptxs)*D2_ptxs #
 dD3_ptxs_dt = 2*k4_ptxs*ATPptxs*D2_ptxs + 3*k5_ptxs*D4_ptxs + H5_ptxs*Q1_ptxs - (2*k3_ptxs + k6_ptxs*ATPptxs)*D3_ptxs #
-#dD4_ptxs_dt = k6_ptxs*ATPptxs*D3_ptxs + H6_ptxs*Q2_ptxs - 3*k5_ptxs*D4_ptxs #
 dC1_ptxs_dt = H1_ptxs*D1_ptxs + k1_ptxs*C2_ptxs - 3*k2_ptxs*ATPptxs*C1_ptxs #
-dC2_ptxs_dt = H7_ptxs*D2_ptxs + 3*k2_ptxs*ATPptxs*C1_ptxs + 2*k3_ptxs*Q1_ptxs - (k1_ptxs + 2*k4_ptxs*ATPptxs + H2_ptxs)*C2_ptxs #
-#dQ1_ptxs_dt = 2*k4_ptxs*ATPptxs*C2_ptxs + 3*k5_ptxs*Q2_ptxs - (2*k3_ptxs + k6_ptxs*ATPptxs + H5_ptxs)*Q1_ptxs #
-#dQ2_ptxs_dt = k6_ptxs*ATPptxs*Q1_ptxs - (3*k5_ptxs + H6_ptxs)*Q2_ptxs #
-dD4_ptxs_dt = k6_ptxs*ATPptxs*D3_ptxs + a2p*Q12_ptxs - (3*k5_ptxs + a2m)*D4_ptxs
-#dQ1_ptxs_dt =  0 
-#dQ2_ptxs_dt =  0 
-dQ12_ptxs_dt = a2m*D4_ptxs + a1p*C2_ptxs - (a1m + a2p)*Q12_ptxs
+dC2_ptxs_dt = H7_ptxs*D2_ptxs + 3*k2_ptxs*ATPptxs*C1_ptxs + b1m*Q12_ptxs - (k1_ptxs + b1p + H2_ptxs)*C2_ptxs
+dD4_ptxs_dt = k6_ptxs*ATPptxs*D3_ptxs + b2p*Q12_ptxs - (3*k5_ptxs + b2m)*D4_ptxs
+dQ12_ptxs_dt = b2m*D4_ptxs + b1p*C2_ptxs - (b1m + b2p)*Q12_ptxs
+dQ1_ptxs_dt = 0
+dQ2_ptxs_dt = 0
+
 
 expressions("Ip2x4")
 #I_ptxf = ((G12_ptxf*(Q1_ptxf + Q2_ptxf)*(V_ptxf - E12_ptxf))*10**6)
 I_ptxf = ((G12_ptxf*(Q12_ptxf)*(V_ptxf - E12_ptxf))*10**6)
-I_f = ((G12_ptxf*(Q1_ptxf + Q2_ptxf)*(-0.06 - E12_ptxf))*10**6)
+#I_f = ((G12_ptxf*(Q1_ptxf + Q2_ptxf)*(-0.06 - E12_ptxf))*10**6)
 
 expressions("Ip2x7")
 #I_ptxs = ((G12_ptxs*(Q1_ptxs + Q2_ptxs)*(V_ptxs - E12_ptxs))*10**6) # in [uC/ms]
 I_ptxs = ((G12_ptxs*(Q12_ptxs)*(V_ptxs - E12_ptxs))*10**6) # in [uC/ms]
-I_s = ((G12_ptxs*(Q1_ptxs + Q2_ptxs)*(-0.04 - E12_ptxs))*10**6) # in [uC/ms]
+#I_s = ((G12_ptxs*(Q1_ptxs + Q2_ptxs)*(-0.04 - E12_ptxs))*10**6) # in [uC/ms]
 
 expressions("Jp2x")
 AHEK = 4*3.141592654*(rHEK)**2 # surface area of HEK293 cell in [sq. meter]
