@@ -365,31 +365,21 @@ data30 = ao.readPickle("/home/AD/bch265/Data_storage/180min_MG_3mMATP_cat.pickle
 data31 = ao.readPickle("/home/AD/bch265/Data_storage/15min_MG_0mMATP_cat.pickle")
 data0 = ao.readPickle("/home/AD/bch265/Data_storage/15min_MG_0mMATP_cat.pickle")
 
+
+# NFAT change with respect to time of exposure
 stateLabel = "NFATNn"
-subData0 = ao.GetData(data0,stateLabel)
-subData1 = ao.GetData(data5,stateLabel)
-subData2 = ao.GetData(data15,stateLabel)
-subData3 = ao.GetData(data16,stateLabel)
-subData4 = ao.GetData(data6,stateLabel)
-subData5 = ao.GetData(data7,stateLabel)
-subData6 = ao.GetData(data8,stateLabel)
+subData0 = ao.GetData(data8,stateLabel)
 
 stateLabel = "NFATNc"
-subData0a = ao.GetData(data0,stateLabel)
-subData1a = ao.GetData(data5,stateLabel)
-subData2a = ao.GetData(data15,stateLabel)
-subData3a = ao.GetData(data16,stateLabel)
-subData4a = ao.GetData(data6,stateLabel)
-subData5a = ao.GetData(data7,stateLabel)
-subData6a = ao.GetData(data8,stateLabel)
+subData1a = ao.GetData(data8,stateLabel)
 
-NFAT0 = subData0.valsIdx[-1] + subData0a.valsIdx[-1]
-NFAT1 = subData1.valsIdx[-1] + subData1a.valsIdx[-1]
-NFAT2 = subData2.valsIdx[-1] + subData2a.valsIdx[-1]
-NFAT3 = subData3.valsIdx[-1] + subData3a.valsIdx[-1]
-NFAT4 = subData4.valsIdx[-1] + subData4a.valsIdx[-1]
-NFAT5 = subData5.valsIdx[-1] + subData5a.valsIdx[-1]
-NFAT6 = subData6.valsIdx[-1] + subData6a.valsIdx[-1]
+NFAT0 = subData0.valsIdx[1] + subData1a.valsIdx[1]
+NFAT1 = subData0.valsIdx[60] + subData1a.valsIdx[60]
+NFAT2 = subData0.valsIdx[5*60] + subData1a.valsIdx[5*60]
+NFAT3 = subData0.valsIdx[10*60] + subData1a.valsIdx[10*60]
+NFAT4 = subData0.valsIdx[15*60] + subData1a.valsIdx[15*60]
+NFAT5 = subData0.valsIdx[30*60] + subData1a.valsIdx[30*60]
+NFAT6 = subData0.valsIdx[60*60] + subData1a.valsIdx[60*60]
 
 NFAT = np.array([NFAT0,NFAT1,NFAT2,NFAT3,NFAT4,NFAT5,NFAT6])
 maxN = max(NFAT)
@@ -398,7 +388,7 @@ NFATr = NFAT/maxN
 dura = np.array([0,1,5,10,15,30,60]) # in min
 ## Ferrari et al.
 LitNFATr = np.array([0,0.26,0.95,1,0.95]) # in fraction
-Littime = np.array([0,1,15,31,60]) # in min
+Littime = np.array([0,1,15,30,60]) # in min
 
 plt.figure(figsize=(7,7),dpi=100)
 plt.tick_params(labelsize=12)
@@ -412,3 +402,236 @@ plt.legend(loc=0,fontsize=12)
 plt.xlabel("ATP exposure time (min)",fontsize=15)
 plt.ylabel("Dephosphorylated NFAT conc. (fraction of max)",fontsize=15)
 plt.tight_layout()
+plt.savefig("NFATvalidFerraritime.png")
+
+
+# NFAT change with resepct to concentration of ATP
+stateLabel = "NFATNn"
+subData1 = ao.GetData(data9,stateLabel)
+subData2 = ao.GetData(data10,stateLabel)
+subData3 = ao.GetData(data11,stateLabel)
+subData4 = ao.GetData(data2,stateLabel)
+subData5 = ao.GetData(data6,stateLabel)
+subData6 = ao.GetData(data12,stateLabel)
+
+stateLabel = "NFATNc"
+subData1a = ao.GetData(data9,stateLabel)
+subData2a = ao.GetData(data10,stateLabel)
+subData3a = ao.GetData(data11,stateLabel)
+subData4a = ao.GetData(data2,stateLabel)
+subData5a = ao.GetData(data6,stateLabel)
+subData6a = ao.GetData(data12,stateLabel)
+
+
+start = 0
+end = 2000
+
+NFAT1 = subData1.valsIdx[-1] + subData1a.valsIdx[-1]
+NFAT2 = subData2.valsIdx[-1] + subData2a.valsIdx[-1]
+NFAT3 = subData3.valsIdx[-1] + subData3a.valsIdx[-1]
+NFAT4 = subData4.valsIdx[-1] + subData4a.valsIdx[-1]
+NFAT5 = subData5.valsIdx[-1] + subData5a.valsIdx[-1]
+NFAT6 = subData6.valsIdx[-1] + subData6a.valsIdx[-1]
+
+NFAT = np.array([NFAT1,NFAT2,NFAT3,NFAT4,NFAT5,NFAT6])
+maxN = max(NFAT)
+NFATr = NFAT/maxN
+
+ATPmM = np.array([0,0.1,0.5,1,3,5])
+LitNFATr = np.array([0,0.05,0.1,0.5,1,0.3])
+
+plt.figure(figsize=(7,7),dpi=100)
+plt.tick_params(labelsize=12)
+plt.plot(ATPmM,NFATr,'b-s',label="Model for 15 min")
+plt.plot(ATPmM,LitNFATr,'r--s',label="Ferrari et. al., for 15 min")
+
+plt.xlim(-0.1,5.1)
+plt.ylim(-0.05,1.05)
+
+plt.legend(loc=0,fontsize=12)
+plt.xlabel("ATP conc. (mM)",fontsize=15)
+plt.ylabel("Dephosphorylated NFAT conc. (fraction of max)",fontsize=15)
+plt.tight_layout()
+plt.savefig("NFATvalidFerrariconc.png")
+
+## TNF validation vs. ATP conc
+stateLabel = "TNFa"
+subData0 = ao.GetData(data31,stateLabel)
+subData1 = ao.GetData(data17,stateLabel)
+subData2 = ao.GetData(data18,stateLabel)
+subData3 = ao.GetData(data19,stateLabel)
+subData4 = ao.GetData(data26,stateLabel)
+
+tnfa0 = subData0.valsIdx[600]
+tnfa1 = max(subData1.valsIdx)
+tnfa2 = max(subData2.valsIdx)
+tnfa3 = max(subData4.valsIdx)
+tnfa4 = max(subData3.valsIdx)
+
+tnfa = np.array([tnfa0, tnfa1, tnfa2, tnfa3, tnfa4])
+maxtnfa = max(tnfa)
+tnfar = tnfa/maxtnfa
+
+## Hide's data
+ATP1 = np.array([0.01,0.1,0.2,1])
+ATP2 = np.array([0,0.01,0.1,0.2,1])
+Hide = np.array([0.04,0.26,0.35,1])
+
+plt.figure(figsize=(7,7),dpi=100)
+plt.tick_params(labelsize=12)
+plt.plot(ATP2,tnfar,'b-s',label="Model - 3 hr")
+plt.plot(ATP1,Hide,'r--s',label="Hide et al. - 3 hr")
+
+plt.xlim(-0.1,1.1)
+plt.ylim(-0.02,1.02)
+
+plt.legend(loc=0,fontsize=12)
+plt.xlabel("[ATP] (mM)",fontsize=15)
+plt.ylabel("TNFa synthesized (fraction of max)",fontsize=15)
+plt.tight_layout()
+plt.savefig("TNFavsATPHide.png")
+
+
+## TNFa vs. time -> Hide
+stateLabel = "TNFa"
+subData3 = ao.GetData(data30,stateLabel)
+
+tnfa1 = subData3.valsIdx[3600]
+tnfa2 = subData3.valsIdx[7200]
+tnfa3 = subData3.valsIdx[10800]
+
+tnfar = np.array([0,tnfa1/tnfa3, tnfa2/tnfa3, tnfa3/tnfa3])
+hrs = np.array([0,1,2,3])
+Hide = np.array([0,0.054,0.54,1])
+
+plt.figure(figsize=(7,7),dpi=100)
+plt.tick_params(labelsize=12)
+plt.plot(hrs,tnfar,'b-s',label="Model - 3 mM ATP")
+plt.plot(hrs,Hide,'r--s',label="Hide et al. - 3 mM ATP")
+
+plt.xlim(-0.2,3.2)
+plt.ylim(-0.05,1.25)
+
+plt.legend(loc=0,fontsize=12)
+plt.xlabel("time (hr)",fontsize=15)
+plt.ylabel("TNFa synthesized (fraction of max)",fontsize=15)
+plt.tight_layout()
+plt.savefig("TNFavsExpoTimeHide.png")
+
+# p-p38 validation -> Hide and Trang
+
+data0 = ao.readPickle("/home/AD/bch265/Data_storage/15min_MG_0mMATP_cat.pickle")
+data1 = ao.readPickle("/home/AD/bch265/Data_storage/1min_MG_005mMATP_cat.pickle")
+data2 = ao.readPickle("/home/AD/bch265/Data_storage/5min_MG_005mMATP_cat.pickle")
+data3 = ao.readPickle("/home/AD/bch265/Data_storage/15min_MG_005mMATP_cat.pickle")
+data4 = ao.readPickle("/home/AD/bch265/Data_storage/30min_MG_005mMATP_cat.pickle")
+data5 = ao.readPickle("/home/AD/bch265/Data_storage/60min_MG_005mMATP_cat.pickle")
+
+data6 = ao.readPickle("/home/AD/bch265/Data_storage/10min_MG_1mMATP_cat.pickle")
+data7 = ao.readPickle("/home/AD/bch265/Data_storage/5min_MG_1mMATP_cat.pickle")
+data8 = ao.readPickle("/home/AD/bch265/Data_storage/1min_MG_1mMATP_cat.pickle")
+
+data9 = ao.readPickle("/home/AD/bch265/Data_storage/10min_MG_001mMATP_cat.pickle")
+data10 = ao.readPickle("/home/AD/bch265/Data_storage/10min_MG_01mMATP_cat.pickle")
+data11= ao.readPickle("/home/AD/bch265/Data_storage/10min_MG_1mMATP_cat.pickle")
+
+
+stateLabel = "pp38"
+subData0 = ao.GetData(data0,stateLabel)
+subData1 = ao.GetData(data1,stateLabel)
+subData2 = ao.GetData(data2,stateLabel)
+subData3 = ao.GetData(data3,stateLabel)
+subData4 = ao.GetData(data4,stateLabel)
+subData5 = ao.GetData(data5,stateLabel)
+subData6 = ao.GetData(data6,stateLabel)
+subData7 = ao.GetData(data7,stateLabel)
+subData8 = ao.GetData(data8,stateLabel)
+
+pp380 = max(subData0.valsIdx)
+pp381 = max(subData1.valsIdx)
+pp382 = max(subData2.valsIdx)
+pp383 = max(subData3.valsIdx)
+pp384 = max(subData4.valsIdx)
+pp385 = max(subData5.valsIdx)
+
+pp386 = max(subData6.valsIdx)
+pp387 = max(subData7.valsIdx)
+pp388 = max(subData8.valsIdx)
+
+pp38 = np.array([pp380,pp381,pp382,pp383,pp384,pp385])
+maxN = max(pp38)
+pp38r = pp38/maxN
+
+pp38hide = np.array([pp380,pp388,pp387,pp386])
+maxN2 = max(pp38hide)
+pp38r2 = pp38hide/maxN2
+Expt = np.array([0,1,5,15,30,60])
+Expt2 = np.array([0,1,5,10])
+Litr2 = np.array([0.7,0.8,0.95,1])# Hide
+Litr = np.array([0.94,1]) # Trang
+Litt = np.array([5,60]) # Trang
+
+plt.figure(figsize=(7,7),dpi=100)
+plt.tick_params(labelsize=12)
+#plt.plot(Expt,pp38r,'r-s',label="Model at 50 uM ATP")
+#plt.plot([5,60],[0.94,1],'r--s',label="Trang et al., at 50 uM ATP")
+#plt.plot(60,1,'r--o',label="Trang et al., at 50 uM ATP")
+plt.plot(Expt2,pp38r2,'b-s',label="Model at 1 mM ATP")
+plt.plot(Expt2,Litr2,'r--s',label="Hide et al., 1 mM ATP")
+plt.legend(loc=0,fontsize=12)
+plt.ylim(0.45,1.05)
+plt.xlim(-1,11)
+plt.tight_layout()
+plt.xlabel("ATP exposure time (min)",fontsize=15)
+plt.ylabel("Relative pp38 amount (Fraction of max)",fontsize=15)
+plt.savefig("pp38validHidetime.png")
+
+stateLabel = "pp38"
+subData0 = ao.GetData(data0,stateLabel)
+subData1 = ao.GetData(data1,stateLabel)
+subData2 = ao.GetData(data2,stateLabel)
+subData3 = ao.GetData(data3,stateLabel)
+subData4 = ao.GetData(data4,stateLabel)
+subData5 = ao.GetData(data5,stateLabel)
+subData6 = ao.GetData(data6,stateLabel)
+subData7 = ao.GetData(data7,stateLabel)
+subData8 = ao.GetData(data8,stateLabel)
+
+pp380 = max(subData0.valsIdx)
+pp381 = max(subData1.valsIdx)
+pp382 = max(subData2.valsIdx)
+pp383 = max(subData3.valsIdx)
+pp384 = max(subData4.valsIdx)
+pp385 = max(subData5.valsIdx)
+
+pp386 = max(subData6.valsIdx)
+pp387 = max(subData7.valsIdx)
+pp388 = max(subData8.valsIdx)
+
+pp38 = np.array([pp380,pp381,pp382,pp383,pp384,pp385])
+maxN = max(pp38)
+pp38r = pp38/maxN
+
+pp38hide = np.array([pp380,pp388,pp387,pp386])
+maxN2 = max(pp38hide)
+pp38r2 = pp38hide/maxN2
+Expt = np.array([0,1,5,15,30,60])
+Expt2 = np.array([0,1,5,10])
+Litr2 = np.array([0.7,0.8,0.95,1])# Hide
+Litr = np.array([0.94,1]) # Trang
+Litt = np.array([5,60]) # Trang
+
+plt.figure(figsize=(7,7),dpi=100)
+plt.tick_params(labelsize=12)
+plt.plot(Expt,pp38r,'b-s',label="Model at 50 uM ATP")
+plt.plot([5,60],[0.94,1],'r--s',label="Trang et al., at 50 uM ATP")
+#plt.plot(60,1,'r--o',label="Trang et al., at 50 uM ATP")
+#plt.plot(Expt2,pp38r2,'b-s',label="Model at 1 mM ATP")
+#plt.plot(Expt2,Litr2,'b--s',label="Hide et al., 1 mM ATP")
+plt.legend(loc=0,fontsize=12)
+plt.ylim(0.75,1.05)
+plt.xlim(-2,62)
+plt.tight_layout()
+plt.xlabel("ATP exposure time (min)",fontsize=15)
+plt.ylabel("Relative pp38 amount (Fraction of max)",fontsize=15)
+plt.savefig("pp38vsEpT50uMATPTrang.png")
