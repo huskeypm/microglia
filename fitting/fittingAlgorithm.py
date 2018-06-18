@@ -487,20 +487,6 @@ def test1():
 The genetic algorithm wrapper
 """
 
-def YamlToParamDict(yamlVarFile):
-  fixedParamDict = None
-  if yamlVarFile is not None:
-    import yaml
-    with open(yamlVarFile ) as fp:
-      fixedParamDict = yaml.load(fp)
-      #varDict[key] = np.float( val )
-    # converting to float since yamml doesnt know science notation
-    for key, val in fixedParamDict.iteritems():
-      fixedParamDict[key] = np.float(val)
-      #print key, type(val)
-      #print key, type(varDict[key]), varDict[key]
-  return fixedParamDict
-
 
 def run(
 	odeModel="shannon_2004_rat.ode",
@@ -523,7 +509,7 @@ def run(
 	):
 
   # open yaml file with variables needed for sim
-  fixedParamDict = YamlToParamDict(yamlVarFile)
+  fixedParamDict = aG.YamlToParamDict(yamlVarFile)
 
   # debug mode
   if debug:
