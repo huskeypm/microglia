@@ -89,6 +89,21 @@ def GetData(data,idxName):
 
     return datac
 
+def YamlToParamDict(yamlVarFile):
+  fixedParamDict = None
+  if yamlVarFile is not None:
+    import yaml
+    with open(yamlVarFile ) as fp:
+      fixedParamDict = yaml.load(fp)
+      #varDict[key] = np.float( val )
+    # converting to float since yamml doesnt know science notation
+    for key, val in fixedParamDict.iteritems():
+      fixedParamDict[key] = np.float(val)
+      #print key, type(val)
+      #print key, type(varDict[key]), varDict[key]
+  return fixedParamDict
+
+
 ### taken from fitter.py/analyzeODE.py, used to process data made to put into panda format at the end.
 # Most of the original implementation has been scrapped
 def ProcessDataArray(dataSub,mode,timeRange=[0,1e3],

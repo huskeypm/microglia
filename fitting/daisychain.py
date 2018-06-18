@@ -264,11 +264,16 @@ if __name__ == "__main__":
 
   for i,arg in enumerate(sys.argv):
     # calls 'runParams' with the next argument following the argument '-validation'
-    if("-var" in arg):
+    if("-var" in arg): # note: can also run yaml 
       # Absolute, not relative values
       varName =sys.argv[i+1]
       varVal =sys.argv[i+2]
       varDict[varName] = np.float(varVal)
+   
+    if("-yaml" in arg): 
+      if bool(varDict): 
+        raise RuntimeError("varDict is not empty! Aborting") 
+      varDict = aG.YamlToParamDict(sys.argv[i+1])
 
     if("-state" in arg):
       stateName =sys.argv[i+1]
