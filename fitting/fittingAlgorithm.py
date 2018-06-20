@@ -649,6 +649,7 @@ def PlotDebuggingData(allDraws,bestDraws,numIters,numRandomDraws,title=None,file
   #print veryBest
   norm_by = 1/veryBest
 
+  
   plt.scatter(scatteredData[:,0], norm_by*scatteredData[:,1],label="draws")
   plt.plot(np.arange(numIters), norm_by*bestDraws, label="best")
   plt.legend()
@@ -656,7 +657,8 @@ def PlotDebuggingData(allDraws,bestDraws,numIters,numRandomDraws,title=None,file
     plt.title(title)
 
   plt.xlabel("number of iterations")
-  plt.xlim([-1,numIters])
+  plt.xlim([0,numIters])
+  plt.ylim([0,np.max(norm_by*scatteredData[:,1])])
 
   plt.ylabel("value (relative to best %e)"%veryBest)
 
