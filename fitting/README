@@ -95,4 +95,16 @@ For this version, stim_time and resting time are from stim_period.
 Specifically, for the first half of stim_period, the system undergoes stimulation (excluding the first initial state)
 whereas, for the next half of the period, the system undergoes resting state. 
 
-This can be further implemented 
+This can be further implemented
+
+
+Note on 06/20/2018
+P2X7 literature: Duan et al. 
+Turns out the cell type is not glial cell so it needs to be updated.
+There are three models based on the difference in p2x parameters
+1. microglia_full.ode : there is no lumped term and each inindividual p2x channel is fitted to the experimental data which is also soon to be updated with the ATP-evoked inward current via p2x7 activation in microglia 
+2. microglia_lumped_fittedp2x.ode: D1/D2 and Q1/Q2 are lumped in this model and the model parameters have been newly and individually fitted to the literature data as like the full model with slightly different parameters. 
+3. microglia_lumped.ode: D1/D2 and Q1/Q2 are lumped but it is more like fitted to Hide's data. For this reason, the ATP-evoked inward current via individual p2x channel has been igonored. 
+
+Do not assume that these three codes generate the same data for other reactions such as TNFa pp38 NFAT. Only P2X data are useful.
+
