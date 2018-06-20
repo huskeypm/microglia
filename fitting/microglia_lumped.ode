@@ -447,6 +447,8 @@ dCaBex_dt = dCaBex
 #Reverse = koffBex*CaBex
 
 expressions("Buffer_ER")
+#dCaS = KonCals*CaER*(BmCals/rV_ER - CaS) - KoffCals*CaS
+# PKH - if rV_ER is used here, this implies BmCals was a 'whole cell' rather than ER-compartment only measurement, thus the conc. needs to be rescaled
 dCaS = KonCals*CaER*(BmCals/rV_ER - CaS) - KoffCals*CaS
 dCaS_dt = dCaS
 
@@ -467,7 +469,8 @@ dNCX_dt = 0
 
 expressions("SERCA_ER")
 nVmaxSERCA = VmaxSERCA*SAserca
-rV_SERCA = 0.035/0.4        # Volume ratio of ER to Cytosol
+#rV_SERCA = 0.035/0.4        # Volume ratio of ER to Cytosol
+rV_SERCA = rV_ER             # Volume ratio of ER to cytosol
 QERCa = Q10ERCa**((T_SERCA-310)/10)
 top_SERCA = ((Cai/Kmf_SERCA)**H_SERCA) - ((CaER/Kmr_SERCA)**H_SERCA)
 bottom_SERCA = 1 + ((Cai/Kmf_SERCA)**H_SERCA) + ((CaER/Kmr_SERCA)**H_SERCA)
