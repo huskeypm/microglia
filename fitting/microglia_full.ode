@@ -38,17 +38,17 @@ parameters("MSMp2x4",
     )
 
 parameters("MSMp2x7",
-    k1_ptxs = ScalarParam(3.94e-5, unit="ms**-1"),
-    #k2_ptxs = ScalarParam(3.19852, unit="(M*ms)**-1"),
-    k3_ptxs = ScalarParam(4.95e-4, unit="ms**-1"),
-    #k4_ptxs = ScalarParam(1.155, unit="(M*ms)**-1"),
-    k5_ptxs = ScalarParam(5.7e-4, unit="ms**-1"),
-    #k6_ptxs = ScalarParam(9.6997e-2, unit="(M*ms)**-1"),
-    H5_ptxs = ScalarParam(2.94e-5, unit="ms**-1"),
-    H1_ptxs = ScalarParam(0.5e-5, unit="ms**-1"),
-    H2_ptxs = ScalarParam(1e-4, unit="ms**-1"),
+    k1_ptxs = ScalarParam(5.14e-5, unit="ms**-1"),
+    k2_ptxs = ScalarParam(2.887, unit="(M*ms)**-1"), #2.88712977498
+    k3_ptxs = ScalarParam(0.000646, unit="ms**-1"),
+    k4_ptxs = ScalarParam(1.176, unit="(M*ms)**-1"), #1.176
+    k5_ptxs = ScalarParam(0.000744, unit="ms**-1"),
+    k6_ptxs = ScalarParam(0.0813, unit="(M*ms)**-1"), #0.0813
+    H5_ptxs = ScalarParam(3.84e-5, unit="ms**-1"), # 3.84e-5
+    H1_ptxs = ScalarParam(0.44e-5, unit="ms**-1"),
+    H2_ptxs = ScalarParam(0.00023, unit="ms**-1"),
     H6_ptxs = ScalarParam(1e-4, unit="ms**-1"),
-    #H4_ptxs = ScalarParam(0, unit="ms**-1")
+    H7_ptxs = ScalarParam(0.156e-4, unit="ms**-1")
     )
 
 parameters("Ip2x4",
@@ -59,7 +59,7 @@ parameters("Ip2x4",
     )
 
 parameters("Ip2x7",
-    G12_ptxs = ScalarParam(2.15e-12, unit="C*(ms*V)**-1"),
+    G12_ptxs = ScalarParam(1.04812053845e-11, unit="C*(ms*V)**-1"),
     V_ptxs = ScalarParam(-0.023, unit="V"),  # 60 mV was used in MSM
     E12_ptxs = ScalarParam(0, unit="V"),
     CaA_ptxs = ScalarParam(0.1) # fraction of current contributed by Calcium transport
@@ -306,10 +306,10 @@ dN_ptxf_dt = H3_ptxf*D4_ptxf - H4_ptxf*N_ptxf
 
 expressions("MSMp2x7")
 
-k2_ptxs = Conditional(Ge(stim_amplitude,500),3.2,4)
-k4_ptxs = Conditional(Ge(stim_amplitude,500),1.155,2)
-k6_ptxs = Conditional(Ge(stim_amplitude,500),9.7e-2,0.01)
-H7_ptxs = Conditional(Ge(stim_amplitude,500),0.2e-4,1e-7) # control tail
+#k2_ptxs = Conditional(Ge(stim_amplitude,500),3.2,4)
+#k4_ptxs = Conditional(Ge(stim_amplitude,500),1.155,2)
+#k6_ptxs = Conditional(Ge(stim_amplitude,500),9.7e-2,0.01)
+#H7_ptxs = Conditional(Ge(stim_amplitude,500),0.2e-4,1e-7) # control tail
 
 dD1_ptxs_dt = k1_ptxs*D2_ptxs - (3*k2_ptxs*ATPptxs + H1_ptxs)*D1_ptxs #
 dD2_ptxs_dt = 3*k2_ptxs*ATPptxs*D1_ptxs + 2*k3_ptxs*D3_ptxs + H2_ptxs*C2_ptxs - (k1_ptxs + 2*k4_ptxs*ATPptxs + H7_ptxs)*D2_ptxs #
