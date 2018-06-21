@@ -187,7 +187,7 @@ parameters("TNFa",
     kgeneexpr_TNF = ScalarParam(277.78e-9, unit="ms**-1"),   # 1/3600            # [1/s]:
     ### Hill equation related constants for activation of DNA dynamics/TNFa release
     IC50pp38_TNF = ScalarParam(3.95, unit="molecule"),
-    IC50p2x7_TNF = ScalarParam(1.00, unit="molecule"),
+    IC50p2x7_TNF = ScalarParam(2.00e-12, unit="C*(ms*V)**-1"), # same scale as G12_ptxs
     npp38_TNF = ScalarParam(5.5),
     ### Exocytosis related ##########
     kmaxexo_TNF = ScalarParam(1e-7, unit="(uM*ms)**-1"), # 5/1800        # [1/(M-s)]: R max of exocytosis of TNFa 150 15 15 10 1
@@ -506,7 +506,7 @@ RdegTNF_TNF = kdegTNF_TNF*TNFa
 RdegRNA_TNF = kdegRNA_TNF*mRNA_TNF*(1/(1+(pp38/IC50pp38_TNF)**npp38_TNF))
 
 Rgeneexp_TNF = kgeneexpf_TNF*DNA_TNF*TNFa - kgeneexpr_TNF*DNATNF # DNATNF is the complex of DNA and TNF
-Rexo_TNF = (1/(1+(IC50p2x7_TNF/Q12_ptxs)*(kmaxexo_TNF/(1+(IC50Caleak_TNF/Cai)**nCaleak_TNF))*TNFa 
+Rexo_TNF = (1/(1+(IC50p2x7_TNF/G12_ptxs)*(kmaxexo_TNF/(1+(IC50Caleak_TNF/Cai)**nCaleak_TNF))*TNFa 
 
 dDNA_TNF_dt = -Rgeneexp_TNF
 dmRNA_TNF_dt = Rtranscript_TNF - RdegRNA_TNF 
