@@ -234,7 +234,8 @@ def fittingAlgorithm(
   jobDuration = 2000, # job run time, [ms]
   outputList = None,
   truthValues = None,
-  sigmaScaleRate = 1., # rate at which sigma is reduced by iteration
+  sigmaScaleRate = 1., # rate at which sigma is reduced by iteration (larger values, faster decay) 
+  maxRejectionsAllowed=3,  # number of rejected steps in a row before exiting alg. 
   numIters = 10):
 
   trialParamVarDict = copy.copy( variedParamDict ) 
@@ -245,7 +246,8 @@ def fittingAlgorithm(
   flag = True
   randomDrawAllIters = []
   bestDrawAllIters = []
-  while iters < numIters:  
+  rejection = 0
+  while iters < numIters and rejection<maxRejectionsAllowed:  
 
       ## Create 'master' varDict list
       iters += 1
@@ -279,13 +281,13 @@ def fittingAlgorithm(
       jobList = []
       ctr=0
       ## randomly distribute n numbers[scales] into m bins
+      print "Should probably rescale sigma by the tolerated error vs current error"
       for parameter,values in parmDict.iteritems():
 
           ## generate random pertubrations
           # draw from normal distribution
           mu,sigma = values
           #print "sigma: ", sigma
-          print "Should probably rescale sigma by the tolerated error vs current error"
           #rescaledSigma = sigma/(sigmaScaleRate * iters)
           rescaledSigma = sigma*np.exp(-sigmaScaleRate * (iters-1))
           #print "rescaledSigma: ", rescaledSigma, " rate ", sigmaScaleRate
@@ -355,6 +357,7 @@ def fittingAlgorithm(
 
       jobFitnesses = np.ones( len(myDataFrame.index) )*-1
       jobNums      = np.ones( len(myDataFrame.index),dtype=int )*-1
+      previousFitness = 1e9
       for i in range(len(myDataFrame.index)):
           #jobOutputs_copy = jobOutputs.copy()
           #slicedJobOutputs = jobOutputs_copy[slicer[]]
@@ -377,6 +380,8 @@ def fittingAlgorithm(
 
               # sum over squares
               error = np.sum((result - obj.truthValue) ** 2)
+              normFactor = np.sum(obj.truthValue ** 2)
+              normError = np.sqrt(error/normFactor) 
               print "result: ", result, "truthValue: ", obj.truthValue
               #allErrors[iters-1].append(error)
 
@@ -385,7 +390,7 @@ def fittingAlgorithm(
                   #errorsGood_array[iters-1].append(True)
               #else:
                   #errorsGood_array[iters-1].append(False)
-              fitness += error
+              fitness += normError
 
           # compute sqrt
           jobFitnesses[i] =  np.sqrt(fitness)
@@ -414,14 +419,18 @@ def fittingAlgorithm(
       #print "bestJob: ", bestJob
 
       if iters == 1:
-	previousDraw = currentFitness
-        print "previousDraw: ", previousDraw
+	previousFitness = currentFitness
+        print "previousFitness: ", previousFitness
 
-      if currentFitness <= previousDraw:
+      print "CurrentFitness/Previous", currentFitness,previousFitness
+      if currentFitness <= previousFitness:
 
       	# get its input params/values
       	bestVarDict = bestJob[ 'varDict' ]
       	print "bestVarDict: " , bestVarDict
+        print "currentFitness", currentFitness
+	previousFitness = currentFitness
+        rejection = 0
 
       	#variedParamVal = bestVarDict[ myVariedParamKey ]
         #bestDrawAllIters.append(variedParamVal)
@@ -435,6 +444,9 @@ def fittingAlgorithm(
 
       else:
 	print "Old draw is better starting point, not overwriting starting point"
+        rejection+=1
+        print "Rejected %d in a row (of %d) "%(rejection,maxRejectionsAllowed) 
+        
       #print allErrors
 
       #if errorsGood_array[iters-1].count(False) == 0:
@@ -444,7 +456,6 @@ def fittingAlgorithm(
           #print "Error is not good, need to run another iteration."
 
       #iters += 1
-
       bestDrawAllIters.append(bestVarDict)       
 
       print "iter", iters, " out of", numIters
@@ -464,7 +475,7 @@ def fittingAlgorithm(
   #myDataFrame = PandaData(jobOutputs,csvFile="example.csv")
 
   #return myDataFrame
-  return randomDrawAllIters, bestDrawAllIters
+  return randomDrawAllIters, bestDrawAllIters,previousFitness
 
 def test1():
   # get stuff for p2x7 valid
@@ -628,7 +639,7 @@ def trial(
 
 
   ## do fitting and get back debugging details
-  allDraws,bestDraws = fittingAlgorithm(
+  allDraws,bestDraws,fitness = fittingAlgorithm(
     odeModel,keys, variedParamDict=variedParamDict,fixedParamDict=fixedParamDict,
       numCores=numCores, numRandomDraws=numRandomDraws, jobDuration=jobDuration, outputList=outputList,numIters=numIters, sigmaScaleRate=sigmaScaleRate)
   bestFitDict =  bestDraws[-1]
@@ -648,7 +659,8 @@ def trial(
     'outputList': outputList,
     'allDraws': allDraws,
     'bestDraws': bestDraws,
-    'bestFitDict': bestFitDict   
+    'bestFitDict': bestFitDict,  
+    'bestFitness': fitness
   }
 
   ## do a demorun with single worker to demonstrate new fit
