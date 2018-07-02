@@ -40,14 +40,14 @@ parameters("MSMp2x4",
 parameters("MSMp2x7",
     k1_ptxs = ScalarParam(3.94e-5, unit="ms**-1"),
 #    k2_ptxs = ScalarParam(3.19852, unit="(M*ms)**-1"),
-    k3_ptxs = ScalarParam(4.95e-4, unit="ms**-1"),
+#    k3_ptxs = ScalarParam(4.95e-4, unit="ms**-1"),
 #    k4_ptxs = ScalarParam(1.155, unit="(M*ms)**-1"),
     k5_ptxs = ScalarParam(5.7e-4, unit="ms**-1"),
 #    k6_ptxs = ScalarParam(9.6997e-2, unit="(M*ms)**-1"),
     H5_ptxs = ScalarParam(2.94e-5, unit="ms**-1"),
     H1_ptxs = ScalarParam(0.5e-5, unit="ms**-1"),
     H2_ptxs = ScalarParam(1e-4, unit="ms**-1"),
-    H6_ptxs = ScalarParam(1e-4, unit="ms**-1"),
+    H6_ptxs = ScalarParam(1e-5, unit="ms**-1"),
 #    H7_ptxs = ScalarParam(0, unit="ms**-1")
     )
 
@@ -144,7 +144,7 @@ parameters("SERCA_ER",
     )
 
 parameters("p-p38",
-    kb_pp38 = ScalarParam(0.18518519e-5, unit="ms**-1"),
+    kb_pp38 = ScalarParam(0.18518519e-6, unit="ms**-1"),
     kf_pp38 = ScalarParam(9.614456e-8, unit="ms**-1"),
     kdcapp38 = ScalarParam(0.08166, unit="uM"),
     ncapp38 = ScalarParam(5.5),
@@ -153,12 +153,12 @@ parameters("p-p38",
     )
 
 parameters("NFAT",
-    kf1_NFAT = ScalarParam(8.0e-7, unit="(nM*ms)**-1"),    # [1/(nMs)]  7.69e-6 5.2e-10
-    kr1_NFAT = ScalarParam(1.93e-3, unit="ms**-1"),   # [1/s] 1.93e-2
-    kf2_NFAT = ScalarParam(1.44e-3, unit="ms**-1"),   # [1/s] 1.44e-3
-    kf3_NFAT = ScalarParam(3.62e-3, unit="ms**-1"),   # [1/s] 3.62e-4
+    kf1_NFAT = ScalarParam(4.5e-9, unit="(nM*ms)**-1"),    # [1/(nMs)]  7.69e-6 5.2e-10
+    kr1_NFAT = ScalarParam(1.93e-7, unit="ms**-1"),   # [1/s] 1.93e-2
+    kf2_NFAT = ScalarParam(1.44e-5, unit="ms**-1"),   # [1/s] 1.44e-3
+    kf3_NFAT = ScalarParam(3.62e-6, unit="ms**-1"),   # [1/s] 3.62e-4
     kr3_NFAT = ScalarParam(8.71e-7, unit="(nM*ms)**-1"),   # [1/(nMs)] 4.71e-3
-    kf4_NFAT = ScalarParam(4.45e-3, unit="ms**-1"),   # [1/s] 4.45e-4
+    kf4_NFAT = ScalarParam(4.45e-7, unit="ms**-1"),   # [1/s] 4.45e-4
     KmN_NFAT = ScalarParam(535, unit="nM"),        # [nM]
     n_NFAT = ScalarParam(2.92),
     Ccn_NFAT = ScalarParam(1),          # Volume ratio of Cytosol to Nucleus
@@ -186,8 +186,9 @@ parameters("TNFa",
     kgeneexpf_TNF = ScalarParam(111.11e-9, unit="(molecule*ms)**-1"),   # 1/(3600*2.5)      # [1/(molecule-s)]: Gene expression
     kgeneexpr_TNF = ScalarParam(277.78e-9, unit="ms**-1"),   # 1/3600            # [1/s]:
     ### Hill equation related constants for activation of DNA dynamics/TNFa release
-    IC50pp38_TNF = ScalarParam(3.95, unit="molecule"),
+    IC50pp38_TNF = ScalarParam(20, unit="molecule"),
     IC50p2x7_TNF = ScalarParam(2.00e-12, unit="C*(ms*V)**-1"), # same scale as G12_ptxs
+    SAp7tnf = ScalarParam(1),
     npp38_TNF = ScalarParam(5.5),
     ### Exocytosis related ##########
     kmaxexo_TNF = ScalarParam(1e-7, unit="(uM*ms)**-1"), # 5/1800        # [1/(M-s)]: R max of exocytosis of TNFa 150 15 15 10 1
@@ -236,7 +237,7 @@ states("Ca_cyto",
     )
 
 states("Buffer_cyto",
-    CaF = ScalarParam(8.66, unit="uM"),         # M
+    CaF = ScalarParam(8.66, unit="uM"),         # M Ca-Fura2
     Ca2_CaM = ScalarParam(0.0179, unit="uM"),                   # M
     Ca4_CaM = ScalarParam(0.00118, unit="uM"),                   # M
     Ca4_CN = ScalarParam(0.0226, unit="uM"),                    # M
@@ -276,8 +277,8 @@ states("TNFa",
     DNA_TNF = ScalarParam(50, unit="molecule"),                  # molecule
     DNATNF = ScalarParam(0, unit="molecule"),                    # molecule
     mRNA_TNF = ScalarParam(0, unit="molecule"),                  # molecule
-    TNFa = ScalarParam(0, unit="molecule")                    # molecule
-    # TNFa_release = ScalarParam(0, unit="molecule")               # molecule
+    TNFa = ScalarParam(0, unit="molecule"),                    # molecule
+    TNFa_release = ScalarParam(0, unit="molecule")               # molecule
     )
 
 states("Leakage",
@@ -356,10 +357,11 @@ dQ2_ptxf_dt = 0
 
 expressions("MSMp2x7")
 
-k2_ptxs = Conditional(Ge(stim_amplitude,500),3.2,3.2)
-k4_ptxs = Conditional(Ge(stim_amplitude,500),1.155,8)
-k6_ptxs = Conditional(Ge(stim_amplitude,500),9.7e-2,0.1)
-H7_ptxs = Conditional(Ge(stim_amplitude,500),5.2e-6,5e-7) # control tail
+k2_ptxs = Conditional(Ge(stim_amplitude,500),0.1,1)
+k3_ptxs = Conditional(Ge(stim_amplitude,500),4.95e-4,3e-4)
+k4_ptxs = Conditional(Ge(stim_amplitude,500),0.45,4)
+k6_ptxs = Conditional(Ge(stim_amplitude,500),5.0e-2,0.2)
+H7_ptxs = Conditional(Ge(stim_amplitude,500),1.2e-5,5e-7) # control tail
 
 l01 = 2*k4_ptxs*ATPptxs
 l10 = 2*k3_ptxs
@@ -506,7 +508,7 @@ RdegTNF_TNF = kdegTNF_TNF*TNFa
 RdegRNA_TNF = kdegRNA_TNF*mRNA_TNF*(1/(1+(pp38/IC50pp38_TNF)**npp38_TNF))
 
 Rgeneexp_TNF = kgeneexpf_TNF*DNA_TNF*TNFa - kgeneexpr_TNF*DNATNF # DNATNF is the complex of DNA and TNF
-Rexo_TNF = (1/(1+(IC50p2x7_TNF/G12_ptxs)*(kmaxexo_TNF/(1+(IC50Caleak_TNF/Cai)**nCaleak_TNF))*TNFa 
+Rexo_TNF = (1/(1+(IC50p2x7_TNF/(G12_ptxs*SAp7tnf))))*(kmaxexo_TNF/(1+(IC50Caleak_TNF/Cai)**nCaleak_TNF))*TNFa 
 
 dDNA_TNF_dt = -Rgeneexp_TNF
 dmRNA_TNF_dt = Rtranscript_TNF - RdegRNA_TNF 
