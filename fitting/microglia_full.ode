@@ -321,7 +321,7 @@ dQ1_ptxs_dt = 2*k4_ptxs*ATPptxs*C2_ptxs + 3*k5_ptxs*Q2_ptxs - (2*k3_ptxs + k6_pt
 dQ2_ptxs_dt = k6_ptxs*ATPptxs*Q1_ptxs - (3*k5_ptxs + H6_ptxs)*Q2_ptxs #
 
 expressions("Ip2x4")
-I_ptxf = ((G12_ptxf*(Q1_ptxf + Q2_ptxf)*(V_ptxf - E12_ptxf))*10**6)
+I_ptxf = ((G12_ptxf*(Q1_ptxf + Q2_ptxf)*(V_ptxf - E12_ptxf))*10**6)*30
 I_f = ((G12_ptxf*(Q1_ptxf + Q2_ptxf)*(-0.06 - E12_ptxf))*10**6)
 
 expressions("Ip2x7")

@@ -4,6 +4,10 @@
 # Path of directories used in this script is customized for the author.
 ## Make sure the path of analyzeGotran pacakge and the pickle files generated as the outcome of gotran calculation
 
+### WARNING ####
+## DIRECTORY PATH MUST BE ADJUSTED ##
+
+
 # routlines for analyzing odes
 import sys
 import pickle as pk
