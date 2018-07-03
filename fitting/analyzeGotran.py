@@ -125,7 +125,7 @@ def ProcessDataArray(dataSub,mode,timeRange=[0,1e3],
       #caiSub = valueTimeSeries[waveMax:]
       if 1: # key=="Cai": # for debug
         tag = 12
-        np.savetxt("test%d"%tag,np.array([timeSeries,valueTimeSeries]).transpose())
+        #np.savetxt("test%d"%tag,np.array([timeSeries,valueTimeSeries]).transpose())
       #print "dataSub.valsIdx: ", dataSub.valsIdx 
       if mode == "max":
           result = np.max(valueTimeSeries)
@@ -140,6 +140,17 @@ def ProcessDataArray(dataSub,mode,timeRange=[0,1e3],
           #print "pts", timeSeries, valueTimeSeries
           result = np.interp(timeInterpolations,timeSeries,valueTimeSeries)
           #print "interp", result     
+      elif mode == "dydt":
+          deltaT = timeSeries[-1] - timeSeries[0]  # assuming you'll only simulate over the interval you're recording slope
+          deltaY = valueTimeSeries[-1] - valueTimeSeries[0]
+          result = deltaY/deltaT
+      elif mode == "tnorm_dydt": # similar to dydt, except that the values are normalized to 0..1
+          deltaT = timeSeries[-1] - timeSeries[0]  # assuming you'll only simulate over the interval you're recording slope
+          normed = valueTimeSeries - valueTimeSeries[0]
+          normed = normed/valueTimeSeries[-1] 
+          deltaY = normed[-1] - normed[0]
+          print deltaT,deltaY, normed[-1] 
+          result = deltaY/deltaT
       elif mode == "ptxsth":
           raise RuntimeError("KILLED IN FAVOR OF normedval_vs_time") 
           modeldata = [timeSeries, valueTimeSeries]
