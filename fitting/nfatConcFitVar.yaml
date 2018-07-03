@@ -1,0 +1,4 @@
+# yaml file that contains specific variables (fixed) needed for fitting the P2X4 currents
+# my reader assumes all entries are floats (since yaml doesnt know 1e3)
+stim_amplitude: 1000.
+pulse_switch: 0        
