@@ -7,8 +7,6 @@ import math
 import cPickle as pickle
 import matplotlib.pylab as plt
 import numpy as np
-#import analyzeODE as ao 
-#import downSamplePickles as dsp
 import json
 
 class empty:pass
@@ -17,6 +15,35 @@ ms_to_s = 1e-3
 
 
 import re
+
+### 
+### I/O 
+###
+def makePackage(p,p_idx,s,s_idx,j,j_idx,t):
+
+  return {'p':p,'s':s,'t':t,'j':np.asarray(j),\
+           'p_idx':p_idx,'s_idx':s_idx,'j_idx':j_idx}
+
+def writePickle(name,p,p_idx,s,s_idx,j,j_idx,t):
+  # store to pickle
+  # using 'asarray' since my 'j' was getting stored as its transpose 
+  #data1 = {'p':p,'s':s,'t':t,'j':np.asarray(j),\
+  #         'p_idx':p_idx,'s_idx':s_idx,'j_idx':j_idx}
+
+  data1 = makePackage(p,p_idx,s,s_idx,j,j_idx,t)
+
+  #print "j again: ", len(j) 
+  #print "j_idx: ",np.shape(j_idx)
+  print "name: ", name
+  #if ".pkl" not in name[-4:]: 
+  if ".pkl" not in name and ".pickle" not in name:
+    name += ".pkl"
+  output = open(name, 'wb')
+  pickle.dump(data1, output)
+  output.close()
+  print "SUCCESS! Wrote output to", name
+
+
 def readPickle(name = "PCa0.75kss0.25.pkl",verbose=True,readSubset=None,readConcat=False):          
 
   if readConcat:
