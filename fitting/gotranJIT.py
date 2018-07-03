@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 from __future__ import division
-__author__ = "Johan Hake (hake.dev@gmail.com)"
+__author__ = "Johan Hake (hake.dev@gmail.com)/pkh"
 __date__ = "2013-03-13 -- 2014-06-12"
 __copyright__ = "Copyright (C) 2013 " + __author__
 __license__  = "GNU LGPL Version 3.0 or later"
@@ -24,7 +24,7 @@ from gotran.common import error, warning
 
 from modelparameters.parameterdict import *
 
-def main(filename, params):
+def main(filename, params,tsteps=None):
 
     # Copy of default parameters
     generation = parameters.generation.copy()
@@ -149,7 +149,10 @@ def main(filename, params):
         else:
             warning(result.message)
 
-    tsteps = np.linspace(t0, t1, t1/dt+1)
+    # use uniform steps 
+    if type( tsteps ) is not np.ndarray:
+      tsteps = np.linspace(t0, t1, t1/dt+1)
+    #print np.shape(tsteps)
 
     # What solver should we use
     if params.solver == "scipy":
@@ -159,7 +162,6 @@ def main(filename, params):
             error("Problem importing scipy.integrate.odeint. {}".format(e))
         # OLD 
         #results = odeint(rhs, y0, tsteps, Dfun=jac, args=(model_params,))
-        mxstep = 1000
         mxstep = 2000 
         results = odeint(rhs, y0, tsteps, Dfun=jac, args=(model_params,),mxstep=mxstep) #,hmax=.03,rtol=1e-12, atol=1e-12)
 

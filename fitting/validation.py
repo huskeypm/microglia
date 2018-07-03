@@ -137,6 +137,63 @@ def multiVarTest(iters=10,numRandomDraws=24):
   previousFitness = 0.161 + 0.01
   assert(results['bestFitness'] < previousFitness), "SOmethign changed" 
 
+# tests that non-uniform time steps give correct answers
+import runModel as rs
+def nonunifTime():
+  ## Full 
+  odeName="microgliav55.ode"
+  yamlVarFile="nfatFitVar.yaml"
+  dt=0.1
+  dtn = 20e3  # job duration 
+  fixedParamDict = aG.YamlToParamDict(yamlVarFile)
+  
+  outName = "full"
+  returnDict = dict() # return results vector
+  if 1: 
+    rs.runParamsFast(odeName=odeName,
+                       name=outName,
+                       varDict = fixedParamDict,
+                       dt=0.1,dtn=dtn,
+                       generateJacobian=True,
+                       returnDict=returnDict)
+    data = aG.readPickle(outName+".pkl")
+  
+  ## non-unif
+  tsteps = rs.TimeSteps(dtFine=dt,dtnFine=3e3,dtCoarse=1.0e3,dtnCoarse=dtn)
+  outName = "nonunif"
+  returnDictNU = dict() # return results vector
+  rs.runParamsFast(odeName=odeName,
+                       name=outName,
+                       varDict = fixedParamDict,
+                       tsteps = tsteps,
+                       generateJacobian = True,
+                       returnDict=returnDictNU)
+  dataNU = aG.readPickle(outName+".pkl")
+  
+  ## Compare 
+  stateLabel = "I_ptxf"
+  
+  subDataFull = aG.GetData(data,stateLabel)
+  plt.figure()
+  plt.plot(subDataFull.t,subDataFull.valsIdx, label="full, %d points"%np.shape(subDataFull.t)[0])
+  #print 
+  
+  subData = aG.GetData(dataNU,stateLabel)
+  valsFull = np.interp(subData.t,subDataFull.t,subDataFull.valsIdx)
+  err = np.linalg.norm(subData.valsIdx - valsFull)
+
+  plt.plot(subData.t,subData.valsIdx,'k.', label="nonunif, %d points\nerr=%e"%(np.shape(subData.t)[0],err))
+  plt.legend(loc=0)
+  plt.gcf().savefig("comp.png") 
+  
+  assert(err < 1e-10), "Non uniform time step broke!"
+
+
+
+def test():
+  nonunifTime()
+
+
 
 #!/usr/bin/env python
 import sys
@@ -154,6 +211,7 @@ def validate():
   # Run tests
   singleVarTest()
   multiVarTest()
+  nonunifTime()
 
 
 #
@@ -199,6 +257,9 @@ if __name__ == "__main__":
       quit()
     if(arg=="-multi"):
       multiVarTest(iters=30,numRandomDraws=64)
+      quit()
+    if(arg=="-test"):   
+      test()
       quit()
   
 
