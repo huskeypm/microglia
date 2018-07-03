@@ -7,7 +7,8 @@ import sys
 #
 ##################################
 
-import analyzeODE as ao
+#import analyzeODE as ao
+import analyzeGotran as anG
 
 #
 # ROUTINE  
@@ -15,7 +16,7 @@ import analyzeODE as ao
 
 # rate - downsample rate
 def downsample(fileName, fileOutName=None,rate=10): 
-  dataFull = ao.readPickle(fileName)
+  dataFull = anG.readPickle(fileName)
    
   p = dataFull['p']
   p_idx = dataFull['p_idx']
@@ -31,7 +32,7 @@ def downsample(fileName, fileOutName=None,rate=10):
     redFileName = fileName.replace(".pickle","_red.pickle")
   else: 
     redFileName = fileOutName 
-  ao.writePickle(redFileName,p,p_idx,sDs,s_idx,jDs,j_idx,tDs)
+  anG.writePickle(redFileName,p,p_idx,sDs,s_idx,jDs,j_idx,tDs)
 
 import numpy as np 
 def downsampleData(s,j,t,rate):

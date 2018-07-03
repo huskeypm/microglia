@@ -1,5 +1,5 @@
 import numpy as np 
-import analyzeODE as ao
+#import analyzeODE as ao
 # Grabs stuff from previous run 
 #prevOut = "run_G_CaBk1.00_G_NaBk1.00_stim2000_1.pickle"
 #prevNum=1 # could probably grab this from pickleName
@@ -189,7 +189,7 @@ def ConcatenateTrajs(pickleNames,writeCat=False,downsampleRate=1):
   if writeCat:
     pickleCatName = re.sub(r'_\d+.pickle', '_cat.pickle', pickleNames[0])
     print pickleNames[0],pickleCatName 
-    ao.writePickle(pickleCatName,
+    anG.writePickle(pickleCatName,
                    data['p'],
                    data['p_idx'],
                    data['s'],

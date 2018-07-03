@@ -14,6 +14,7 @@ import matplotlib.pylab as plt
 #import fitter
 import daisychain as dc
 import analyzeGotran as aG
+import analyzeGotran as anG
 ms_to_s = 1e-3
 
 
@@ -682,7 +683,7 @@ def Demo(odeModel, jobDuration,fixedParamDict,results):
   obj= outputList[key]
   testStateName = obj.name
   data = workerResults.outputResults
-  dataSub = ao.GetData(data,testStateName)
+  dataSub = anG.GetData(data,testStateName)
 
   plt.figure()
   ts = dataSub.t

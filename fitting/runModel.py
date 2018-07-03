@@ -8,8 +8,9 @@ import numpy as np
 import runner 
 import downSamplePickles
 runner.init()
-idxNCX = runner.model.monitor_indices("i_NaCa")
-import analyzeODE as ao
+#idxNCX = runner.model.monitor_indices("i_NaCa")
+#import analyzeODE as ao
+import analyzeGotran as anG
 import gotranJIT
 
 class empty:
@@ -617,7 +618,7 @@ def runParamsFast(odeName = "shannon_2004.ode",name="out", # if None, returns wi
   #print "ji", len(j_idx)   
   
   if name==None:
-    returnDict['data'] = ao.makePackage(p,p_idx,s,s_idx,j,j_idx,t)
+    returnDict['data'] = anG.makePackage(p,p_idx,s,s_idx,j,j_idx,t)
     return 
 
   if downsampleRate >1:     
@@ -625,10 +626,10 @@ def runParamsFast(odeName = "shannon_2004.ode",name="out", # if None, returns wi
       print "jds", np.shape(jDs)
       print "name ", name 
       red = name 
-      ao.writePickle(red,p,p_idx,sDs,s_idx,jDs,j_idx,tDs)
+      anG.writePickle(red,p,p_idx,sDs,s_idx,jDs,j_idx,tDs)
   else:
-      ao.writePickle(name,p,p_idx,s,s_idx,j,j_idx,t)
-      returnDict['data'] = ao.makePackage(p,p_idx,s,s_idx,j,j_idx,t)
+      anG.writePickle(name,p,p_idx,s,s_idx,j,j_idx,t)
+      returnDict['data'] = anG.makePackage(p,p_idx,s,s_idx,j,j_idx,t)
 
 #!/usr/bin/env python
 import sys
