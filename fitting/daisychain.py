@@ -34,7 +34,7 @@ def InitializeNextInSequence(prevOut,prevNum,downsampleRate):
   return nextOut,nextNum,stateDict,paramDict   
 #s_idx
 
-import runShannonTest as rs
+import runModel as rs
 def daisychain(\
     odeName = "shannon_2004.ode",
     dt=0.1,

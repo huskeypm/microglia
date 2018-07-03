@@ -4,12 +4,12 @@ import sys
 import multiprocessing
 import random
 from os import getpid
-import runShannonTest as rs
+import runModel as rs
 import numpy as np
-import analyzeODE as ao
+#import analyzeODE as ao
 import copy
 import pandas as pd
-import taufitting as tf
+#import taufitting as tf
 import matplotlib.pylab as plt
 #import fitter
 import daisychain as dc
@@ -92,7 +92,7 @@ def workerParams(
                      varDict = varDict,
                      dt=0.1,
                      dtn=dtn,
-                     stim_period=240.0,
+                     #stim_period=240.0, s.b. overwritten by varDict 
                      returnDict=returnDict)
 
     #print "after runParamsFast"

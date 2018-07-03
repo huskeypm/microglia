@@ -1,5 +1,5 @@
 """
-For performing parameter sweeps and running shannon model with dictionaries of parameter values 
+For performing parameter sweeps and running model with dictionaries of parameter values 
 """
 
 # Revisions 
