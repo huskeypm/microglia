@@ -144,7 +144,10 @@ def nonunifTime():
   odeName="microgliav55.ode"
   yamlVarFile="nfatFitVar.yaml"
   dt=0.1
+  #dtn =900e3  # job duration 
   dtn = 20e3  # job duration 
+  stateLabel = "NFATNn"
+  #stateLabel = "I_ptxf"
   fixedParamDict = aG.YamlToParamDict(yamlVarFile)
   
   outName = "full"
@@ -171,7 +174,6 @@ def nonunifTime():
   dataNU = aG.readPickle(outName+".pkl")
   
   ## Compare 
-  stateLabel = "I_ptxf"
   
   subDataFull = aG.GetData(data,stateLabel)
   plt.figure()
@@ -184,6 +186,8 @@ def nonunifTime():
 
   plt.plot(subData.t,subData.valsIdx,'k.', label="nonunif, %d points\nerr=%e"%(np.shape(subData.t)[0],err))
   plt.legend(loc=0)
+  plt.title(stateLabel)
+  plt.xlabel("time [s]") 
   plt.gcf().savefig("comp.png") 
   
   assert(err < 1e-10), "Non uniform time step broke!"

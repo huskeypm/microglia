@@ -100,7 +100,7 @@ def runParamsFast(odeName = "shannon_2004.ode",
     params.tstop = dtn
     params.dt = dt
   else:
-    print "Using user-provided time-steps"
+    print "Using user-provided time-steps:", np.shape(tsteps) 
 
   if generateJacobian:
     print "Computing jacobian to save memory"
@@ -143,18 +143,19 @@ def runParamsFast(odeName = "shannon_2004.ode",
   #print "s_for_real", s
   #print "ji", len(j_idx)   
   
+  #print "time", np.min(t), np.max(t)
   if name==None:
-    returnDict['data'] = anG.makePackage(p,p_idx,s,s_idx,j,j_idx,t)
+    returnDict['data'] = anG.makePackage(p,p_idx,s,s_idx,j,j_idx,t,tsteps)
     return 
 
   if downsampleRate >1:     
       sDs,jDs,tDs = downSamplePickles.downsampleData(s,j,t,downsampleRate)
-      print "jds", np.shape(jDs)
-      print "name ", name 
+#      print "jds", np.shape(jDs)
+#     print "name ", name 
       red = name 
       anG.writePickle(red,p,p_idx,sDs,s_idx,jDs,j_idx,tDs)
   else:
-      anG.writePickle(name,p,p_idx,s,s_idx,j,j_idx,t)
+      anG.writePickle(name,p,p_idx,s,s_idx,j,j_idx,t,tsteps)
       returnDict['data'] = anG.makePackage(p,p_idx,s,s_idx,j,j_idx,t)
 
 #!/usr/bin/env python
@@ -258,6 +259,7 @@ if __name__ == "__main__":
               odeName = odeName,
               name=name,dtn=deltaT,dt=dt, stim_period = stim, downsampleRate = downsampleRate)
     else:
+      raise RuntimeError("antiquated") 
       runParams(runner=runner,varDict=varDict,\
               name=name,deltaT=deltaT,dt=dt, stim_period = stim, downsampleRate = downsampleRate)
   

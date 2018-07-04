@@ -19,18 +19,20 @@ import re
 ### 
 ### I/O 
 ###
-def makePackage(p,p_idx,s,s_idx,j,j_idx,t):
+def makePackage(p,p_idx,s,s_idx,j,j_idx,t,tsteps=None):
 
   return {'p':p,'s':s,'t':t,'j':np.asarray(j),\
-           'p_idx':p_idx,'s_idx':s_idx,'j_idx':j_idx}
+           'p_idx':p_idx,'s_idx':s_idx,'j_idx':j_idx,
+          'tsteps':tsteps # Flag that user-provided steps were in use
+         }
 
-def writePickle(name,p,p_idx,s,s_idx,j,j_idx,t):
+def writePickle(name,p,p_idx,s,s_idx,j,j_idx,t,tsteps=None):
   # store to pickle
   # using 'asarray' since my 'j' was getting stored as its transpose 
   #data1 = {'p':p,'s':s,'t':t,'j':np.asarray(j),\
   #         'p_idx':p_idx,'s_idx':s_idx,'j_idx':j_idx}
 
-  data1 = makePackage(p,p_idx,s,s_idx,j,j_idx,t)
+  data1 = makePackage(p,p_idx,s,s_idx,j,j_idx,t,tsteps=tsteps) 
 
   #print "j again: ", len(j) 
   #print "j_idx: ",np.shape(j_idx)
@@ -94,7 +96,12 @@ def LoadPickles(caseDict,noOverwrite=False,
 def GetData(data,idxName):
     #print "getting data" 
     datac = empty()
-    datac.t = data['t'] * ms_to_s   # can't guarantee units are in [ms]
+    if data.has_key('tsteps') is False  or data['tsteps'] is None: # if not false, user manually supplied time steps  
+      datac.t = data['t'] * ms_to_s   # can't guarantee units are in [ms]
+    else: # leave time as is, since rescale is meaningless
+      datac.t = data['t']  
+    #nprint data['tsteps'],"SDF"
+    #nprint np.max(datac.t) 
     #datac.s = data['s'] / mM_to_uM  # ??? not all states are in uM....
     datac.s_idx = data['s_idx']
     #datac.j = data['j']
@@ -130,14 +137,46 @@ def YamlToParamDict(yamlVarFile):
       #print key, type(varDict[key]), varDict[key]
   return fixedParamDict
 
+### computes average slope of the line
+def dydt(timeSeries,valueTimeSeries,mode="dydt"): 
+  # norm
+  normed = valueTimeSeries - valueTimeSeries[0]
+  normed = normed/np.max(normed)
+  #print mode 
+
+  # option 
+  if mode == "dydt": 
+    deltaT = timeSeries[-1] - timeSeries[0]  # assuming you'll only simulate over the interval you're recording slope
+    deltaY = valueTimeSeries[-1] - valueTimeSeries[0]
+    result = deltaY/deltaT
+  elif mode == "tnorm_dydt":  
+    deltaT = timeSeries[-1] - timeSeries[0]  # assuming you'll only simulate over the interval you're recording slope
+    deltaY = normed[-1] - normed[0]
+    result = deltaY/deltaT
+    #print np.min(valueTimeSeries), np.max(valueTimeSeries), valueTimeSeries[-1]
+  elif mode == "tnorm_maxdydt": 
+    dt = timeSeries[1:]-timeSeries[:-1]
+    dy = normed[1:]-normed[:-1]
+    result = np.max(dy/dt) 
+  else:
+    raise RuntimeError("%s not understood"%mode) 
+      
+          
+  return result 
+
 
 ### taken from fitter.py/analyzeODE.py, used to process data made to put into panda format at the end.
 # Most of the original implementation has been scrapped
-def ProcessDataArray(dataSub,mode,timeRange=[0,1e3],
+def ProcessDataArray(
+      dataSub,
+      mode,
+      timeRange=[0,1e3],
       timeInterpolations=None,   # if ndarray, will interpolate the values of valueTimeSeries at the provided times
       key=None):
 
-      # PRINT NO, NEED TO PASS IN TIME TOO 
+      
+      # Time is listed in seconds [s] EXCEPT if user provided steps (tsteps) were used. 
+      # in this case, the t's are in the same units as tsteps 
       timeSeries = dataSub.t
       idxMin = (np.abs(timeSeries-timeRange[0])).argmin()  # looks for entry closest to timeRange[i]
       idxMax = (np.abs(timeSeries-timeRange[1])).argmin()
@@ -167,17 +206,14 @@ def ProcessDataArray(dataSub,mode,timeRange=[0,1e3],
           #print "pts", timeSeries, valueTimeSeries
           result = np.interp(timeInterpolations,timeSeries,valueTimeSeries)
           #print "interp", result     
-      elif mode == "dydt":
-          deltaT = timeSeries[-1] - timeSeries[0]  # assuming you'll only simulate over the interval you're recording slope
-          deltaY = valueTimeSeries[-1] - valueTimeSeries[0]
-          result = deltaY/deltaT
-      elif mode == "tnorm_dydt": # similar to dydt, except that the values are normalized to 0..1
-          deltaT = timeSeries[-1] - timeSeries[0]  # assuming you'll only simulate over the interval you're recording slope
-          normed = valueTimeSeries - valueTimeSeries[0]
-          normed = normed/valueTimeSeries[-1] 
-          deltaY = normed[-1] - normed[0]
-          print deltaT,deltaY, normed[-1] 
-          result = deltaY/deltaT
+
+      elif mode == "dydt": # Note that t is in [s]
+          result = dydt(timeSeries,valueTimeSeries,mode=mode)
+      # similar to dydt, except that the values are normalized to 0..1
+      elif mode == "tnorm_dydt": # note that t is in seconds [s] EXCEPT if user provided tsteps 
+          result = dydt(timeSeries,valueTimeSeries,mode=mode)
+      elif mode == "tnorm_maxdydt": # note that t is in seconds [s] EXCEPT if user provided tsteps 
+          result = dydt(timeSeries,valueTimeSeries,mode=mode)
       elif mode == "ptxsth":
           raise RuntimeError("KILLED IN FAVOR OF normedval_vs_time") 
           modeldata = [timeSeries, valueTimeSeries]
