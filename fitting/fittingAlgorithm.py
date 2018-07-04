@@ -6,15 +6,10 @@ import random
 from os import getpid
 import runModel as rs
 import numpy as np
-#import analyzeODE as ao
 import copy
 import pandas as pd
-#import taufitting as tf
 import matplotlib.pylab as plt
-#import fitter
-import daisychain as dc
 import analyzeGotran as aG
-import analyzeGotran as anG
 ms_to_s = 1e-3
 
 
@@ -56,9 +51,11 @@ def workerParams(
     dtn = jobDict['jobDuration'] # [ms]
     variedParamDict = jobDict['varDict']
     fixedParamDict =jobDict['fixedParamDict']
-    #print varDict
-    #print fixedParamDict
-    #quit()
+    if 'tsteps' in jobDict:
+      tsteps = jobDict['tsteps']
+    else:
+      tsteps = None
+
     print "Worker bee %d, Job %d "%(getpid(),jobNum)
 
     #print "varDict: ", varDict
@@ -93,6 +90,7 @@ def workerParams(
                      varDict = varDict,
                      dt=0.1,
                      dtn=dtn,
+                     tsteps=tsteps,
                      #stim_period=240.0, s.b. overwritten by varDict 
                      returnDict=returnDict)
 
@@ -136,6 +134,7 @@ def ProcessWorkerOutputs(data,outputList, tag=99):
 
     #print "dataSub: ", dataSub
     #print "dataSub.valsIdx: ", dataSub.valsIdx
+    #print "damax",np.max(dataSub.t)
     result = aG.ProcessDataArray(dataSub,obj.mode,obj.timeRange,obj.timeInterpolations,key=key)
 
     #output.result = result
@@ -233,6 +232,7 @@ def fittingAlgorithm(
   numCores=5,  # number of cores over which jobs are run
   numRandomDraws=3,  # number of random draws for each parameter
   jobDuration = 2000, # job run time, [ms]
+  tsteps = None, # linspace of time steps (optional) [ms]  
   outputList = None,
   truthValues = None,
   sigmaScaleRate = 1., # rate at which sigma is reduced by iteration (larger values, faster decay) 
@@ -248,6 +248,7 @@ def fittingAlgorithm(
   randomDrawAllIters = []
   bestDrawAllIters = []
   rejection = 0
+  previousFitness = 1e9
   while iters < numIters and rejection<maxRejectionsAllowed:  
 
       ## Create 'master' varDict list
@@ -282,7 +283,7 @@ def fittingAlgorithm(
       jobList = []
       ctr=0
       ## randomly distribute n numbers[scales] into m bins
-      print "Should probably rescale sigma by the tolerated error vs current error"
+      print "Should probably rescale sigma by the tolerated error vs current error and only for selected params "
       for parameter,values in parmDict.iteritems():
 
           ## generate random pertubrations
@@ -314,7 +315,9 @@ def fittingAlgorithm(
               varDict = copy.copy(defaultVarDict)
               varDict[parameter] = val
 
-              jobDict =  {'odeModel':odeModel,'varDict':varDict,'fixedParamDict':fixedParamDict,'jobNum':ctr,'jobDuration':jobDuration, 'outputList':outputList}
+              jobDict =  {'odeModel':odeModel,'varDict':varDict,'fixedParamDict':fixedParamDict,
+                          'jobNum':ctr,'jobDuration':jobDuration, 'tsteps':tsteps,
+                          'outputList':outputList}
               jobList.append( jobDict )
               ctr+=1
               #print "JobList2: ", jobList
@@ -358,7 +361,6 @@ def fittingAlgorithm(
 
       jobFitnesses = np.ones( len(myDataFrame.index) )*-1
       jobNums      = np.ones( len(myDataFrame.index),dtype=int )*-1
-      previousFitness = 1e9
       for i in range(len(myDataFrame.index)):
           #jobOutputs_copy = jobOutputs.copy()
           #slicedJobOutputs = jobOutputs_copy[slicer[]]
@@ -419,11 +421,10 @@ def fittingAlgorithm(
       currentFitness = jobFitnesses[pandasIndex]
       #print "bestJob: ", bestJob
 
+      print "CurrentFitness/Previous", currentFitness,previousFitness
       if iters == 1:
 	previousFitness = currentFitness
-        print "previousFitness: ", previousFitness
 
-      print "CurrentFitness/Previous", currentFitness,previousFitness
       if currentFitness <= previousFitness:
 
       	# get its input params/values
@@ -553,6 +554,7 @@ def run(
         variedParamDict = None,      
         timeStart= 0, # [ms] discard data before this time point
 	jobDuration= 30e3, # [ms] simulation length
+        tsteps = None, # can input nonuniform times (non uniform linspace) 
 	fileName=None,
 	numRandomDraws=5,
 	numIters=3,
@@ -592,7 +594,10 @@ Fixing random seed
     random.seed(10)
 
   # Data analyzed over this range
-  timeRange = [timeStart*ms_to_s,jobDuration*ms_to_s] # [s] range for data (It's because of the way GetData rescales the time series)
+  if tsteps is None: 
+    timeRange = [timeStart*ms_to_s,jobDuration*ms_to_s] # [s] range for data (It's because of the way GetData rescales the time series)
+  else: 
+     timeRange =[timeStart, tsteps[-1]]
 
   print "timeRange: ", timeRange
 
@@ -610,7 +615,11 @@ Fixing random seed
 
   # Run
   numCores = np.min([numRandomDraws,maxCores])
-  results = trial(odeModel=odeModel,variedParamDict=variedParamDict,outputList=outputList,fixedParamDict=fixedParamDict,numCores=numCores,numRandomDraws=numRandomDraws,jobDuration=jobDuration,numIters=numIters,sigmaScaleRate=sigmaScaleRate,fileName=fileName)
+  results = trial(odeModel=odeModel,variedParamDict=variedParamDict,
+                  outputList=outputList,fixedParamDict=fixedParamDict,
+                  numCores=numCores,numRandomDraws=numRandomDraws,
+                  jobDuration=jobDuration,tsteps=tsteps,
+                  numIters=numIters,sigmaScaleRate=sigmaScaleRate,fileName=fileName)
 
   return results
 
@@ -626,6 +635,7 @@ def trial(
   numCores = 2, # maximum number of processors used at a time
   numRandomDraws = 2,# number of random draws for parameters list in 'parmDict' (parmDict should probably be passed in)
   jobDuration = 4e3, # [ms] simulation length
+  tsteps= None,  # optional time steps [ms] 
   numIters=2,
   sigmaScaleRate = 1.0,
   fileName = None
@@ -642,7 +652,9 @@ def trial(
   ## do fitting and get back debugging details
   allDraws,bestDraws,fitness = fittingAlgorithm(
     odeModel,keys, variedParamDict=variedParamDict,fixedParamDict=fixedParamDict,
-      numCores=numCores, numRandomDraws=numRandomDraws, jobDuration=jobDuration, outputList=outputList,numIters=numIters, sigmaScaleRate=sigmaScaleRate)
+      numCores=numCores, numRandomDraws=numRandomDraws, 
+      jobDuration=jobDuration, tsteps=tsteps,
+      outputList=outputList,numIters=numIters, sigmaScaleRate=sigmaScaleRate)
   bestFitDict =  bestDraws[-1]
   print "Best fit parameters", bestFitDict  
 
@@ -665,17 +677,19 @@ def trial(
   }
 
   ## do a demorun with single worker to demonstrate new fit
-  results['data']  = Demo(odeModel, jobDuration,fixedParamDict,results)
+  results['data']  = Demo(odeModel, jobDuration=jobDuration,tsteps=tsteps,fixedParamDict=fixedParamDict,results=results)
 
   return results
 
-def Demo(odeModel, jobDuration,fixedParamDict,results):
+def Demo(odeModel, jobDuration=30e3,tsteps=None,fixedParamDict=None,results=None):           
   print "Running demo with new parameters for comparison against truth" 
 
   # run job with best parameters
   outputList = results['outputList']
   varDict = results['bestFitDict'] # {variedParamKey: results['bestFitParam']}
-  jobDict =  {'odeModel':odeModel,'varDict':varDict,'fixedParamDict':fixedParamDict,'jobNum':0,'jobDuration':jobDuration, 'outputList':results['outputList']}
+  jobDict =  {'odeModel':odeModel,'varDict':varDict,'fixedParamDict':fixedParamDict,'jobNum':0,
+              'jobDuration':jobDuration, 'tsteps':tsteps,
+               'outputList':results['outputList']}
   dummy, workerResults = workerParams(jobDict,skipProcess=True, verbose=True)
 
   # cludgy way of plotting result
@@ -683,7 +697,7 @@ def Demo(odeModel, jobDuration,fixedParamDict,results):
   obj= outputList[key]
   testStateName = obj.name
   data = workerResults.outputResults
-  dataSub = anG.GetData(data,testStateName)
+  dataSub = aG.GetData(data,testStateName)
 
   plt.figure()
   ts = dataSub.t
@@ -699,13 +713,6 @@ def Demo(odeModel, jobDuration,fixedParamDict,results):
 
 
   return data
-
-
-
-
-
-
-  return 1
 
 def PlotDebuggingData(allDraws,bestDraws,numIters,numRandomDraws,title=None,fileName=None):
   # put into array form
