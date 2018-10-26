@@ -1,0 +1,19 @@
+# use glob syntax.
+syntax: glob
+
+#pyc files
+__pycache__/*
+*.pyc
+
+#old-files
+fitting/old-bash/*
+fitting/old-etc/*
+fitting/old-odefiles/*
+fitting/old-ipynb/*
+fitting/.ipynb_checkpoints/*
+gotran/old-etc/*
+gotran/Old-ipython/*
+gotran/.ipynb_checkpoints/*
+etc/*
+.ipynb_checkpoints/*
+
