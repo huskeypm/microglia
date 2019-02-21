@@ -45,7 +45,7 @@ mM_to_uM = 1e3
 #monitor(j_rel_SR)
 #monitor(j_pump_SR)
 #monitor(i_Stim)
-#fCa_SL  =0
+fCa_SL  =0
 #fCa_jct =1
 #i_NaCa  =2 
 #j_rel_SR=3

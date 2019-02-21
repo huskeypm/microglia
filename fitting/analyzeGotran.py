@@ -2,10 +2,10 @@
 For processing ODE outputs in support of Satin/Despa collaborations 
 """
 
-from matplotlib.ticker import ScalarFormatter
+#from matplotlib.ticker import ScalarFormatter
 import math
 import cPickle as pickle
-import matplotlib.pylab as plt
+#import matplotlib.pylab as plt
 import numpy as np
 import json
 
