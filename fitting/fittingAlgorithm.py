@@ -44,7 +44,7 @@ Returns result that is used for comparison against expt
 def workerParams(
     jobDict,
     skipProcess=False,
-    verbose = False): 
+    verbose = False):
 
     odeName = jobDict['odeModel']
     jobNum = jobDict['jobNum']
@@ -76,7 +76,7 @@ def workerParams(
         varDict[key]=val
     if verbose:
       #for key,val in varDict.iteritems() :
-      print "Running with these varied parameters:" 
+      print "Running with these varied parameters:"
       for key,val in variedParamDict.iteritems() :
         print "  ",key,val
 
@@ -91,7 +91,7 @@ def workerParams(
                      dt=0.1,
                      dtn=dtn,
                      tsteps=tsteps,
-                     #stim_period=240.0, s.b. overwritten by varDict 
+                     #stim_period=240.0, s.b. overwritten by varDict
                      returnDict=returnDict)
 
     #print "after runParamsFast"
@@ -226,20 +226,20 @@ def StoreJob(job1):
 # Genetic algorithm that randomizes the provided parameters (1 for now), selects the solution that minimizes the error, and repeats this process for a given number of iterations
 def fittingAlgorithm(
   odeModel,
-  myVariedParamKeys, # Supports multiple params, hopefully 
+  myVariedParamKeys, # Supports multiple params, hopefully
   variedParamDict = None,
   fixedParamDict=None, # optional, input set of fixed parameters/values
   numCores=5,  # number of cores over which jobs are run
   numRandomDraws=3,  # number of random draws for each parameter
   jobDuration = 2000, # job run time, [ms]
-  tsteps = None, # linspace of time steps (optional) [ms]  
+  tsteps = None, # linspace of time steps (optional) [ms]
   outputList = None,
   truthValues = None,
-  sigmaScaleRate = 1., # rate at which sigma is reduced by iteration (larger values, faster decay) 
-  maxRejectionsAllowed=3,  # number of rejected steps in a row before exiting alg. 
+  sigmaScaleRate = 1., # rate at which sigma is reduced by iteration (larger values, faster decay)
+  maxRejectionsAllowed=3,  # number of rejected steps in a row before exiting alg.
   numIters = 10):
 
-  trialParamVarDict = copy.copy( variedParamDict ) 
+  trialParamVarDict = copy.copy( variedParamDict )
 
   iters = 0
   allErrors = []
@@ -249,7 +249,7 @@ def fittingAlgorithm(
   bestDrawAllIters = []
   rejection = 0
   previousFitness = 1e9
-  while iters < numIters and rejection<maxRejectionsAllowed:  
+  while iters < numIters and rejection<maxRejectionsAllowed:
 
       ## Create 'master' varDict list
       iters += 1
@@ -261,7 +261,7 @@ def fittingAlgorithm(
       #if trialParamVarDict != None: # PKH - why is this here?
       #    parmDict = trialParamVarDict
       #print 'adding, not clear why we need t he prev line'
-      parmDict = trialParamVarDict 
+      parmDict = trialParamVarDict
 
       print "iter", iters, " out of", numIters
       #print "parmDict: " , parmDict
@@ -322,26 +322,26 @@ def fittingAlgorithm(
               ctr+=1
               #print "JobList2: ", jobList
 
-      # now selecting subset via reservoire sampling 
-      N = numRandomDraws              
+      # now selecting subset via reservoire sampling
+      N = numRandomDraws
       sample = [];
-      for i,line in enumerate(jobList): 
+      for i,line in enumerate(jobList):
         #print line['jobNum']
         if i < N:
           sample.append(line)
         elif i >= N and random.random() < N/float(i+1):
           replace = random.randint(0,len(sample)-1)
           sample[replace] = line
-      jobList = sample 
-      #print "Print new" 
-      # renumber job num for indexing later 
-      for i,line in enumerate(jobList): 
-         # old print line['jobNum'] 
+      jobList = sample
+      #print "Print new"
+      # renumber job num for indexing later
+      for i,line in enumerate(jobList):
+         # old print line['jobNum']
          line['jobNum'] = i
-      
-      
 
-   
+
+
+
       ## Run jobs
       if numCores > 1:
           print "Multi-threading"
@@ -384,7 +384,7 @@ def fittingAlgorithm(
               # sum over squares
               error = np.sum((result - obj.truthValue) ** 2)
               normFactor = np.sum(obj.truthValue ** 2)
-              normError = np.sqrt(error/normFactor) 
+              normError = np.sqrt(error/normFactor)
               print "result: ", result, "truthValue: ", obj.truthValue
               #allErrors[iters-1].append(error)
 
@@ -439,7 +439,7 @@ def fittingAlgorithm(
 
       	# update 'trialParamDict' with new values, [0] represents mean value of paramater
         for myVariedParamKey, variedParamVal in bestVarDict.iteritems():
-          #print myVariedParamKey, variedParamVal 
+          #print myVariedParamKey, variedParamVal
       	  trialParamVarDict[ myVariedParamKey ][0]  = variedParamVal
       	  # [1] to represent updating stdDev value
       	  # trialParamVarDict[ myVariedParam ][1]  = variedStdDevVal
@@ -447,8 +447,8 @@ def fittingAlgorithm(
       else:
 	print "Old draw is better starting point, not overwriting starting point"
         rejection+=1
-        print "Rejected %d in a row (of %d) "%(rejection,maxRejectionsAllowed) 
-        
+        print "Rejected %d in a row (of %d) "%(rejection,maxRejectionsAllowed)
+
       #print allErrors
 
       #if errorsGood_array[iters-1].count(False) == 0:
@@ -458,7 +458,7 @@ def fittingAlgorithm(
           #print "Error is not good, need to run another iteration."
 
       #iters += 1
-      bestDrawAllIters.append(bestVarDict)       
+      bestDrawAllIters.append(bestVarDict)
 
       print "iter", iters, " out of", numIters
       print ""
@@ -487,13 +487,13 @@ def test1():
     "k1_ptxs":  [3.94e-5,stddev],
     "k3_ptxs":  [4.95e-4,stddev]
   }
-  """ 
-k1_ptxs = ScalarParam(3.94e-5, 
+  """
+k1_ptxs = ScalarParam(3.94e-5,
 k3_ptxs = ScalarParam(4.95e-4,
 k5_ptxs = ScalarParam(5.7e-4,
 H5_ptxs = ScalarParam(2.94e-5,
 H1_ptxs = ScalarParam(0.5e-5,
-H2_ptxs = ScalarParam(1e-4, 
+H2_ptxs = ScalarParam(1e-4,
 H6_ptxs = ScalarParam(1e-4,
   """
 
@@ -501,14 +501,14 @@ H6_ptxs = ScalarParam(1e-4,
   results = run(
     odeModel = "microgliav53.ode",
     yamlVarFile = "P2X7FitVar.yaml" ,
-    # I shouldn't need these 
-    #myVariedParams= "H2_ptxf",  
+    # I shouldn't need these
+    #myVariedParams= "H2_ptxf",
     #variedParamTruthVal = 0.00026  , # was 2.22e-13 in code, but bumping it up a bit
     variedParamDict = variedParamDict,
     fileName = fileName,
     jobDuration = 3e3,
-    numRandomDraws = 3,  
-    numIters = 5,    
+    numRandomDraws = 3,
+    numIters = 5,
     sigmaScaleRate = 0.45,
     outputParamName = "I",
     outputParamSearcher = testState,
@@ -519,9 +519,9 @@ H6_ptxs = ScalarParam(1e-4,
 
 
 
-  
+
 def DoForSeveralConc():
-  1 
+  1
 
 # Here we try to optimize the sodium buffer to get the correct free Na concentration
 def validation():
@@ -549,12 +549,12 @@ The genetic algorithm wrapper
 
 def run(
 	odeModel="shannon_2004_rat.ode",
-	myVariedParam=None,          
+	myVariedParam=None,
 	variedParamTruthVal=5.0,
-        variedParamDict = None,      
-        timeStart= 0, # [ms] discard data before this time point
+    variedParamDict = None,
+    timeStart= 0, # [ms] discard data before this time point
 	jobDuration= 30e3, # [ms] simulation length
-        tsteps = None, # can input nonuniform times (non uniform linspace) 
+    tsteps = None, # can input nonuniform times (non uniform linspace)
 	fileName=None,
 	numRandomDraws=5,
 	numIters=3,
@@ -564,22 +564,22 @@ def run(
 	outputParamMethod="mean",
 	outputParamTruthTimes=None, # time points ([ms]) at which to interpolate predicted values. Used where TruthVal is an array
 	outputParamTruthVal=12.0e-3, # can be an array
-        maxCores = 30,
-        yamlVarFile = None,
-        debug = False
+    maxCores = 30,
+    yamlVarFile = None,
+    debug = False
 	):
 
-  # Check inputs  
+  # Check inputs
   if myVariedParam is None and variedParamDict is None:
-    raise RuntimeError("Must define either myVariedParam or variedParamDict") 
+    raise RuntimeError("Must define either myVariedParam or variedParamDict")
   elif myVariedParam is not None and variedParamDict is not None:
-    raise RuntimeError("Cannot define BOTH myVariedParam and variedParamDict") 
+    raise RuntimeError("Cannot define BOTH myVariedParam and variedParamDict")
   ## Define parameter, its mean starting value and the starting std dev
   elif myVariedParam is not None:
     variedParamDict = {myVariedParam:[variedParamTruthVal, 0.2]} # for log normal
 
 
-  
+
 
   # open yaml file with variables needed for sim
   fixedParamDict = aG.YamlToParamDict(yamlVarFile)
@@ -594,9 +594,9 @@ Fixing random seed
     random.seed(10)
 
   # Data analyzed over this range
-  if tsteps is None: 
+  if tsteps is None:
     timeRange = [timeStart*ms_to_s,jobDuration*ms_to_s] # [s] range for data (It's because of the way GetData rescales the time series)
-  else: 
+  else:
      timeRange =[timeStart, tsteps[-1]]
 
   print "timeRange: ", timeRange
@@ -635,13 +635,13 @@ def trial(
   numCores = 2, # maximum number of processors used at a time
   numRandomDraws = 2,# number of random draws for parameters list in 'parmDict' (parmDict should probably be passed in)
   jobDuration = 4e3, # [ms] simulation length
-  tsteps= None,  # optional time steps [ms] 
+  tsteps= None,  # optional time steps [ms]
   numIters=2,
   sigmaScaleRate = 1.0,
   fileName = None
   ):
 
-  print "WHY is this wrapper needde"  
+  print "WHY is this wrapper needde"
   # get varied parameter (should only be one for now)
   keys = [key for key in variedParamDict.iterkeys()]
   #variedParamKey = keys[0]
@@ -652,18 +652,18 @@ def trial(
   ## do fitting and get back debugging details
   allDraws,bestDraws,fitness = fittingAlgorithm(
     odeModel,keys, variedParamDict=variedParamDict,fixedParamDict=fixedParamDict,
-      numCores=numCores, numRandomDraws=numRandomDraws, 
+      numCores=numCores, numRandomDraws=numRandomDraws,
       jobDuration=jobDuration, tsteps=tsteps,
       outputList=outputList,numIters=numIters, sigmaScaleRate=sigmaScaleRate)
   bestFitDict =  bestDraws[-1]
-  print "Best fit parameters", bestFitDict  
+  print "Best fit parameters", bestFitDict
 
 
 
 
   ## plot performance
   if fileName is not None:
-    print "WARNING: skipping Plotting of debuggin data, since current plotter broken. need to adapt to plotting dictionary values instead of a single value, since varying multiple params" 
+    print "WARNING: skipping Plotting of debuggin data, since current plotter broken. need to adapt to plotting dictionary values instead of a single value, since varying multiple params"
     #PlotDebuggingData(allDraws,bestDraws,numIters,numRandomDraws,title="Varied param %s"%variedParamKey,fileName=fileName)
   else:
     print "Leaving!!"
@@ -672,7 +672,7 @@ def trial(
     'outputList': outputList,
     'allDraws': allDraws,
     'bestDraws': bestDraws,
-    'bestFitDict': bestFitDict,  
+    'bestFitDict': bestFitDict,
     'bestFitness': fitness
   }
 
@@ -681,8 +681,8 @@ def trial(
 
   return results
 
-def Demo(odeModel, jobDuration=30e3,tsteps=None,fixedParamDict=None,results=None):           
-  print "Running demo with new parameters for comparison against truth" 
+def Demo(odeModel, jobDuration=30e3,tsteps=None,fixedParamDict=None,results=None):
+  print "Running demo with new parameters for comparison against truth"
 
   # run job with best parameters
   outputList = results['outputList']
@@ -729,7 +729,7 @@ def PlotDebuggingData(allDraws,bestDraws,numIters,numRandomDraws,title=None,file
   #print veryBest
   norm_by = 1/veryBest
 
-  
+
   plt.scatter(scatteredData[:,0], norm_by*scatteredData[:,1],label="draws")
   plt.plot(np.arange(numIters), norm_by*bestDraws, label="best")
   plt.legend()
